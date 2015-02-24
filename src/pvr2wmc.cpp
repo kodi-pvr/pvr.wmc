@@ -20,12 +20,12 @@
 *
 */
 
-#include "tinyxml/XMLUtils.h"
+#include "kodi/util/XMLUtils.h"
 #include "pvr2wmc.h"
 #include "utilities.h"
 #include "DialogRecordPref.h"
 #include "DialogDeleteTimer.h"
-#include "platform/util/timeutils.h"
+#include "kodi/util/timeutils.h"
 
 using namespace std;
 using namespace ADDON;

@@ -14,17 +14,16 @@
 *
 *  You should have received a copy of the GNU General Public License
 *  along with XBMC; see the file COPYING.  If not, write to
-*  the Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
-*  MA 02110-1301  USA
+*  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 *  http://www.gnu.org/copyleft/gpl.html
 *
 */
 
 #include "client.h"
-#include "xbmc_pvr_dll.h"
+#include "kodi/xbmc_pvr_dll.h"
 #include "pvr2wmc.h"
 #include "utilities.h"
-#include "platform/util/util.h"
+#include "kodi/util/util.h"
 
 using namespace std;
 using namespace ADDON;
@@ -325,7 +324,7 @@ extern "C" {
 		pCapabilities->bSupportsTV					= true;
 		pCapabilities->bSupportsRadio				= true;
 		pCapabilities->bSupportsRecordings			= true;
-  pCapabilities->bSupportsRecordingsUndelete = false;
+		pCapabilities->bSupportsRecordingsUndelete = false;
 		pCapabilities->bSupportsTimers				= true;
 		pCapabilities->bSupportsChannelGroups		= true;
 		pCapabilities->bSupportsChannelScan			= false;
@@ -481,7 +480,7 @@ extern "C" {
 	}
 
 	// recording file functions
-PVR_ERROR GetRecordings(ADDON_HANDLE handle, bool deleted)
+	PVR_ERROR GetRecordings(ADDON_HANDLE handle, bool deleted)
 	{ 
 		if (_wmc)
 			return _wmc->GetRecordings(handle);
@@ -686,12 +685,12 @@ PVR_ERROR GetRecordings(ADDON_HANDLE handle, bool deleted)
 	}
 
 	/** UNUSED API FUNCTIONS */
-PVR_ERROR OpenDialogChannelScan(void) { return PVR_ERROR_NOT_IMPLEMENTED; }
+	PVR_ERROR OpenDialogChannelScan(void) { return PVR_ERROR_NOT_IMPLEMENTED; }
 	PVR_ERROR DeleteChannel(const PVR_CHANNEL &channel) { return PVR_ERROR_NOT_IMPLEMENTED; }
 	PVR_ERROR RenameChannel(const PVR_CHANNEL &channel) { return PVR_ERROR_NOT_IMPLEMENTED; }
 	PVR_ERROR MoveChannel(const PVR_CHANNEL &channel) { return PVR_ERROR_NOT_IMPLEMENTED; }
-PVR_ERROR OpenDialogChannelSettings(const PVR_CHANNEL &channel)  {  return PVR_ERROR_NOT_IMPLEMENTED;  }
-PVR_ERROR OpenDialogChannelAdd(const PVR_CHANNEL &channel) { return PVR_ERROR_NOT_IMPLEMENTED; }
+	PVR_ERROR OpenDialogChannelSettings(const PVR_CHANNEL &channel)  {  return PVR_ERROR_NOT_IMPLEMENTED;  }
+	PVR_ERROR OpenDialogChannelAdd(const PVR_CHANNEL &channel) { return PVR_ERROR_NOT_IMPLEMENTED; }
 	void DemuxReset(void) {}
 	void DemuxFlush(void) {}
 	void DemuxAbort(void) {}
@@ -704,7 +703,7 @@ PVR_ERROR OpenDialogChannelAdd(const PVR_CHANNEL &channel) { return PVR_ERROR_NO
 	time_t GetPlayingTime() { return 0; }
 	time_t GetBufferTimeStart() { return 0; }
 	time_t GetBufferTimeEnd() { return 0; }
-PVR_ERROR UndeleteRecording(const PVR_RECORDING& recording) { return PVR_ERROR_NOT_IMPLEMENTED; }
-PVR_ERROR DeleteAllRecordingsFromTrash() { return PVR_ERROR_NOT_IMPLEMENTED; }
+	PVR_ERROR UndeleteRecording(const PVR_RECORDING& recording) { return PVR_ERROR_NOT_IMPLEMENTED; }
+	PVR_ERROR DeleteAllRecordingsFromTrash() { return PVR_ERROR_NOT_IMPLEMENTED; }
 
 }

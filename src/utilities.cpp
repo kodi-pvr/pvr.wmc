@@ -1,5 +1,5 @@
 
-#include "tinyxml/XMLUtils.h"
+#include "kodi/util/XMLUtils.h"
 #include "utilities.h"
 
 #include "client.h"
