@@ -21,6 +21,7 @@
 
 #include "client.h"
 #include "kodi/xbmc_pvr_dll.h"
+#include "kodi/libKODI_guilib.h"
 #include "pvr2wmc.h"
 #include "utilities.h"
 #include "kodi/util/util.h"
@@ -65,9 +66,9 @@ CStdString g_strUserPath             = "";
 CStdString g_strClientPath           = "";
 CStdString		g_AddonDataCustom	= "";					// location of custom addondata settings file
 
-CHelper_libXBMC_addon *XBMC           = NULL;
-CHelper_libXBMC_pvr   *PVR            = NULL;
-CHelper_libXBMC_gui   *GUI            = NULL; 
+CHelper_libXBMC_addon   *XBMC           = NULL;
+CHelper_libXBMC_pvr   	*PVR            = NULL;
+CHelper_libKODI_guilib  *GUI            = NULL; 
 
 #define LOCALHOST "127.0.0.1"
 
@@ -175,7 +176,7 @@ extern "C" {
 		}
 
 		// register gui
-		GUI = new CHelper_libXBMC_gui;
+		GUI = new CHelper_libKODI_guilib;
 		if (!GUI->RegisterMe(hdl))
 		{
 			SAFE_DELETE(GUI);
@@ -308,14 +309,12 @@ extern "C" {
 	
 	const char* GetGUIAPIVersion(void)
 	{
-	  static const char *strGuiApiVersion = XBMC_GUI_API_VERSION;
-	  return strGuiApiVersion;
+	  return KODI_GUILIB_API_VERSION;
 	}
 
 	const char* GetMininumGUIAPIVersion(void)
 	{
-	  static const char *strMinGuiApiVersion = XBMC_GUI_MIN_API_VERSION;
-	  return strMinGuiApiVersion;
+	  return KODI_GUILIB_MIN_API_VERSION;
 	}
 
 	PVR_ERROR GetAddonCapabilities(PVR_ADDON_CAPABILITIES* pCapabilities)
