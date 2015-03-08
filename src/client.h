@@ -22,7 +22,7 @@
 
 #include "kodi/libXBMC_addon.h"
 #include "kodi/libXBMC_pvr.h"
-#include "kodi/libXBMC_gui.h"
+#include "kodi/libKODI_guilib.h"
 #include "kodi/util/StdString.h"
 
 #include "clientversion.h"
@@ -37,9 +37,9 @@ extern int								g_port;
 extern bool								g_bSignalEnable;
 extern int								g_signalThrottle;
 extern bool								g_bEnableMultiResume;
-extern ADDON::CHelper_libXBMC_addon		*XBMC;
-extern CHelper_libXBMC_pvr				*PVR;
-extern CHelper_libXBMC_gui				*GUI;
+extern ADDON::CHelper_libXBMC_addon				*XBMC;
+extern CHelper_libXBMC_pvr					*PVR;
+extern CHelper_libKODI_guilib					*GUI;
 extern CStdString						g_strServerMAC;
 extern bool								g_bWakeOnLAN;
 extern CStdString						g_AddonDataCustom;

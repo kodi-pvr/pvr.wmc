@@ -20,7 +20,7 @@
  */
 
 #include "DialogDeleteTimer.h"
-#include "kodi/libXBMC_gui.h"
+#include "kodi/libKODI_guilib.h"
 
 #define BUTTON_OK                       1
 #define BUTTON_CANCEL                   2
