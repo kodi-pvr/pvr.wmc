@@ -1,4 +1,4 @@
-/*
+  /*
 *      Copyright (C) 2011 Pulse-Eight
 *      http://www.pulse-eight.com/
 *
@@ -389,6 +389,12 @@ PVR_ERROR Pvr2Wmc::GetChannelGroups(ADDON_HANDLE handle, bool bRadio)
 		xGroup.bIsRadio = bRadio;
 		strncpy(xGroup.strGroupName, v[0].c_str(), sizeof(xGroup.strGroupName) - 1);
 
+		// PVR API 1.9.6 adds Position field
+		if (v.size() >= 2)
+		{
+			xGroup.iPosition = atoi(v[1].c_str());
+		}
+
 		PVR->TransferChannelGroup(handle, &xGroup);
 	}
 
@@ -454,6 +460,8 @@ PVR_ERROR Pvr2Wmc::GetEPGForChannel(ADDON_HANDLE handle, const PVR_CHANNEL &chan
 		//	origAirDate, e.TVRating, e.Program.StarRating,
 		//	e.Program.SeasonNumber, e.Program.EpisodeNumber,
 		//	e.Program.EpisodeTitle
+		//	(MB3 fields) channelID, audioFormat, GenreString, ProgramType
+		//	actors, directors, writers, year, movieID
 		xEpg.iUniqueBroadcastId = atoi(v[0].c_str());		// entry ID
 		xEpg.strTitle = v[1].c_str();						// entry title
 		xEpg.iChannelNumber = atoi(v[2].c_str());			// channel number
@@ -471,6 +479,16 @@ PVR_ERROR Pvr2Wmc::GetEPGForChannel(ADDON_HANDLE handle, const PVR_CHANNEL &chan
 		xEpg.strIconPath = v[14].c_str();					// the icon url
 		xEpg.strEpisodeName = v[15].c_str();				// the episode name
 		xEpg.strGenreDescription = "";
+
+	// Kodi PVR API 1.9.6 adds new EPG fields
+	if (v.size() >= 25)
+	{
+		xEpg.strCast = v[20].c_str();
+		xEpg.strDirector = v[21].c_str();
+		xEpg.strWriter = v[22].c_str();
+		xEpg.iYear = atoi(v[23].c_str());
+		xEpg.strIMDBNumber = v[24].c_str();
+	}
 
 		PVR->TransferEpgEntry(handle, &xEpg);
 
@@ -794,6 +812,12 @@ PVR_ERROR Pvr2Wmc::GetRecordings(ADDON_HANDLE handle)
 			{
 				xRec.iPlayCount = atoi(v[24].c_str());
 			}
+		}
+
+		// Kodi PVR API 1.9.5 adds EPG ID field
+		if (v.size() > 19)
+		{
+			xRec.iEpgEventId = atoi(v[18].c_str());
 		}
 
 		PVR->TransferRecordingEntry(handle, &xRec);
