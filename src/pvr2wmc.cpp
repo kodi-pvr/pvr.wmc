@@ -1,24 +1,22 @@
-  /*
-*      Copyright (C) 2011 Pulse-Eight
-*      http://www.pulse-eight.com/
-*
-*  This Program is free software; you can redistribute it and/or modify
-*  it under the terms of the GNU General Public License as published by
-*  the Free Software Foundation; either version 2, or (at your option)
-*  any later version.
-*
-*  This Program is distributed in the hope that it will be useful,
-*  but WITHOUT ANY WARRANTY; without even the implied warranty of
-*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-*  GNU General Public License for more details.
-*
-*  You should have received a copy of the GNU General Public License
-*  along with XBMC; see the file COPYING.  If not, write to
-*  the Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
-*  MA 02110-1301  USA
-*  http://www.gnu.org/copyleft/gpl.html
-*
-*/
+/*
+ *      Copyright (C) 2005-2015 Team XBMC
+ *      http://xbmc.org
+ *
+ *  This Program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2, or (at your option)
+ *  any later version.
+ *
+ *  This Program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with XBMC; see the file COPYING.  If not, see
+ *  <http://www.gnu.org/licenses/>.
+ *
+ */
 
 #include "kodi/util/XMLUtils.h"
 #include "pvr2wmc.h"
@@ -480,15 +478,15 @@ PVR_ERROR Pvr2Wmc::GetEPGForChannel(ADDON_HANDLE handle, const PVR_CHANNEL &chan
 		xEpg.strEpisodeName = v[15].c_str();				// the episode name
 		xEpg.strGenreDescription = "";
 
-	// Kodi PVR API 1.9.6 adds new EPG fields
-	if (v.size() >= 25)
-	{
-		xEpg.strCast = v[20].c_str();
-		xEpg.strDirector = v[21].c_str();
-		xEpg.strWriter = v[22].c_str();
-		xEpg.iYear = atoi(v[23].c_str());
-		xEpg.strIMDBNumber = v[24].c_str();
-	}
+		// Kodi PVR API 1.9.6 adds new EPG fields
+		if (v.size() >= 25)
+		{
+			xEpg.strCast = v[20].c_str();
+			xEpg.strDirector = v[21].c_str();
+			xEpg.strWriter = v[22].c_str();
+			xEpg.iYear = atoi(v[23].c_str());
+			xEpg.strIMDBNumber = v[24].c_str();
+		}
 
 		PVR->TransferEpgEntry(handle, &xEpg);
 
