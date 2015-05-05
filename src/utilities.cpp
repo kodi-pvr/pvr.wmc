@@ -18,7 +18,7 @@
  *
  */
 
-#include "kodi/util/StdString.h"
+#include "platform/util/StdString.h"
 #include "kodi/util/XMLUtils.h"
 #include "utilities.h"
 

@@ -23,7 +23,7 @@
 #include "utilities.h"
 #include "DialogRecordPref.h"
 #include "DialogDeleteTimer.h"
-#include "kodi/util/timeutils.h"
+#include "platform/util/timeutils.h"
 
 using namespace std;
 using namespace ADDON;

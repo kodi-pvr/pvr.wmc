@@ -20,7 +20,7 @@
 #pragma once
 
 #include <vector>
-#include "kodi/util/StdString.h"
+#include "platform/util/StdString.h"
 #include "client.h"
 #include "Socket.h"
 
