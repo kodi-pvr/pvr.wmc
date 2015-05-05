@@ -20,13 +20,13 @@
 
 #include "kodi/libXBMC_addon.h"
 #include <string>
-#include "kodi/os.h"
+#include "platform/os.h"
 #include "client.h"
 #include "Socket.h"
 
 #include "utilities.h"
-#include "kodi/util/timeutils.h"
-#include "kodi/threads/mutex.h"
+#include "platform/util/timeutils.h"
+#include "platform/threads/mutex.h"
 
 using namespace std;
 using namespace ADDON;
