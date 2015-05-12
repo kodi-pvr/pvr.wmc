@@ -1,2 +1,2 @@
-usr/lib/kodi/addons/pvr.wmc
+usr/lib/*/kodi/addons/pvr.wmc/pvr.wmc.so* usr/lib/kodi/addons/pvr.wmc
 usr/share/kodi/addons/pvr.wmc
