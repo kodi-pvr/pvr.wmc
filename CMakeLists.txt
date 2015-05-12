@@ -21,7 +21,9 @@ set(WMC_SOURCES src/client.cpp
                 src/Socket.cpp
                 src/utilities.cpp)
 
-set(DEPLIBS ${platform_LIBRARIES})
+set(DEPLIBS ${kodiplatform_LIBRARIES}
+            ${platform_LIBRARIES})
+
 if (WIN32)
   list(APPEND DEPLIBS ws2_32)
 endif()
