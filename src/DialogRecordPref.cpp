@@ -19,7 +19,7 @@
  */
 
 #include "DialogRecordPref.h"
-#include "kodi/libKODI_guilib.h"
+#include "libKODI_guilib.h"
 
 #define BUTTON_OK                       1
 #define BUTTON_CANCEL                   2
