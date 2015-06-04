@@ -328,7 +328,6 @@ extern "C" {
 		pCapabilities->bSupportsChannelScan			= false;
 		pCapabilities->bHandlesInputStream			= true;
 		pCapabilities->bHandlesDemuxing				= false;
-		pCapabilities->bSupportsRecordingFolders	= false;
 		pCapabilities->bSupportsRecordingPlayCount	= true;
 		pCapabilities->bSupportsLastPlayedPosition	= g_bEnableMultiResume;
 		pCapabilities->bSupportsRecordingEdl		= false;
@@ -439,6 +438,12 @@ extern "C" {
 
 
 	// timer functions
+PVR_ERROR GetTimerTypes(PVR_TIMER_TYPE types[], int *size)
+{
+	/* TODO: Implement this to get support for the timer features introduced with PVR API 1.9.7 */
+	return PVR_ERROR_NOT_IMPLEMENTED;
+}
+
 	int GetTimersAmount(void) 
 	{ 
 		if (_wmc)
@@ -449,6 +454,7 @@ extern "C" {
 
 	PVR_ERROR GetTimers(ADDON_HANDLE handle) 
 	{ 
+		/* TODO: Change implementation to get support for the timer features introduced with PVR API 1.9.7 */
 		if (_wmc)
 			return _wmc->GetTimers(handle);
 
@@ -470,8 +476,10 @@ extern "C" {
 		return PVR_ERROR_NO_ERROR;
 	}
 
-	PVR_ERROR DeleteTimer(const PVR_TIMER &timer, bool bForceDelete) 
+	PVR_ERROR DeleteTimer(const PVR_TIMER &timer, bool bForceDelete, bool /*bDeleteScheduled*/)
 	{
+	/* TODO: Change implementation to support bDeleteScheduled (introduced with PVR API 1.9.7 */
+
 		if (_wmc)
 			return _wmc->DeleteTimer(timer, bForceDelete);
 		return PVR_ERROR_NO_ERROR;
