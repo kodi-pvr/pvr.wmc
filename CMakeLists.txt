@@ -15,8 +15,6 @@ include_directories(${kodiplatform_INCLUDE_DIRS}
 add_definitions(-DUSE_DEMUX)
 
 set(WMC_SOURCES src/client.cpp
-                src/DialogDeleteTimer.cpp
-                src/DialogRecordPref.cpp
                 src/pvr2wmc.cpp
                 src/Socket.cpp
                 src/utilities.cpp)

@@ -73,14 +73,14 @@ CHelper_libKODI_guilib  *GUI            = NULL;
 
 extern "C" {
 
-	void ADDON_ReadSettings(void)		// todo: get settings for real
+	void ADDON_ReadSettings(void)
 	{
 		char buffer[512];
 
 		if (!XBMC)
 			return;
 
-		g_strServerName = LOCALHOST;			// either "mediaserver" OR "." / "127.0.0.1"
+		g_strServerName = LOCALHOST;
 		g_strServerMAC = "";
 		g_bWakeOnLAN = false;
 		g_port = DEFAULT_PORT;
@@ -322,7 +322,7 @@ extern "C" {
 		pCapabilities->bSupportsTV					= true;
 		pCapabilities->bSupportsRadio				= true;
 		pCapabilities->bSupportsRecordings			= true;
-		pCapabilities->bSupportsRecordingsUndelete = false;
+		pCapabilities->bSupportsRecordingsUndelete	= false;
 		pCapabilities->bSupportsTimers				= true;
 		pCapabilities->bSupportsChannelGroups		= true;
 		pCapabilities->bSupportsChannelScan			= false;
@@ -438,11 +438,13 @@ extern "C" {
 
 
 	// timer functions
-PVR_ERROR GetTimerTypes(PVR_TIMER_TYPE types[], int *size)
-{
-	/* TODO: Implement this to get support for the timer features introduced with PVR API 1.9.7 */
-	return PVR_ERROR_NOT_IMPLEMENTED;
-}
+	PVR_ERROR GetTimerTypes(PVR_TIMER_TYPE types[], int *size)
+	{
+		if (_wmc)
+			return _wmc->GetTimerTypes(types, size);
+
+		return PVR_ERROR_NOT_IMPLEMENTED;
+	}
 
 	int GetTimersAmount(void) 
 	{ 
@@ -476,26 +478,24 @@ PVR_ERROR GetTimerTypes(PVR_TIMER_TYPE types[], int *size)
 		return PVR_ERROR_NO_ERROR;
 	}
 
-	PVR_ERROR DeleteTimer(const PVR_TIMER &timer, bool bForceDelete, bool /*bDeleteScheduled*/)
+	PVR_ERROR DeleteTimer(const PVR_TIMER &timer, bool bForceDelete, bool bDeleteScheduled)
 	{
-	/* TODO: Change implementation to support bDeleteScheduled (introduced with PVR API 1.9.7 */
-
 		if (_wmc)
-			return _wmc->DeleteTimer(timer, bForceDelete);
+			return _wmc->DeleteTimer(timer, bForceDelete, bDeleteScheduled);
 		return PVR_ERROR_NO_ERROR;
 	}
 
 	// recording file functions
 	PVR_ERROR GetRecordings(ADDON_HANDLE handle, bool deleted)
 	{ 
-		if (_wmc)
+		if (!deleted && _wmc)
 			return _wmc->GetRecordings(handle);
 		return PVR_ERROR_NO_ERROR;
 	}
 
 	int GetRecordingsAmount(bool deleted)
 	{ 
-		if (_wmc)
+		if (!deleted && _wmc)
 			return _wmc->GetRecordingsAmount();
 
 		return -1;
