@@ -705,6 +705,7 @@ PVR_ERROR GetTimerTypes(PVR_TIMER_TYPE types[], int *size)
 	const char * GetLiveStreamURL(const PVR_CHANNEL &channel)  {  return "";  }
 	bool SeekTime(int,bool,double*) { return false; }
 	void SetSpeed(int) {};
+	bool IsTimeshifting(void) { return false; }
 	PVR_ERROR GetRecordingEdl(const PVR_RECORDING&, PVR_EDL_ENTRY[], int*) { return PVR_ERROR_NOT_IMPLEMENTED; };
 	time_t GetPlayingTime() { return 0; }
 	time_t GetBufferTimeStart() { return 0; }
