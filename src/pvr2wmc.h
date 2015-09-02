@@ -24,6 +24,55 @@
 #include "client.h"
 #include "Socket.h"
 
+/* timer type ids */
+#define TIMER_MANUAL_MIN			(PVR_TIMER_TYPE_NONE + 1)
+#define TIMER_ONCE_MANUAL			(TIMER_MANUAL_MIN + 0)
+#define TIMER_ONCE_EPG				(TIMER_MANUAL_MIN + 1)
+#define TIMER_ONCE_KEYWORD			(TIMER_MANUAL_MIN + 2)
+#define TIMER_ONCE_MANUAL_CHILD		(TIMER_MANUAL_MIN + 3)
+#define TIMER_ONCE_EPG_CHILD		(TIMER_MANUAL_MIN + 4)
+#define TIMER_ONCE_KEYWORD_CHILD	(TIMER_MANUAL_MIN + 5)
+#define TIMER_MANUAL_MAX			(TIMER_MANUAL_MIN + 5)
+
+#define TIMER_REPEATING_MIN			(TIMER_MANUAL_MAX + 1)
+#define TIMER_REPEATING_MANUAL		(TIMER_REPEATING_MIN + 0)
+#define TIMER_REPEATING_EPG			(TIMER_REPEATING_MIN + 1)
+#define TIMER_REPEATING_KEYWORD		(TIMER_REPEATING_MIN + 2)
+#define TIMER_REPEATING_MAX			(TIMER_REPEATING_MIN + 2)
+
+typedef enum {
+	WMC_PRIORITY_NORMAL = 0,
+	WMC_PRIORITY_HIGH = 1,
+	WMC_PRIORITY_LOW = 2
+} wmc_priority_t;
+
+typedef enum {
+	WMC_SHOWTYPE_ANY = 0,
+	WMC_SHOWTYPE_FIRSTRUNONLY = 1,
+	WMC_SHOWTYPE_LIVEONLY = 2
+} wmc_showtype_t;
+
+typedef enum {
+	WMC_LIFETIME_NOTSET = -4,
+	WMC_LIFETIME_LATEST = -3,
+	WMC_LIFETIME_WATCHED = -2,
+	WMC_LIFETIME_ELIGIBLE = -1,
+	WMC_LIFETIME_DELETED = 0,
+	WMC_LIFETIME_ONEWEEK = 7
+} wmc_lifetime_t;
+
+typedef enum {
+	WMC_LIMIT_ASMANY = -1,
+	WMC_LIMIT_1 = 1,
+	WMC_LIMIT_2 = 2,
+	WMC_LIMIT_3 = 3,
+	WMC_LIMIT_4 = 4,
+	WMC_LIMIT_5 = 5,
+	WMC_LIMIT_6 = 6,
+	WMC_LIMIT_7 = 7,
+	WMC_LIMIT_10 = 10
+} wmc_recordinglimit_t;
+
 class Pvr2Wmc 
 {
 public:
@@ -33,6 +82,7 @@ public:
 	virtual bool IsServerDown();
 	virtual void UnLoading();
 	const char *GetBackendVersion(void);
+	PVR_ERROR GetTimerTypes ( PVR_TIMER_TYPE types[], int *size );
 	virtual PVR_ERROR GetDriveSpace(long long *iTotal, long long *iUsed);
 
 	// channels
@@ -49,7 +99,7 @@ public:
 	// timers
 	virtual PVR_ERROR GetTimers(ADDON_HANDLE handle);
 	virtual PVR_ERROR AddTimer(const PVR_TIMER &timer);
-	virtual PVR_ERROR DeleteTimer(const PVR_TIMER &timer, bool bForceDelete);
+	virtual PVR_ERROR DeleteTimer(const PVR_TIMER &timer, bool bForceDelete, bool bDeleteSchedule);
 	virtual int GetTimersAmount(void);
 
 	// recording files
@@ -84,6 +134,7 @@ public:
 private:
 	int _serverBuild;
 	CStdString Timer2String(const PVR_TIMER &xTmr);
+	CStdString SeriesTimer2String(const PVR_TIMER &xTmr);
 	CStdString Channel2String(const PVR_CHANNEL &xTmr);
 
 	Socket _socketClient;
@@ -108,4 +159,9 @@ private:
 
 	bool _insertDurationHeader;			// if true, insert a duration header for active Rec TS file
 	CStdString _durationHeader;			// the header to insert (received from server)
+
+	int _defaultPriority;
+	int _defaultLiftetime;
+	int _defaultLimit;
+	int _defaultShowType;
 };

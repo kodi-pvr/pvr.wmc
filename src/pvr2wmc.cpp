@@ -21,9 +21,9 @@
 #include "kodi/util/XMLUtils.h"
 #include "pvr2wmc.h"
 #include "utilities.h"
-#include "DialogRecordPref.h"
-#include "DialogDeleteTimer.h"
 #include "platform/util/timeutils.h"
+
+#include <memory>
 
 using namespace std;
 using namespace ADDON;
@@ -56,7 +56,7 @@ Pvr2Wmc::Pvr2Wmc(void)
 	_readCnt = 0;
 
 	_initialStreamResetCnt = 0;		// used to count how many times we reset the stream position (due to 2 pass demuxer)
-	_initialStreamPosition = 0;     // used to set an initial position (multiple clients watching the same live tv buffer)
+	_initialStreamPosition = 0;		// used to set an initial position (multiple clients watching the same live tv buffer)
 	
 	_insertDurationHeader = false;	// if true, insert a duration header for active Rec TS file
 	_durationHeader = "";			// the header to insert (received from server)
@@ -66,6 +66,11 @@ Pvr2Wmc::Pvr2Wmc(void)
 	_lastStreamSize = 0;			// the last value found for the stream file size
 	_isStreamFileGrowing = false;	// true if stream file is growing (server determines)
 	_streamWTV = true;				// by default, assume we are streaming Wtv files (not ts files)
+
+	_defaultPriority = WMC_PRIORITY_NORMAL;
+	_defaultLiftetime = WMC_LIFETIME_ELIGIBLE;
+	_defaultLimit = WMC_LIMIT_ASMANY;
+	_defaultShowType = WMC_SHOWTYPE_ANY;
 }
 
 Pvr2Wmc::~Pvr2Wmc(void)
@@ -118,9 +123,9 @@ const char *Pvr2Wmc::GetBackendVersion(void)
 			_serverBuild = atoi(results[1]);			// get server build number for feature checking
 		}
 		// check if recorded tv folder is accessible from client
-        if (results.size() > 2 && results[2] != "")		// if server sends empty string, skip check
-        {
-            if (!XBMC->DirectoryExists(results[2]))
+		if (results.size() > 2 && results[2] != "")		// if server sends empty string, skip check
+		{
+			if (!XBMC->DirectoryExists(results[2]))
 			{
 				XBMC->Log(LOG_ERROR, "Recorded tv '%s' does not exist", results[2].c_str());
 				CStdString infoStr = XBMC->GetLocalizedString(30017);		
@@ -132,7 +137,7 @@ const char *Pvr2Wmc::GetBackendVersion(void)
 				CStdString infoStr = XBMC->GetLocalizedString(30018);		
 				XBMC->QueueNotification(QUEUE_ERROR, infoStr.c_str());
 			}
-        }
+		}
 		// check if server returned it's MAC address
 		if (results.size() > 3 && results[3] != "" && results[3] != g_strServerMAC)
 		{
@@ -145,7 +150,313 @@ const char *Pvr2Wmc::GetBackendVersion(void)
 		
 		return strVersion.c_str();	// return server version to caller
 	}
-	return "Not accessible";	//  server version check failed
+	return "Not accessible";	// server version check failed
+}
+
+namespace
+{
+struct TimerType : PVR_TIMER_TYPE
+{
+  TimerType(unsigned int id,
+			unsigned int attributes,
+			const std::string &description,
+			const std::vector< std::pair<int, std::string> > &priorityValues,
+			int priorityDefault,
+			const std::vector< std::pair<int, std::string> > &lifetimeValues,
+			int lifetimeDefault,
+			const std::vector< std::pair<int, std::string> > &maxRecordingsValues,
+			int maxRecordingsDefault,
+			const std::vector< std::pair<int, std::string> > &dupEpisodesValues,
+			int dupEpisodesDefault
+			)
+  {
+	memset(this, 0, sizeof(PVR_TIMER_TYPE));
+
+	iId								 = id;
+	iAttributes						 = attributes;
+	iPrioritiesSize					 = priorityValues.size();
+	iPrioritiesDefault				 = priorityDefault;
+	iLifetimesSize					 = lifetimeValues.size();
+	iLifetimesDefault				 = lifetimeDefault;
+	iMaxRecordingsSize				 = maxRecordingsValues.size();
+	iMaxRecordingsDefault			 = maxRecordingsDefault;
+	iPreventDuplicateEpisodesSize	 = dupEpisodesValues.size();
+	iPreventDuplicateEpisodesDefault = dupEpisodesDefault;
+	strncpy(strDescription, description.c_str(), sizeof(strDescription) - 1);
+
+	int i = 0;
+	for (auto it = priorityValues.begin(); it != priorityValues.end(); ++it, ++i)
+	{
+		priorities[i].iValue = it->first;
+		strncpy(priorities[i].strDescription, it->second.c_str(), sizeof(priorities[i].strDescription) - 1);
+	}
+
+	i = 0;
+	for (auto it = lifetimeValues.begin(); it != lifetimeValues.end(); ++it, ++i)
+	{
+		lifetimes[i].iValue = it->first;
+		strncpy(lifetimes[i].strDescription, it->second.c_str(), sizeof(lifetimes[i].strDescription) - 1);
+	}
+
+	i = 0;
+	for (auto it = maxRecordingsValues.begin(); it != maxRecordingsValues.end(); ++it, ++i)
+	{
+		maxRecordings[i].iValue = it->first;
+		strncpy(maxRecordings[i].strDescription, it->second.c_str(), sizeof(maxRecordings[i].strDescription) - 1);
+	}
+
+	i = 0;
+	for (auto it = dupEpisodesValues.begin(); it != dupEpisodesValues.end(); ++it, ++i)
+	{
+		preventDuplicateEpisodes[i].iValue = it->first;
+		strncpy(preventDuplicateEpisodes[i].strDescription, it->second.c_str(), sizeof(preventDuplicateEpisodes[i].strDescription) - 1);
+	}
+  }
+};
+
+} // unnamed namespace
+
+PVR_ERROR Pvr2Wmc::GetTimerTypes ( PVR_TIMER_TYPE types[], int *size )
+{
+	/* PVR_Timer.iPriority values and presentation.*/
+	static std::vector< std::pair<int, std::string> > priorityValues;
+	if (priorityValues.size() == 0)
+	{
+		priorityValues.push_back(std::make_pair(WMC_PRIORITY_NORMAL,		XBMC->GetLocalizedString(30140)));
+		priorityValues.push_back(std::make_pair(WMC_PRIORITY_HIGH,			XBMC->GetLocalizedString(30141)));
+		priorityValues.push_back(std::make_pair(WMC_PRIORITY_LOW,			XBMC->GetLocalizedString(30142)));
+	}
+
+	/* PVR_Timer.iLifeTime values and presentation.*/
+	static std::vector< std::pair<int, std::string> > lifetimeValues;
+	if (lifetimeValues.size() == 0)
+	{
+		lifetimeValues.push_back(std::make_pair(WMC_LIFETIME_NOTSET,		XBMC->GetLocalizedString(30160)));
+		lifetimeValues.push_back(std::make_pair(WMC_LIFETIME_LATEST,		XBMC->GetLocalizedString(30161)));
+		lifetimeValues.push_back(std::make_pair(WMC_LIFETIME_WATCHED,		XBMC->GetLocalizedString(30162)));
+		lifetimeValues.push_back(std::make_pair(WMC_LIFETIME_ELIGIBLE,		XBMC->GetLocalizedString(30163)));
+		lifetimeValues.push_back(std::make_pair(WMC_LIFETIME_DELETED,		XBMC->GetLocalizedString(30164)));
+		lifetimeValues.push_back(std::make_pair(WMC_LIFETIME_ONEWEEK,		XBMC->GetLocalizedString(30165)));
+	}
+
+	/* PVR_Timer.iMaxRecordings values and presentation. */
+	static std::vector< std::pair<int, std::string> > recordingLimitValues;
+	if (recordingLimitValues.size() == 0)
+	{
+		recordingLimitValues.push_back(std::make_pair(WMC_LIMIT_ASMANY,		XBMC->GetLocalizedString(30170)));
+		recordingLimitValues.push_back(std::make_pair(WMC_LIMIT_1,			XBMC->GetLocalizedString(30171)));
+		recordingLimitValues.push_back(std::make_pair(WMC_LIMIT_2,			XBMC->GetLocalizedString(30172)));
+		recordingLimitValues.push_back(std::make_pair(WMC_LIMIT_3,			XBMC->GetLocalizedString(30173)));
+		recordingLimitValues.push_back(std::make_pair(WMC_LIMIT_4,			XBMC->GetLocalizedString(30174)));
+		recordingLimitValues.push_back(std::make_pair(WMC_LIMIT_5,			XBMC->GetLocalizedString(30175)));
+		recordingLimitValues.push_back(std::make_pair(WMC_LIMIT_6,			XBMC->GetLocalizedString(30176)));
+		recordingLimitValues.push_back(std::make_pair(WMC_LIMIT_7,			XBMC->GetLocalizedString(30177)));
+		recordingLimitValues.push_back(std::make_pair(WMC_LIMIT_10,			XBMC->GetLocalizedString(30178)));
+	}
+
+	/* PVR_Timer.iPreventDuplicateEpisodes values and presentation.*/
+	static std::vector< std::pair<int, std::string> > showTypeValues;
+	if (showTypeValues.size() == 0)
+	{
+		showTypeValues.push_back(std::make_pair(WMC_SHOWTYPE_FIRSTRUNONLY,	XBMC->GetLocalizedString(30150)));
+		showTypeValues.push_back(std::make_pair(WMC_SHOWTYPE_ANY,			XBMC->GetLocalizedString(30151)));
+		showTypeValues.push_back(std::make_pair(WMC_SHOWTYPE_LIVEONLY,		XBMC->GetLocalizedString(30152)));
+	}
+
+	static std::vector< std::pair<int, std::string> > emptyList;
+
+	static const unsigned int TIMER_MANUAL_ATTRIBS
+	  =	PVR_TIMER_TYPE_IS_MANUAL							|
+		PVR_TIMER_TYPE_SUPPORTS_CHANNELS					|
+		PVR_TIMER_TYPE_SUPPORTS_START_TIME					|
+		PVR_TIMER_TYPE_SUPPORTS_END_TIME					|
+		PVR_TIMER_TYPE_SUPPORTS_PRIORITY					|
+		PVR_TIMER_TYPE_SUPPORTS_LIFETIME;
+
+	static const unsigned int TIMER_EPG_ATTRIBS
+	  =	PVR_TIMER_TYPE_REQUIRES_EPG_TAG_ON_CREATE			|
+		PVR_TIMER_TYPE_SUPPORTS_CHANNELS					|
+		PVR_TIMER_TYPE_SUPPORTS_START_END_MARGIN			|
+		PVR_TIMER_TYPE_SUPPORTS_PRIORITY					|
+		PVR_TIMER_TYPE_SUPPORTS_LIFETIME;
+
+	static const unsigned int TIMER_KEYWORD_ATTRIBS
+	  =	PVR_TIMER_TYPE_SUPPORTS_FULLTEXT_EPG_MATCH			|
+		PVR_TIMER_TYPE_SUPPORTS_CHANNELS					|
+		PVR_TIMER_TYPE_SUPPORTS_TITLE_EPG_MATCH				|
+		PVR_TIMER_TYPE_SUPPORTS_START_END_MARGIN			|
+		PVR_TIMER_TYPE_SUPPORTS_PRIORITY					|
+		PVR_TIMER_TYPE_SUPPORTS_LIFETIME;
+
+	static const unsigned int TIMER_REPEATING_MANUAL_ATTRIBS
+	  = PVR_TIMER_TYPE_IS_REPEATING							|
+		PVR_TIMER_TYPE_SUPPORTS_WEEKDAYS					|
+		PVR_TIMER_TYPE_SUPPORTS_MAX_RECORDINGS;
+
+	static const unsigned int TIMER_REPEATING_EPG_ATTRIBS
+	  =	PVR_TIMER_TYPE_IS_REPEATING							|
+		PVR_TIMER_TYPE_SUPPORTS_START_ANYTIME				|
+		PVR_TIMER_TYPE_SUPPORTS_WEEKDAYS					|
+		PVR_TIMER_TYPE_SUPPORTS_RECORD_ONLY_NEW_EPISODES	|
+		PVR_TIMER_TYPE_SUPPORTS_MAX_RECORDINGS;
+
+	static const unsigned int TIMER_REPEATING_KEYWORD_ATTRIBS
+	  =	PVR_TIMER_TYPE_IS_REPEATING							|
+		PVR_TIMER_TYPE_SUPPORTS_RECORD_ONLY_NEW_EPISODES	|
+		PVR_TIMER_TYPE_SUPPORTS_MAX_RECORDINGS;
+
+	static const unsigned int TIMER_CHILD_ATTRIBUTES
+	  = PVR_TIMER_TYPE_SUPPORTS_START_TIME					|
+		PVR_TIMER_TYPE_SUPPORTS_END_TIME					|
+		PVR_TIMER_TYPE_FORBIDS_NEW_INSTANCES;
+
+	/* Timer types definition.*/
+	static std::vector< std::unique_ptr< TimerType > > timerTypes;
+	if (timerTypes.size() == 0)
+	{
+	timerTypes.push_back(
+		/* One-shot manual (time and channel based) */
+		std::unique_ptr<TimerType>(new TimerType(
+		/* Type id. */
+		TIMER_ONCE_MANUAL,
+		/* Attributes. */
+		TIMER_MANUAL_ATTRIBS,
+		/* Description. */
+		XBMC->GetLocalizedString(30131), // "One time (manual)",
+		/* Values definitions for attributes. */
+		priorityValues, _defaultPriority,
+		lifetimeValues, _defaultLiftetime,
+		recordingLimitValues, _defaultLimit,
+		showTypeValues, _defaultShowType)));
+
+	timerTypes.push_back(
+		/* One-shot epg based */
+		std::unique_ptr<TimerType>(new TimerType(
+		/* Type id. */
+		TIMER_ONCE_EPG,
+		/* Attributes. */
+		TIMER_EPG_ATTRIBS,
+		/* Description. */
+		XBMC->GetLocalizedString(30132), // "One time (guide)",
+		/* Values definitions for attributes. */
+		priorityValues, _defaultPriority,
+		lifetimeValues, _defaultLiftetime,
+		recordingLimitValues, _defaultLimit,
+		showTypeValues, _defaultShowType)));
+
+	timerTypes.push_back(
+		/* One shot Keyword based */
+		std::unique_ptr<TimerType>(new TimerType(
+		/* Type id. */
+		TIMER_ONCE_KEYWORD,
+		/* Attributes. */
+		TIMER_KEYWORD_ATTRIBS,
+		/* Description. */
+		XBMC->GetLocalizedString(30133), // "One time (wishlist)"
+		/* Values definitions for attributes. */
+		priorityValues, _defaultPriority,
+		lifetimeValues, _defaultLiftetime,
+		recordingLimitValues, _defaultLimit,
+		showTypeValues, _defaultShowType)));
+
+	timerTypes.push_back(
+		/* Read-only one-shot for timers generated by timerec */
+		std::unique_ptr<TimerType>(new TimerType(
+		/* Type id. */
+		TIMER_ONCE_MANUAL_CHILD,
+		/* Attributes. */
+		TIMER_MANUAL_ATTRIBS | TIMER_CHILD_ATTRIBUTES,
+		/* Description. */
+		XBMC->GetLocalizedString(30130), // "Created by Repeating Timer"
+		/* Values definitions for attributes. */
+		priorityValues, _defaultPriority,
+		lifetimeValues, _defaultLiftetime,
+		recordingLimitValues, _defaultLimit,
+		showTypeValues, _defaultShowType)));
+
+	timerTypes.push_back(
+		/* Read-only one-shot for timers generated by autorec */
+		std::unique_ptr<TimerType>(new TimerType(
+		/* Type id. */
+		TIMER_ONCE_EPG_CHILD,
+		/* Attributes. */
+		TIMER_EPG_ATTRIBS | TIMER_CHILD_ATTRIBUTES,
+		/* Description. */
+		XBMC->GetLocalizedString(30130), // "Created by Repeating Timer"
+		/* Values definitions for attributes. */
+		priorityValues, _defaultPriority,
+		lifetimeValues, _defaultLiftetime,
+		recordingLimitValues, _defaultLimit,
+		showTypeValues, _defaultShowType)));
+
+	timerTypes.push_back(
+		/* One shot Keyword based */
+		std::unique_ptr<TimerType>(new TimerType(
+		/* Type id. */
+		TIMER_ONCE_KEYWORD_CHILD,
+		/* Attributes. */
+		TIMER_KEYWORD_ATTRIBS | TIMER_CHILD_ATTRIBUTES,
+		/* Description. */
+		XBMC->GetLocalizedString(30130), // "Created by Repeating Timer"
+		/* Values definitions for attributes. */
+		priorityValues, _defaultPriority,
+		lifetimeValues, _defaultLiftetime,
+		recordingLimitValues, _defaultLimit,
+		showTypeValues, _defaultShowType)));
+
+	timerTypes.push_back(
+		/* Repeating manual (time and channel based) Parent */
+		std::unique_ptr<TimerType>(new TimerType(
+		/* Type id. */
+		TIMER_REPEATING_MANUAL,
+		/* Attributes. */
+		TIMER_MANUAL_ATTRIBS | TIMER_REPEATING_MANUAL_ATTRIBS,
+		/* Description. */
+		XBMC->GetLocalizedString(30134), // "Repeating (manual)"
+		/* Values definitions for attributes. */
+		priorityValues, _defaultPriority,
+		lifetimeValues, _defaultLiftetime,
+		recordingLimitValues, _defaultLimit,
+		showTypeValues, _defaultShowType)));
+
+	timerTypes.push_back(
+		/* Repeating epg based Parent*/
+		std::unique_ptr<TimerType>(new TimerType(
+		/* Type id. */
+		TIMER_REPEATING_EPG,
+		/* Attributes. */
+		TIMER_EPG_ATTRIBS | TIMER_REPEATING_EPG_ATTRIBS,
+		/* Description. */
+		XBMC->GetLocalizedString(30135), // "Repeating (guide)"
+		/* Values definitions for attributes. */
+		priorityValues, _defaultPriority,
+		lifetimeValues, _defaultLiftetime,
+		recordingLimitValues, _defaultLimit,
+		showTypeValues, _defaultShowType)));
+
+	timerTypes.push_back(
+		/* Repeating Keyword (Generic) based */
+		std::unique_ptr<TimerType>(new TimerType(
+		/* Type id. */
+		TIMER_REPEATING_KEYWORD,
+		/* Attributes. */
+		TIMER_KEYWORD_ATTRIBS | TIMER_REPEATING_KEYWORD_ATTRIBS,
+		/* Description. */
+		XBMC->GetLocalizedString(30136), // "Repeating (wishlist)"
+		/* Values definitions for attributes. */
+		priorityValues, _defaultPriority,
+		lifetimeValues, _defaultLiftetime,
+		recordingLimitValues, _defaultLimit,
+		showTypeValues, _defaultShowType)));
+	}
+
+	/* Copy data to target array. */
+	int i = 0;
+	for (auto it = timerTypes.begin(); it != timerTypes.end(); ++it, ++i)
+		types[i] = **it;
+
+	*size = timerTypes.size();
+	return PVR_ERROR_NO_ERROR;
 }
 
 PVR_ERROR Pvr2Wmc::GetDriveSpace(long long *iTotal, long long *iUsed)
@@ -337,10 +648,10 @@ PVR_ERROR Pvr2Wmc::GetChannels(ADDON_HANDLE handle, bool bRadio)
 
 		xChannel.iUniqueId = strtoul(v[0].c_str(), 0, 10);					// convert to unsigned int
 		xChannel.bIsRadio = Str2Bool(v[1]);
-		STRCPY(xChannel.strChannelName,  v[3].c_str());
+		STRCPY(xChannel.strChannelName, v[3].c_str());
 		xChannel.iEncryptionSystem = Str2Bool(v[4]);
 		if (v[5].compare("NULL") != 0)										// if icon path is null
-			STRCPY(xChannel.strIconPath,  v[5].c_str()); 
+			STRCPY(xChannel.strIconPath, v[5].c_str());
 		xChannel.bIsHidden = Str2Bool(v[6]);
 
 		// Populate Stream DLNA URL if present
@@ -423,7 +734,7 @@ PVR_ERROR Pvr2Wmc::GetChannelGroupMembers(ADDON_HANDLE handle, const PVR_CHANNEL
 
 		strncpy(xGroupMember.strGroupName, group.strGroupName, sizeof(xGroupMember.strGroupName) - 1);
 		xGroupMember.iChannelUniqueId = strtoul(v[0].c_str(), 0, 10);					// convert to unsigned int
-		xGroupMember.iChannelNumber   =  atoi(v[1].c_str());
+		xGroupMember.iChannelNumber =  atoi(v[1].c_str());
 
 		PVR->TransferChannelGroupMember(handle, &xGroupMember);
 	}
@@ -504,91 +815,14 @@ int Pvr2Wmc::GetTimersAmount(void)
 	return _socketClient.GetInt("GetTimerCount", true);
 }
 
-PVR_ERROR Pvr2Wmc::AddTimer(const PVR_TIMER &xTmr)  
+PVR_ERROR Pvr2Wmc::AddTimer(const PVR_TIMER &xTmr)
 {
 	if (IsServerDown())
 		return PVR_ERROR_SERVER_ERROR;
 
-	// TODO: haven't figured out how implement changes to timers that aren't SE based
-	if (xTmr.iClientIndex != -1)				//  != -1 means user is trying to change params of an existing timer
-	{
-		return PVR_ERROR_NOT_IMPLEMENTED;
-	}
-
-	bool isSeries = false;						// whether show being requested is a series
-
-	// series specific params for recording
-	bool recSeries = false;						// if true, request a series recording
-	int runType;								// the type of episodes to record (all, new, live)
-	bool anyChannel;							// whether to rec series from ANY channel
-	bool anyTime;								// whether to rec series at ANY time
-
-	CStdString command;
-	CStdString timerStr = Timer2String(xTmr);	// convert timer to string
-
-	if (xTmr.startTime != 0 && xTmr.iEpgUid != -1)		// if we are NOT doing an 'instant' record (=0) AND not a 'manual' record (=-1)
-	{
-
-		command = "GetShowInfo" + timerStr;		// request data about the show that will be recorded by the timer
-		vector<CStdString> info;				// holds results from server
-		info = _socketClient.GetVector(command, true);	// get results from server
-
-		if (isServerError(info))
-		{
-			return PVR_ERROR_SERVER_ERROR;
-		} 
-		else 
-		{
-			isSeries = info[0] == "True";			// first string determines if show is a series (all that is handled for now)
-			if (isSeries)							// if the show is a series, next string contains record params for series
-			{
-				vector<CStdString> v = split(info[1].c_str(), "|");		// split to unpack string containing series params
-
-				if (v.size() < 7)
-				{
-					XBMC->Log(LOG_DEBUG, "Wrong number of fields xfered for AddTimer data");
-					return PVR_ERROR_NO_ERROR;
-				}
-
-				// fill in params for dialog windows
-				recSeries = v[0] == "True";								// get reset of params for dialog windows
-				runType = atoi(v[1].c_str());							// any=0, firstRun=1, live=2
-				anyChannel = v[2] == "True";
-				anyTime = v[3] == "True";
-				// start dialogwindow
-				CDialogRecordPref vWindow(	recSeries, runType, anyChannel, anyTime,
-					v[4]/*channelName*/, v[5]/*=startTimeStr*/, v[6]/*showName*/);
-
-				int dlogResult = vWindow.DoModal();
-				if (dlogResult == 1)								// present dialog with recording options
-				{
-					recSeries = vWindow.RecSeries;
-					if (recSeries)
-					{
-						runType = vWindow.RunType;					// the type of episodes to record (0->all, 1->new, 2->live)
-						anyChannel = vWindow.AnyChannel;			// whether to rec series from ANY channel
-						anyTime = vWindow.AnyTime;					// whether to rec series at ANY time
-					}
-				}
-				else if (dlogResult == 0)
-					return PVR_ERROR_NO_ERROR;						// user canceled timer in dialog
-				else
-				{
-				}
-			}
-		}
-	}
-
-	command = "SetTimer" + timerStr;					// create setTimer request
-
-	// if recording a series append series info request
-	CStdString extra;
-	if (recSeries)
-		extra.Format("|%d|%d|%d|%d", recSeries, runType, anyChannel, anyTime);
-	else
-		extra.Format("|%d", recSeries);
-
-	command.append(extra);								
+	// Send request to ServerWMC
+	CStdString command = "";
+	command = "SetTimerKodi" + Timer2String(xTmr);	// convert timer to string
 
 	vector<CStdString> results = _socketClient.GetVector(command, false);	// get results from server
 
@@ -649,38 +883,33 @@ CStdString Pvr2Wmc::Timer2String(const PVR_TIMER &xTmr)
 {
 	CStdString tStr;
 
-	tStr.Format("|%d|%d|%d|%d|%d|%s|%d|%d|%d|%d|%d",													// format for 11 params:
-		xTmr.iClientIndex, xTmr.iClientChannelUid, xTmr.startTime, xTmr.endTime, PVR_TIMER_STATE_NEW,		// 5 params
-		xTmr.strTitle, xTmr.iPriority,  xTmr.iMarginStart, xTmr.iMarginEnd, xTmr.iWeekdays != PVR_WEEKDAY_NONE,				// 5 params
-		xTmr.iEpgUid);																						// 1 param
+	bool bRepeating = xTmr.iTimerType >= TIMER_REPEATING_MIN && xTmr.iTimerType <= TIMER_REPEATING_MAX;
+	bool bKeyword = xTmr.iTimerType == TIMER_REPEATING_KEYWORD || xTmr.iTimerType == TIMER_ONCE_KEYWORD || xTmr.iTimerType == TIMER_ONCE_KEYWORD_CHILD;
+
+	tStr.Format("|%d|%d|%d|%d|%d|%s|%d|%d|%d|%d|%d",
+		xTmr.iClientIndex, xTmr.iClientChannelUid, xTmr.startTime, xTmr.endTime, PVR_TIMER_STATE_NEW,		// 0-4
+		xTmr.strTitle, xTmr.iPriority,  xTmr.iMarginStart, xTmr.iMarginEnd, bRepeating,						// 5-9
+		xTmr.iEpgUid);																						// 10
+
+	// Append extra fields from Kodi 16
+	CStdString extra;
+	extra.Format("|%d|%d|%d|%d|%d|%d|%s|%d",
+		xTmr.iPreventDuplicateEpisodes, xTmr.bStartAnyTime, xTmr.iWeekdays, // 11-13 param
+		xTmr.iLifetime, bKeyword, xTmr.bFullTextEpgSearch, xTmr.strEpgSearchString, xTmr.iMaxRecordings); // 14-18
+	tStr.append(extra);
 
 	return tStr;
 }
 
-PVR_ERROR Pvr2Wmc::DeleteTimer(const PVR_TIMER &xTmr, bool bForceDelete)
+PVR_ERROR Pvr2Wmc::DeleteTimer(const PVR_TIMER &xTmr, bool bForceDelete, bool bDeleteSchedule)
 {
 	if (IsServerDown())
 		return PVR_ERROR_SERVER_ERROR;
 
-	bool deleteSeries = false;
-
-	if (xTmr.iWeekdays != PVR_WEEKDAY_NONE)									// if timer is a series timer, ask if want to cancel series
-	{
-		CDialogDeleteTimer vWindow(deleteSeries, xTmr.strTitle);
-		int dlogResult = vWindow.DoModal();
-		if (dlogResult == 1)								// present dialog with delete timer options
-		{
-			deleteSeries = vWindow.DeleteSeries;
-		}
-		else if (dlogResult == 0)
-			return PVR_ERROR_NO_ERROR;						// user canceled in delete timer dialog
-		//else if dialog fails, just delete the episode
-	}
-
 	CStdString command = "DeleteTimer" + Timer2String(xTmr);
 
 	CStdString eStr;										// append whether to delete the series or episode
-	eStr.Format("|%d", deleteSeries);
+	eStr.Format("|%d", bDeleteSchedule);
 	command.append(eStr);
 
 	vector<CStdString> results = _socketClient.GetVector(command, false);	// get results from server
@@ -693,7 +922,7 @@ PVR_ERROR Pvr2Wmc::DeleteTimer(const PVR_TIMER &xTmr, bool bForceDelete)
 	}
 	else
 	{
-		if (deleteSeries)
+		if (bDeleteSchedule)
 			XBMC->Log(LOG_DEBUG, "deleted series timer '%s', with rec state %s", xTmr.strTitle, results[0].c_str());
 		else
 			XBMC->Log(LOG_DEBUG, "deleted timer '%s', with rec state %s", xTmr.strTitle, results[0].c_str());
@@ -706,9 +935,65 @@ PVR_ERROR Pvr2Wmc::GetTimers(ADDON_HANDLE handle)
 	if (IsServerDown())
 		return PVR_ERROR_SERVER_ERROR;
 
-	vector<CStdString> responses = _socketClient.GetVector("GetTimers", true);
+	vector<CStdString> responsesSeries = _socketClient.GetVector("GetSeriesTimers", true);
+	FOREACH(response, responsesSeries)
+	{
+		PVR_TIMER xTmr;
+		memset(&xTmr, 0, sizeof(PVR_TIMER));						// set all struct to zero
 
-	FOREACH(response, responses)
+		vector<CStdString> v = split(*response, "|");				// split to unpack string
+		if (v.size() < 24)
+		{
+			XBMC->Log(LOG_DEBUG, "Wrong number of fields xfered for SeriesTimer data");
+			continue;
+		}
+
+		xTmr.iTimerType = PVR_TIMER_TYPE_NONE;
+																// [0] Timer ID (need UINT32 value, see [21])
+																// [1] Title (superceded by [17] Timer Name)
+		xTmr.iClientChannelUid = atoi(v[2].c_str());			// [2] channel id
+		xTmr.iEpgUid = atoi(v[3].c_str());						// [3] epg ID (same as client ID, except for a 'manual' record)	
+		STRCPY(xTmr.strSummary, v[4].c_str());					// [4] currently set to episode description
+		xTmr.startTime = atoi(v[5].c_str());					// [5] start time 
+		xTmr.endTime = atoi(v[6].c_str());						// [6] end time 
+		xTmr.iMarginStart = atoi(v[7].c_str());					// [7] rec margin at start (sec)
+		xTmr.iMarginEnd = atoi(v[8].c_str());					// [8] rec margin at end (sec)
+																// [9] isPreMarginRequired
+																// [10] isPostMarginRequired
+																// [11] WMC Priority (need Kodi compatible value, see [26])
+																// [12] NewEpisodesOnly (superceded by RunType)
+		if (Str2Bool(v[13].c_str()))							// [13] Any Channel
+		{
+			xTmr.iClientChannelUid = 0;
+		}
+		if (Str2Bool(v[14].c_str()))							// [14] Any Time
+		{
+			xTmr.bStartAnyTime = true;
+			xTmr.bEndAnyTime = true;
+		}
+		xTmr.iWeekdays = atoi(v[15].c_str());					// [15] DaysOfWeek (converted to Kodi values in the backend)
+		xTmr.state = (PVR_TIMER_STATE)atoi(v[16].c_str());		// [16] current state of timer
+		STRCPY(xTmr.strTitle, v[17].c_str());					// [17] timer name
+		xTmr.iGenreType = atoi(v[18].c_str());					// [18] genre ID
+		xTmr.iGenreSubType = atoi(v[19].c_str());				// [19] sub genre ID
+		xTmr.iPreventDuplicateEpisodes = atoi(v[20].c_str());	// [20] WMC RunType
+		xTmr.iClientIndex = atoi(v[21].c_str());				// [21] Timer ID (in UINT32 form)
+		STRCPY(xTmr.strEpgSearchString, v[22].c_str());			// [22] Keyword Search
+		xTmr.bFullTextEpgSearch = Str2Bool(v[23].c_str());		// [23] Keyword is FullText
+		xTmr.iLifetime = atoi(v[24].c_str());					// [24] Lifetime
+		xTmr.iMaxRecordings = atoi(v[25].c_str());				// [25] Maximum Recordings (Recording Limit)
+		xTmr.iPriority = atoi(v[26].c_str());					// [26] Priority (in Kodi enum value form)
+
+		// Determine TimerType
+		bool hasKeyword = strlen(xTmr.strEpgSearchString) > 0;
+		bool hasEPG = (xTmr.iEpgUid != 0);
+		xTmr.iTimerType = hasKeyword ? TIMER_REPEATING_KEYWORD : hasEPG ? TIMER_REPEATING_EPG : TIMER_REPEATING_MANUAL;
+		
+		PVR->TransferTimerEntry(handle, &xTmr);
+	}
+
+	vector<CStdString> responsesTimers = _socketClient.GetVector("GetTimers", true);
+	FOREACH(response, responsesTimers)
 	{
 		PVR_TIMER xTmr;
 		memset(&xTmr, 0, sizeof(PVR_TIMER));						// set all struct to zero
@@ -718,31 +1003,62 @@ PVR_ERROR Pvr2Wmc::GetTimers(ADDON_HANDLE handle)
 		// rp.Program.Title, ""/*recdir*/, rp.Program.EpisodeTitle/*summary?*/, rp.Priority, rp.Request.IsRecurring,
 		// eId, preMargin, postMargin, genre, subgenre
 
-		if (v.size() < 15)
+		if (v.size() < 24)
 		{
 			XBMC->Log(LOG_DEBUG, "Wrong number of fields xfered for timer data");
 			continue;
 		}
 
-		/* TODO: Implement own timer types to get support for the timer features introduced with PVR API 1.9.7 */
 		xTmr.iTimerType = PVR_TIMER_TYPE_NONE;
+		xTmr.iClientIndex = atoi(v[0].c_str());					// [0] Timer ID
+		xTmr.iClientChannelUid = atoi(v[1].c_str());			// [1] channel id
+		xTmr.startTime = atoi(v[2].c_str());					// [2] start time 
+		xTmr.endTime = atoi(v[3].c_str());						// [3] end time 
+		xTmr.state = (PVR_TIMER_STATE)atoi(v[4].c_str());		// [4] current state of time
+		STRCPY(xTmr.strTitle, v[5].c_str());					// [5] timer name (set to same as Program title)
+		STRCPY(xTmr.strDirectory, v[6].c_str());				// [6] rec directory
+		STRCPY(xTmr.strSummary, v[7].c_str());					// [7] currently set to episode title
+																// [8] WMC Priority (need Kodi compatible value, see [26])
+																// [9] IsRecurring
+		xTmr.iEpgUid = atoi(v[10].c_str());						// [10] epg ID
+		xTmr.iMarginStart = atoi(v[11].c_str());				// [11] rec margin at start (sec)
+		xTmr.iMarginEnd = atoi(v[12].c_str());					// [12] rec margin at end (sec)
+		xTmr.iGenreType = atoi(v[13].c_str());					// [13] genre ID
+		xTmr.iGenreSubType = atoi(v[14].c_str());				// [14] sub genre ID
+																// [15] epg ID (duplicated from [9] for some reason)
+																// [16] Parent Series ID (need in UINT32 form, see [23])
+																// [17] isPreMarginRequired
+																// [18] isPostMarginRequired
+		xTmr.iPreventDuplicateEpisodes = atoi(v[19].c_str());	// [19] WMC runType
+		if (Str2Bool(v[20].c_str()))							// [20] Any Channel
+		{
+			xTmr.iClientChannelUid = 0;
+		}
+		if (Str2Bool(v[21].c_str()))							// [21] Any Time
+		{
+			//xTmr.bStartAnyTime = true;
+			//xTmr.bEndAnyTime = true;
+		}
+		xTmr.iWeekdays = atoi(v[22].c_str());					// [22] DaysOfWeek (converted to Kodi values in the backend)
+		xTmr.iParentClientIndex = atoi(v[23].c_str());			// [23] Parent Series ID (in UINT32 form)
+		xTmr.iLifetime = atoi(v[24].c_str());					// [24] Lifetime
+		xTmr.iMaxRecordings = atoi(v[25].c_str());				// [25] Maximum Recordings (Recording Limit)
+		xTmr.iPriority = atoi(v[26].c_str());					// [26] Priority (in Kodi enum value form)
+		STRCPY(xTmr.strEpgSearchString, v[27].c_str());			// [27] Keyword Search
+		xTmr.bFullTextEpgSearch = Str2Bool(v[28].c_str());		// [28] Keyword is FullText
 
-		xTmr.iClientIndex = atoi(v[0].c_str());				// timer index (set to same as Entry ID)
-		xTmr.iClientChannelUid = atoi(v[1].c_str());		// channel id
-		xTmr.startTime = atoi(v[2].c_str());                // start time 
-		xTmr.endTime = atoi(v[3].c_str());                  // end time 
-		xTmr.state = (PVR_TIMER_STATE)atoi(v[4].c_str());   // current state of time
-
-		STRCPY(xTmr.strTitle, v[5].c_str());				// timer name (set to same as Program title)
-		STRCPY(xTmr.strDirectory, v[6].c_str());			// rec directory
-		STRCPY(xTmr.strSummary, v[7].c_str());				// currently set to episode title
-		xTmr.iPriority = atoi(v[8].c_str());				// rec priority
-
-		xTmr.iEpgUid = atoi(v[10].c_str());					// epg ID (same as client ID, except for a 'manual' record)
-		xTmr.iMarginStart = atoi(v[11].c_str());			// rec margin at start (sec)
-		xTmr.iMarginEnd = atoi(v[12].c_str());				// rec margin at end (sec)
-		xTmr.iGenreType = atoi(v[13].c_str());				// genre ID
-		xTmr.iGenreSubType = atoi(v[14].c_str());			// sub genre ID
+		// Determine TimerType
+		bool hasParent = (xTmr.iParentClientIndex != 0);
+		bool hasKeyword = strlen(xTmr.strEpgSearchString) > 0;
+		bool hasEPG = (xTmr.iEpgUid != 0);
+		if (hasParent)
+		{
+			xTmr.iTimerType = hasKeyword ? TIMER_ONCE_KEYWORD_CHILD : hasEPG ? TIMER_ONCE_EPG_CHILD : TIMER_ONCE_MANUAL_CHILD;
+		}
+		else
+		{
+			xTmr.iTimerType = hasKeyword ? TIMER_ONCE_KEYWORD : hasEPG ? TIMER_ONCE_EPG : TIMER_ONCE_MANUAL;
+		}
 
 		PVR->TransferTimerEntry(handle, &xTmr);
 	}
@@ -1147,9 +1463,9 @@ bool Pvr2Wmc::CheckErrorOnServer()
 	return false;
 }
 
-//#define SEEK_SET    0
-//#define SEEK_CUR    1
-//#define SEEK_END    2
+//#define SEEK_SET	0
+//#define SEEK_CUR	1
+//#define SEEK_END	2
 long long Pvr2Wmc::SeekLiveStream(long long iPosition, int iWhence /* = SEEK_SET */) 
 {
 	int64_t lFilePos = 0;
@@ -1325,7 +1641,7 @@ PVR_ERROR Pvr2Wmc::SignalStatus(PVR_SIGNAL_STATUS &signalStatus)
 		if (IsServerDown())
 			return PVR_ERROR_SERVER_ERROR;
 
-      // Reset count to throttle value
+		// Reset count to throttle value
 		_signalStatusCount = g_signalThrottle;
 
 		CStdString command;
