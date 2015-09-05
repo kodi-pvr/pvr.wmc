@@ -1,5 +1,8 @@
+v0.6.6
+- Fix deletion of Series Timers
+
 v0.6.5
-- Implement forst cut of Series Timer support for Kodi 16
+- Implement first cut of Series Timer support for Kodi 16
 
 v0.6.4
 - Updated to PVR API v3.0.0

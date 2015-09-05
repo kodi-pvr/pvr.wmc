@@ -906,12 +906,11 @@ PVR_ERROR Pvr2Wmc::DeleteTimer(const PVR_TIMER &xTmr, bool bForceDelete, bool bD
 	if (IsServerDown())
 		return PVR_ERROR_SERVER_ERROR;
 
-	CStdString command = "DeleteTimer" + Timer2String(xTmr);
+	bool bRepeating = xTmr.iTimerType >= TIMER_REPEATING_MIN && xTmr.iTimerType <= TIMER_REPEATING_MAX;
 
-	CStdString eStr;										// append whether to delete the series or episode
-	eStr.Format("|%d", bDeleteSchedule);
-	command.append(eStr);
-
+	CStdString command = "DeleteTimerKodi";
+	command.Format("DeleteTimerKodi|%d|%d|%d", xTmr.iClientIndex, bRepeating, bDeleteSchedule);
+	
 	vector<CStdString> results = _socketClient.GetVector(command, false);	// get results from server
 
 	PVR->TriggerTimerUpdate();									// update timers regardless of whether there is an error
