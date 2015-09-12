@@ -478,10 +478,10 @@ extern "C" {
 		return PVR_ERROR_NO_ERROR;
 	}
 
-	PVR_ERROR DeleteTimer(const PVR_TIMER &timer, bool bForceDelete, bool bDeleteScheduled)
+	PVR_ERROR DeleteTimer(const PVR_TIMER &timer, bool bForceDelete)
 	{
 		if (_wmc)
-			return _wmc->DeleteTimer(timer, bForceDelete, bDeleteScheduled);
+			return _wmc->DeleteTimer(timer, bForceDelete);
 		return PVR_ERROR_NO_ERROR;
 	}
 
