@@ -99,7 +99,7 @@ public:
 	// timers
 	virtual PVR_ERROR GetTimers(ADDON_HANDLE handle);
 	virtual PVR_ERROR AddTimer(const PVR_TIMER &timer);
-	virtual PVR_ERROR DeleteTimer(const PVR_TIMER &timer, bool bForceDelete, bool bDeleteSchedule);
+	virtual PVR_ERROR DeleteTimer(const PVR_TIMER &timer, bool bForceDelete);
 	virtual int GetTimersAmount(void);
 
 	// recording files

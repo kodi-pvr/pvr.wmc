@@ -901,7 +901,7 @@ CStdString Pvr2Wmc::Timer2String(const PVR_TIMER &xTmr)
 	return tStr;
 }
 
-PVR_ERROR Pvr2Wmc::DeleteTimer(const PVR_TIMER &xTmr, bool bForceDelete, bool bDeleteSchedule)
+PVR_ERROR Pvr2Wmc::DeleteTimer(const PVR_TIMER &xTmr, bool bForceDelete)
 {
 	if (IsServerDown())
 		return PVR_ERROR_SERVER_ERROR;
@@ -909,7 +909,7 @@ PVR_ERROR Pvr2Wmc::DeleteTimer(const PVR_TIMER &xTmr, bool bForceDelete, bool bD
 	bool bRepeating = xTmr.iTimerType >= TIMER_REPEATING_MIN && xTmr.iTimerType <= TIMER_REPEATING_MAX;
 
 	CStdString command = "DeleteTimerKodi";
-	command.Format("DeleteTimerKodi|%d|%d|%d", xTmr.iClientIndex, bRepeating, bDeleteSchedule);
+	command.Format("DeleteTimerKodi|%d|%d", xTmr.iClientIndex, bRepeating);
 	
 	vector<CStdString> results = _socketClient.GetVector(command, false);	// get results from server
 
@@ -921,10 +921,7 @@ PVR_ERROR Pvr2Wmc::DeleteTimer(const PVR_TIMER &xTmr, bool bForceDelete, bool bD
 	}
 	else
 	{
-		if (bDeleteSchedule)
-			XBMC->Log(LOG_DEBUG, "deleted series timer '%s', with rec state %s", xTmr.strTitle, results[0].c_str());
-		else
-			XBMC->Log(LOG_DEBUG, "deleted timer '%s', with rec state %s", xTmr.strTitle, results[0].c_str());
+		XBMC->Log(LOG_DEBUG, "deleted timer '%s', with rec state %s", xTmr.strTitle, results[0].c_str());
 		return PVR_ERROR_NO_ERROR;
 	}
 }
