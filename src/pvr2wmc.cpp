@@ -295,6 +295,7 @@ PVR_ERROR Pvr2Wmc::GetTimerTypes ( PVR_TIMER_TYPE types[], int *size )
 
 	static const unsigned int TIMER_REPEATING_EPG_ATTRIBS
 	  =	PVR_TIMER_TYPE_IS_REPEATING							|
+		PVR_TIMER_TYPE_REQUIRES_EPG_SERIES_ON_CREATE		|
 		PVR_TIMER_TYPE_SUPPORTS_START_ANYTIME				|
 		PVR_TIMER_TYPE_SUPPORTS_WEEKDAYS					|
 		PVR_TIMER_TYPE_SUPPORTS_RECORD_ONLY_NEW_EPISODES	|
@@ -797,6 +798,15 @@ PVR_ERROR Pvr2Wmc::GetEPGForChannel(ADDON_HANDLE handle, const PVR_CHANNEL &chan
 			xEpg.strWriter = v[22].c_str();
 			xEpg.iYear = atoi(v[23].c_str());
 			xEpg.strIMDBNumber = v[24].c_str();
+		}
+
+		// Kodi PVR API 4.1.0 adds new EPG iFlags field
+		if (v.size() >= 26)
+		{
+			if (Str2Bool(v[25].c_str()))
+			{
+				xEpg.iFlags |= EPG_TAG_FLAG_IS_SERIES;
+			}
 		}
 
 		PVR->TransferEpgEntry(handle, &xEpg);
