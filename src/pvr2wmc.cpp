@@ -895,6 +895,7 @@ CStdString Pvr2Wmc::Timer2String(const PVR_TIMER &xTmr)
 
 	bool bRepeating = xTmr.iTimerType >= TIMER_REPEATING_MIN && xTmr.iTimerType <= TIMER_REPEATING_MAX;
 	bool bKeyword = xTmr.iTimerType == TIMER_REPEATING_KEYWORD || xTmr.iTimerType == TIMER_ONCE_KEYWORD || xTmr.iTimerType == TIMER_ONCE_KEYWORD_CHILD;
+	bool bManual = xTmr.iTimerType == TIMER_ONCE_MANUAL || xTmr.iTimerType == TIMER_ONCE_MANUAL_CHILD || xTmr.iTimerType == TIMER_REPEATING_MANUAL;
 
 	tStr.Format("|%d|%d|%d|%d|%d|%s|%d|%d|%d|%d|%d",
 		xTmr.iClientIndex, xTmr.iClientChannelUid, xTmr.startTime, xTmr.endTime, PVR_TIMER_STATE_NEW,		// 0-4
@@ -903,9 +904,9 @@ CStdString Pvr2Wmc::Timer2String(const PVR_TIMER &xTmr)
 
 	// Append extra fields from Kodi 16
 	CStdString extra;
-	extra.Format("|%d|%d|%d|%d|%d|%d|%s|%d",
+	extra.Format("|%d|%d|%d|%d|%d|%d|%s|%d|%d",
 		xTmr.iPreventDuplicateEpisodes, xTmr.bStartAnyTime, xTmr.iWeekdays, // 11-13 param
-		xTmr.iLifetime, bKeyword, xTmr.bFullTextEpgSearch, xTmr.strEpgSearchString, xTmr.iMaxRecordings); // 14-18
+		xTmr.iLifetime, bKeyword, xTmr.bFullTextEpgSearch, xTmr.strEpgSearchString, xTmr.iMaxRecordings, bManual); // 14-19
 	tStr.append(extra);
 
 	return tStr;

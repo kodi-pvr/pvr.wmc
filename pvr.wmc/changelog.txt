@@ -1,3 +1,6 @@
+v0.6.9
+- fix for manual timers created from EPG showing as guide based timers
+
 v0.6.8
 - Updated to PVR API v4.1.0
 - Populate IsSeries field on EPG Items
