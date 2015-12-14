@@ -1039,12 +1039,11 @@ PVR_ERROR Pvr2Wmc::GetTimers(ADDON_HANDLE handle)
 		xTmr.iPreventDuplicateEpisodes = atoi(v[19].c_str());	// [19] WMC runType
 		if (Str2Bool(v[20].c_str()))							// [20] Any Channel
 		{
-			xTmr.iClientChannelUid = 0;
+			// As this is a child instance recording, we want to preserve the actual channel
 		}
 		if (Str2Bool(v[21].c_str()))							// [21] Any Time
 		{
-			//xTmr.bStartAnyTime = true;
-			//xTmr.bEndAnyTime = true;
+			// As this is a child instance recording, we want to preserve the actual start/finish times
 		}
 		xTmr.iWeekdays = atoi(v[22].c_str());					// [22] DaysOfWeek (converted to Kodi values in the backend)
 		xTmr.iParentClientIndex = atoi(v[23].c_str());			// [23] Parent Series ID (in UINT32 form)
