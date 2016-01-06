@@ -20,18 +20,18 @@
 
 #include "kodi/libXBMC_addon.h"
 #include <string>
-#include "platform/os.h"
+#include "p8-platform/os.h"
 #include "client.h"
 #include "Socket.h"
 
 #include "utilities.h"
-#include "platform/util/timeutils.h"
-#include "platform/threads/mutex.h"
+#include "p8-platform/util/timeutils.h"
+#include "p8-platform/threads/mutex.h"
 
 using namespace std;
 using namespace ADDON;
 
-PLATFORM::CMutex        m_mutex;
+P8PLATFORM::CMutex        m_mutex;
 
 /* Master defines for client control */
 //#define RECEIVE_TIMEOUT 6 //sec
@@ -593,7 +593,7 @@ std::vector<CStdString> Socket::GetVector(const CStdString &request, bool allowR
 	int maxAttempts = 3;
 	int sleepAttemptsMs = 1000;
 
-	PLATFORM::CLockObject lock(m_mutex);						// only process one request at a time
+	P8PLATFORM::CLockObject lock(m_mutex);						// only process one request at a time
 
 	int code;
 	std::vector<CStdString> reponses;
