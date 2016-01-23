@@ -21,13 +21,13 @@
 #include "kodi/util/XMLUtils.h"
 #include "pvr2wmc.h"
 #include "utilities.h"
-#include "platform/util/timeutils.h"
+#include "p8-platform/util/timeutils.h"
 
 #include <memory>
 
 using namespace std;
 using namespace ADDON;
-using namespace PLATFORM;
+using namespace P8PLATFORM;
 
 #define null NULL
 
@@ -1070,7 +1070,7 @@ PVR_ERROR Pvr2Wmc::GetTimers(ADDON_HANDLE handle)
 	}
 
 	// check time since last time Recordings were updated, update if it has been awhile
-	if ( _lastRecordingUpdateTime != 0 && PLATFORM::GetTimeMs() > _lastRecordingUpdateTime + 120000)
+	if ( _lastRecordingUpdateTime != 0 && P8PLATFORM::GetTimeMs() > _lastRecordingUpdateTime + 120000)
 	{
 		PVR->TriggerRecordingUpdate();
 	}
@@ -1145,7 +1145,7 @@ PVR_ERROR Pvr2Wmc::GetRecordings(ADDON_HANDLE handle)
 		PVR->TransferRecordingEntry(handle, &xRec);
 	}
 
-	_lastRecordingUpdateTime = PLATFORM::GetTimeMs();
+	_lastRecordingUpdateTime = P8PLATFORM::GetTimeMs();
 
 	return PVR_ERROR_NO_ERROR;
 }

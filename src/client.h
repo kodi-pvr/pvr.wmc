@@ -22,7 +22,7 @@
 #include "kodi/libXBMC_addon.h"
 #include "kodi/libXBMC_pvr.h"
 #include "kodi/libKODI_guilib.h"
-#include "platform/util/StdString.h"
+#include "p8-platform/util/StdString.h"
 
 #include "clientversion.h"
 

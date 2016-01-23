@@ -23,7 +23,7 @@
 #include "kodi/libKODI_guilib.h"
 #include "pvr2wmc.h"
 #include "utilities.h"
-#include "platform/util/util.h"
+#include "p8-platform/util/util.h"
 
 using namespace std;
 using namespace ADDON;
