@@ -1,0 +1,23 @@
+# build artifacts
+build/
+debian/changelog
+debian/files
+debian/kodi-pvr-wmc-dbg.debhelper.log
+debian/kodi-pvr-wmc-dbg.substvars
+debian/kodi-pvr-wmc-dbg/
+debian/kodi-pvr-wmc.debhelper.log
+debian/kodi-pvr-wmc.postinst.debhelper
+debian/kodi-pvr-wmc.postrm.debhelper
+debian/kodi-pvr-wmc.substvars
+debian/kodi-pvr-wmc/
+debian/tmp/
+obj-x86_64-linux-gnu/
+pvr.wmc/addon.xml
+
+# clion
+.idea/
+
+# Eclipse/CDT
+.cproject
+.project
+.settings/
