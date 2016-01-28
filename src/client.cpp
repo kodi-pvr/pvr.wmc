@@ -706,6 +706,7 @@ extern "C" {
 	bool SeekTime(int,bool,double*) { return false; }
 	void SetSpeed(int) {};
 	bool IsTimeshifting(void) { return false; }
+	bool IsRealTimeStream(void) { return true; }
 	PVR_ERROR GetRecordingEdl(const PVR_RECORDING&, PVR_EDL_ENTRY[], int*) { return PVR_ERROR_NOT_IMPLEMENTED; };
 	time_t GetPlayingTime() { return 0; }
 	time_t GetBufferTimeStart() { return 0; }

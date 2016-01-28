@@ -21,5 +21,5 @@
 
 inline CStdString PVRWMC_GetClientVersion()
 {
-	return "1.0.0";	// ALSO CHANGE IN REV NUMBER in 'pvr.wmc/addon.xml.in'
+	return "1.0.2";	// ALSO CHANGE IN REV NUMBER in 'pvr.wmc/addon.xml.in'
 }
