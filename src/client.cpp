@@ -363,11 +363,6 @@ extern "C" {
 		return PVR_ERROR_SERVER_ERROR;
 	}
 
-	int GetCurrentClientChannel(void)
-	{
-		return _currentChannel.iUniqueId;
-	}
-
 	PVR_ERROR GetStreamProperties(PVR_STREAM_PROPERTIES* pProperties)
 	{
 		return PVR_ERROR_NOT_IMPLEMENTED;
