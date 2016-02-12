@@ -1142,6 +1142,9 @@ PVR_ERROR Pvr2Wmc::GetRecordings(ADDON_HANDLE handle)
 			xRec.iEpgEventId = atoi(v[18].c_str());
 		}
 
+		/* TODO: PVR API 5.0.0: Implement this */
+		xRec.iChannelUid = PVR_CHANNEL_INVALID_UID;
+
 		PVR->TransferRecordingEntry(handle, &xRec);
 	}
 
