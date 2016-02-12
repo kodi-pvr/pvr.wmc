@@ -690,6 +690,23 @@ extern "C" {
 		return PVR_ERROR_NOT_IMPLEMENTED;
 	}
 
+	bool IsTimeshifting(void) 
+	{ 
+		return false; 
+	}
+	time_t GetPlayingTime() 
+	{ 
+		return 0; 
+	}
+	time_t GetBufferTimeStart() 
+	{ 
+		return 0; 
+	}
+	time_t GetBufferTimeEnd() 
+	{ 
+		return 0; 
+	}
+
 	/** UNUSED API FUNCTIONS */
 	PVR_ERROR OpenDialogChannelScan(void) { return PVR_ERROR_NOT_IMPLEMENTED; }
 	PVR_ERROR DeleteChannel(const PVR_CHANNEL &channel) { return PVR_ERROR_NOT_IMPLEMENTED; }
@@ -705,11 +722,8 @@ extern "C" {
 	const char * GetLiveStreamURL(const PVR_CHANNEL &channel)  {  return "";  }
 	bool SeekTime(int,bool,double*) { return false; }
 	void SetSpeed(int) {};
-	bool IsTimeshifting(void) { return false; }
+	bool IsRealTimeStream(void) { return true; }
 	PVR_ERROR GetRecordingEdl(const PVR_RECORDING&, PVR_EDL_ENTRY[], int*) { return PVR_ERROR_NOT_IMPLEMENTED; };
-	time_t GetPlayingTime() { return 0; }
-	time_t GetBufferTimeStart() { return 0; }
-	time_t GetBufferTimeEnd() { return 0; }
 	PVR_ERROR UndeleteRecording(const PVR_RECORDING& recording) { return PVR_ERROR_NOT_IMPLEMENTED; }
 	PVR_ERROR DeleteAllRecordingsFromTrash() { return PVR_ERROR_NOT_IMPLEMENTED; }
 
