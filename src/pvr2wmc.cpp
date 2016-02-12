@@ -1676,8 +1676,6 @@ PVR_ERROR Pvr2Wmc::SignalStatus(PVR_SIGNAL_STATUS &signalStatus)
 				snprintf(cachedSignalStatus.strServiceName, sizeof(cachedSignalStatus.strServiceName), "%s", results[3].c_str());
 				snprintf(cachedSignalStatus.strMuxName, sizeof(cachedSignalStatus.strMuxName), "%s", results[4].c_str());
 				cachedSignalStatus.iSignal = (int)(atoi(results[5]) * 655.35);
-				cachedSignalStatus.dVideoBitrate = atof(results[6]);
-				cachedSignalStatus.dAudioBitrate = atof(results[7]);
 			
 				bool error = atoi(results[8]) == 1;
 				if (error)
