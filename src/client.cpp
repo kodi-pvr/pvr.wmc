@@ -20,7 +20,6 @@
 
 #include "client.h"
 #include "kodi/xbmc_pvr_dll.h"
-#include "kodi/libKODI_guilib.h"
 #include "pvr2wmc.h"
 #include "utilities.h"
 #include "p8-platform/util/util.h"
@@ -67,7 +66,6 @@ CStdString		g_AddonDataCustom	= "";					// location of custom addondata settings
 
 CHelper_libXBMC_addon   *XBMC           = NULL;
 CHelper_libXBMC_pvr   	*PVR            = NULL;
-CHelper_libKODI_guilib  *GUI            = NULL; 
 
 #define LOCALHOST "127.0.0.1"
 
@@ -174,21 +172,11 @@ extern "C" {
 			return ADDON_STATUS_PERMANENT_FAILURE;
 		}
 
-		// register gui
-		GUI = new CHelper_libKODI_guilib;
-		if (!GUI->RegisterMe(hdl))
-		{
-			SAFE_DELETE(GUI);
-			SAFE_DELETE(XBMC);
-			return ADDON_STATUS_PERMANENT_FAILURE;
-		}
-
 		// register as pvr
 		PVR = new CHelper_libXBMC_pvr;	
 		if (!PVR->RegisterMe(hdl))
 		{
 			SAFE_DELETE(PVR);
-			SAFE_DELETE(GUI);
 			SAFE_DELETE(XBMC);
 			return ADDON_STATUS_PERMANENT_FAILURE;
 		}
@@ -207,7 +195,6 @@ extern "C" {
 		{
 			SAFE_DELETE(_wmc);
 			SAFE_DELETE(PVR);
-			SAFE_DELETE(GUI);
 			SAFE_DELETE(XBMC);
 			_CurStatus = ADDON_STATUS_LOST_CONNECTION;
 		}
@@ -240,7 +227,6 @@ extern "C" {
 		if (_wmc)
 			_wmc->UnLoading();
 		SAFE_DELETE(PVR);
-		SAFE_DELETE(GUI);
 		_bCreated = false;
 		_CurStatus = ADDON_STATUS_UNKNOWN;
 	}
@@ -308,12 +294,12 @@ extern "C" {
 	
 	const char* GetGUIAPIVersion(void)
 	{
-	  return KODI_GUILIB_API_VERSION;
+		return ""; // GUI API not used
 	}
 
 	const char* GetMininumGUIAPIVersion(void)
 	{
-	  return KODI_GUILIB_MIN_API_VERSION;
+		return ""; // GUI API not used
 	}
 
 	PVR_ERROR GetAddonCapabilities(PVR_ADDON_CAPABILITIES* pCapabilities)
@@ -375,11 +361,6 @@ extern "C" {
 			return _wmc->GetEPGForChannel(handle, channel, iStart, iEnd);
 
 		return PVR_ERROR_SERVER_ERROR;
-	}
-
-	int GetCurrentClientChannel(void)
-	{
-		return _currentChannel.iUniqueId;
 	}
 
 	PVR_ERROR GetStreamProperties(PVR_STREAM_PROPERTIES* pProperties)
@@ -726,5 +707,6 @@ extern "C" {
 	PVR_ERROR GetRecordingEdl(const PVR_RECORDING&, PVR_EDL_ENTRY[], int*) { return PVR_ERROR_NOT_IMPLEMENTED; };
 	PVR_ERROR UndeleteRecording(const PVR_RECORDING& recording) { return PVR_ERROR_NOT_IMPLEMENTED; }
 	PVR_ERROR DeleteAllRecordingsFromTrash() { return PVR_ERROR_NOT_IMPLEMENTED; }
+	PVR_ERROR SetEPGTimeFrame(int) { return PVR_ERROR_NOT_IMPLEMENTED; }
 
 }
