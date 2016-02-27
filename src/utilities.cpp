@@ -81,6 +81,16 @@ bool StartsWith(CStdString const &fullString, CStdString const &starting)
     }
 }
 
+// return the directory from the input file path
+CStdString GetDirectoryPath(CStdString const &path)
+{
+	size_t found = path.find_last_of("/\\");
+	if (found != CStdString::npos)
+		return path.substr(0, found);
+	else
+		return path;
+}
+
 bool ReadFileContents(CStdString const &strFileName, CStdString &strContent)
 {
 	void* fileHandle = XBMC->OpenFile(strFileName.c_str(), 0);

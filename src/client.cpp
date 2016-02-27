@@ -671,21 +671,33 @@ extern "C" {
 		return PVR_ERROR_NOT_IMPLEMENTED;
 	}
 
-	bool IsTimeshifting(void) 
-	{ 
-		return false; 
+	bool IsTimeshifting(void)
+	{
+		if (_wmc)
+			return _wmc->IsTimeShifting();
+		else
+			return false;
 	}
-	time_t GetPlayingTime() 
-	{ 
-		return 0; 
+	time_t GetPlayingTime()
+	{
+		if (_wmc)
+			return _wmc->GetPlayingTime();
+		else
+			return false;
 	}
-	time_t GetBufferTimeStart() 
-	{ 
-		return 0; 
+	time_t GetBufferTimeStart()
+	{
+		if (_wmc)
+			return _wmc->GetBufferTimeStart();
+		else
+			return false;
 	}
-	time_t GetBufferTimeEnd() 
-	{ 
-		return 0; 
+	time_t GetBufferTimeEnd()
+	{
+		if (_wmc)
+			return _wmc->GetBufferTimeEnd();
+		else
+			return false;
 	}
 
 	/** UNUSED API FUNCTIONS */
