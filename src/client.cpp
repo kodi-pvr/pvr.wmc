@@ -683,21 +683,21 @@ extern "C" {
 		if (_wmc)
 			return _wmc->GetPlayingTime();
 		else
-			return false;
+			return 0;
 	}
 	time_t GetBufferTimeStart()
 	{
 		if (_wmc)
 			return _wmc->GetBufferTimeStart();
 		else
-			return false;
+			return 0;
 	}
 	time_t GetBufferTimeEnd()
 	{
 		if (_wmc)
 			return _wmc->GetBufferTimeEnd();
 		else
-			return false;
+			return 0;
 	}
 
 	/** UNUSED API FUNCTIONS */

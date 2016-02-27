@@ -1154,23 +1154,26 @@ PVR_ERROR Pvr2Wmc::GetRecordings(ADDON_HANDLE handle)
 			xRec.iChannelUid = PVR_CHANNEL_INVALID_UID;
 		}
 
-		// fix for advocate99 bug, where new recordings won't play until kodi file cache gets a refresh.  
-		// If a recording exists but is not in the Kodi cache use the trick below to force refresh the kodi cache.  
+		// fix for advocate99 bug: new recordings won't play until kodi file cache gets a refresh.  
+		// If a recording path is given, but is not in the Kodi cache, use the trick below to force refresh kodi cache.  
 		// Does nothing if swmc doesn't return a path to the recording
-		if (strlen(xRec.strStreamURL) > 0 && !XBMC->FileExists(xRec.strStreamURL, true/*cache*/))	// path exists, but rec is not in Kodi cache
+		if (strlen(xRec.strStreamURL) > 0 && !XBMC->FileExists(xRec.strStreamURL, true/*inCache*/))	// path str exists, but rec is not in Kodi cache
 		{
 			unsigned int numItems;
 			CStdString mask = "*.wtv";
 			VFSDirEntry *items;
 			CStdString path = GetDirectoryPath(xRec.strStreamURL);		// get path to directory recording is in
-			if (XBMC->GetDirectory(path, mask, &items, &numItems))		// this causes the kodi file cache to refresh
-				XBMC->FreeDirectory(items, numItems);
+			if (XBMC->DirectoryExists(path))							
+			{ 
+				if (XBMC->GetDirectory(path, mask, &items, &numItems))	// this causes the kodi file cache to refresh
+					XBMC->FreeDirectory(items, numItems);
 
-			// check to see if fix worked
-			if (XBMC->FileExists(xRec.strStreamURL, true))
-				XBMC->Log(LOG_DEBUG, "recording cache fix for '%s' succeeded", xRec.strStreamURL);
-			else
-				XBMC->Log(LOG_DEBUG, "fix for recording cache bug failed for '%s'", xRec.strStreamURL);
+				// check to see if fix worked
+				if (XBMC->FileExists(xRec.strStreamURL, true))
+					XBMC->Log(LOG_DEBUG, "recording cache fix for '%s' succeeded", xRec.strStreamURL);
+				else
+					XBMC->Log(LOG_DEBUG, "fix for recording cache bug failed for '%s'", xRec.strStreamURL);
+			}
 		}
 
 		PVR->TransferRecordingEntry(handle, &xRec);
@@ -1291,6 +1294,8 @@ bool Pvr2Wmc::OpenLiveStream(const PVR_CHANNEL &channel)
 
 	_lostStream = true;								// init
 	_readCnt = 0;
+	int _buffTimesCnt = 0;							
+	int _buffTimeFILTER = 0;
 
 	CloseLiveStream(false);							// close current stream (if any)
 
@@ -1597,6 +1602,8 @@ bool Pvr2Wmc::OpenRecordedStream(const PVR_RECORDING &recording)
 
 	_lostStream = true;								// init
 	_readCnt = 0;
+	int _buffTimesCnt = 0;
+	int _buffTimeFILTER = 0;
 
 	// request an active recording stream
 	CStdString request;
@@ -1723,7 +1730,7 @@ PVR_ERROR Pvr2Wmc::SignalStatus(PVR_SIGNAL_STATUS &signalStatus)
 
 bool Pvr2Wmc::IsTimeShifting()
 {
-	if (_streamFile)		// if using a stream file we are timeshifting
+	if (_streamFile)		// ?not sure if this should be false if playtime is at buffer end)
 		return true;		
 	else
 		return false;
@@ -1733,28 +1740,30 @@ time_t _buffStart;
 time_t _buffEnd;
 time_t _buffCurrent;
 
+// get current playing time from swmc remux, this method also recieves buffer start and buffer end
+// to minimize traffic to swmc, since Kodi calls this like crazy, the calls are filtered.  The size
+// of the filter is passed in from swmc
 time_t Pvr2Wmc::GetPlayingTime()
 {
-	if (_streamFile && _buffTimesCnt >= _buffTimeFILTER)
+	if (_streamFile && _buffTimesCnt >= _buffTimeFILTER)				// filter so we don't query swmc too much
 	{
 		_buffTimesCnt = 0;
-		int64_t filePos = XBMC->GetFilePosition(_streamFile);					// get the current filel pos
+		int64_t filePos = XBMC->GetFilePosition(_streamFile);			// get the current file pos so we can convert to play time
 		CStdString request;
 		request.Format("GetBufferTimes|%llu", filePos);
-		// multiple method
 		vector<CStdString> results = _socketClient.GetVector(request, false);	// have swmc convert file pos to current play time
 
-		if (results.size() > 0)
+		if (results.size() > 3)
 		{
 			_buffStart = atol(results[0]);
 			_buffEnd = atol(results[1]);
 			_buffCurrent = atol(results[2]);
-			_buffTimeFILTER = atoi(results[3]);		// get filter value for swmc
+			_buffTimeFILTER = atoi(results[3]);		// get filter value from swmc
 		}
 
-		// single method follows !!!
+		//int64_t filePos = XBMC->GetFilePosition(_streamFile);					
 		//request.Format("GetPlayingTime|%llu", filePos);
-		//time = _socketClient.GetLL(request, false);							// have swmc convert file pos to current play time
+		//time = _socketClient.GetLL(request, false);							
 		//return time;
 	}
 	_buffTimesCnt++;
