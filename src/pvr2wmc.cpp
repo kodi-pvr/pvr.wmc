@@ -1772,7 +1772,7 @@ time_t Pvr2Wmc::GetPlayingTime()
 
 time_t Pvr2Wmc::GetBufferTimeStart()
 {
-	time_t time = 0;
+	//time_t time = 0;
 	if (_streamFile)
 	{
 		return _buffStart;
@@ -1784,7 +1784,7 @@ time_t Pvr2Wmc::GetBufferTimeStart()
 
 time_t Pvr2Wmc::GetBufferTimeEnd()
 {
-	uint64_t time = 0;
+	//uint64_t time = 0;
 	if (_streamFile)
 	{
 		return _buffEnd;
