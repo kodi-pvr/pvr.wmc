@@ -1159,21 +1159,16 @@ PVR_ERROR Pvr2Wmc::GetRecordings(ADDON_HANDLE handle)
 		// Does nothing if swmc doesn't return a path to the recording
 		if (strlen(xRec.strStreamURL) > 0 && !XBMC->FileExists(xRec.strStreamURL, true/*inCache*/))	// path str exists, but rec is not in Kodi cache
 		{
-			unsigned int numItems;
-			CStdString mask = "*.wtv";
-			VFSDirEntry *items;
-			CStdString path = GetDirectoryPath(xRec.strStreamURL);		// get path to directory recording is in
-			if (XBMC->DirectoryExists(path))							
-			{ 
-				if (XBMC->GetDirectory(path, mask, &items, &numItems))	// this causes the kodi file cache to refresh
-					XBMC->FreeDirectory(items, numItems);
+			CStdString dummyFile = xRec.strStreamURL;
+			dummyFile += "_new_rec_fix.deleteMe";
+			if (XBMC->CreateDirectoryA(dummyFile))				// create a dummy folder
+				XBMC->RemoveDirectoryA(dummyFile);				// delete the dummy folder if it was created
 
-				// check to see if fix worked
-				if (XBMC->FileExists(xRec.strStreamURL, true))
-					XBMC->Log(LOG_DEBUG, "recording cache fix for '%s' succeeded", xRec.strStreamURL);
-				else
-					XBMC->Log(LOG_DEBUG, "fix for recording cache bug failed for '%s'", xRec.strStreamURL);
-			}
+			// check to see if fix worked
+			if (XBMC->FileExists(xRec.strStreamURL, true))
+				XBMC->Log(LOG_DEBUG, "recording cache fix for '%s' succeeded", xRec.strStreamURL);
+			else
+				XBMC->Log(LOG_DEBUG, "fix for recording cache bug failed for '%s'", xRec.strStreamURL);
 		}
 
 		PVR->TransferRecordingEntry(handle, &xRec);
