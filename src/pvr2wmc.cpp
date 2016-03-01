@@ -1142,6 +1142,23 @@ PVR_ERROR Pvr2Wmc::GetRecordings(ADDON_HANDLE handle)
 			xRec.iEpgEventId = atoi(v[18].c_str());
 		}
 
+		// fix for advocate99 bug: new recordings won't play until kodi file cache gets a refresh.  
+		// If a recording path is given, but is not in the Kodi cache, use the trick below to force refresh kodi cache.  
+		// Does nothing if swmc doesn't return a path to the recording
+		if (strlen(xRec.strStreamURL) > 0 && !XBMC->FileExists(xRec.strStreamURL, true/*inCache*/))	// path str exists, but rec is not in Kodi cache
+		{
+			CStdString dummyFile = xRec.strStreamURL;
+			dummyFile += "_new_rec_fix.deleteMe";
+			if (XBMC->CreateDirectoryA(dummyFile))				// create a dummy folder
+				XBMC->RemoveDirectoryA(dummyFile);				// delete the dummy folder if it was created
+
+			// check to see if fix worked
+			if (XBMC->FileExists(xRec.strStreamURL, true))
+				XBMC->Log(LOG_DEBUG, "recording cache fix for '%s' succeeded", xRec.strStreamURL);
+			else
+				XBMC->Log(LOG_DEBUG, "fix for recording cache bug failed for '%s'", xRec.strStreamURL);
+		}
+
 		PVR->TransferRecordingEntry(handle, &xRec);
 	}
 
