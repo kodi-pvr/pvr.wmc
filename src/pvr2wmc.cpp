@@ -1149,8 +1149,8 @@ PVR_ERROR Pvr2Wmc::GetRecordings(ADDON_HANDLE handle)
 		{
 			CStdString dummyFile = xRec.strStreamURL;
 			dummyFile += "_new_rec_fix.deleteMe";
-			if (XBMC->CreateDirectoryA(dummyFile))				// create a dummy folder
-				XBMC->RemoveDirectoryA(dummyFile);				// delete the dummy folder if it was created
+			if (XBMC->CreateDirectory(dummyFile))				// create a dummy folder
+				XBMC->RemoveDirectory(dummyFile);				// delete the dummy folder if it was created
 
 			// check to see if fix worked
 			if (XBMC->FileExists(xRec.strStreamURL, true))
