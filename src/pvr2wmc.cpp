@@ -1161,8 +1161,8 @@ PVR_ERROR Pvr2Wmc::GetRecordings(ADDON_HANDLE handle)
 		{
 			CStdString dummyFile = xRec.strStreamURL;
 			dummyFile += "_new_rec_fix.deleteMe";
-			if (XBMC->CreateDirectoryA(dummyFile))				// create a dummy folder
-				XBMC->RemoveDirectoryA(dummyFile);				// delete the dummy folder if it was created
+			if (XBMC->CreateDirectory(dummyFile))				// create a dummy folder
+				XBMC->RemoveDirectory(dummyFile);				// delete the dummy folder if it was created
 
 			// check to see if fix worked
 			if (XBMC->FileExists(xRec.strStreamURL, true))
@@ -1755,11 +1755,6 @@ time_t Pvr2Wmc::GetPlayingTime()
 			_buffCurrent = atol(results[2]);
 			_buffTimeFILTER = atoi(results[3]);		// get filter value from swmc
 		}
-
-		//int64_t filePos = XBMC->GetFilePosition(_streamFile);					
-		//request.Format("GetPlayingTime|%llu", filePos);
-		//time = _socketClient.GetLL(request, false);							
-		//return time;
 	}
 	_buffTimesCnt++;
 	return _buffCurrent;
@@ -1767,24 +1762,18 @@ time_t Pvr2Wmc::GetPlayingTime()
 
 time_t Pvr2Wmc::GetBufferTimeStart()
 {
-	//time_t time = 0;
 	if (_streamFile)
 	{
 		return _buffStart;
-		//time = _socketClient.GetLL("GetBufferTimeStart", false);
-		//return (time_t)time;
 	}
 	return 0;
 }
 
 time_t Pvr2Wmc::GetBufferTimeEnd()
 {
-	//uint64_t time = 0;
 	if (_streamFile)
 	{
 		return _buffEnd;
-		//time = _socketClient.GetLL("GetBufferTimeEnd", false);
-		//return (time_t)time;
 	}
 	return 0;
 }
