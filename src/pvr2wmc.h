@@ -126,7 +126,13 @@ public:
 	long long LengthLiveStream(void);
 	long long ActualFileSize(int count);
 	PVR_ERROR SignalStatus(PVR_SIGNAL_STATUS &signalStatus);
-	
+
+	// time shifting
+	bool IsTimeShifting();
+	time_t GetPlayingTime();
+	time_t GetBufferTimeStart();
+	time_t GetBufferTimeEnd();
+
 	bool CheckErrorOnServer();
 	void TriggerUpdates(std::vector<CStdString> results);
 	void ExtractDriveSpace(std::vector<CStdString> results);
