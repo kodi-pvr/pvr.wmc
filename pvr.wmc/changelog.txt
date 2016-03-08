@@ -1,3 +1,6 @@
+1.2.0
+- Updated to PVR addon API v5.1.0
+
 1.1.2
 - added support for buffer timeshift calls
 - added fix for new recordings bug
