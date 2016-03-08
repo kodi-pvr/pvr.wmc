@@ -1154,6 +1154,9 @@ PVR_ERROR Pvr2Wmc::GetRecordings(ADDON_HANDLE handle)
 			xRec.iChannelUid = PVR_CHANNEL_INVALID_UID;
 		}
 
+		/* TODO: PVR API 5.1.0: Implement this */
+		xRec.channelType = PVR_RECORDING_CHANNEL_TYPE_UNKNOWN;
+
 		// fix for advocate99 bug: new recordings won't play until kodi file cache gets a refresh.  
 		// If a recording path is given, but is not in the Kodi cache, use the trick below to force refresh kodi cache.  
 		// Does nothing if swmc doesn't return a path to the recording
