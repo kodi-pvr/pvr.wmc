@@ -2,7 +2,7 @@
 <addon
   id="pvr.wmc"
   version="1.2.1"
-  name="PVR WMC Client"
+  name="WMC PVR Client Addon"
   provider-name="KrustyReturns and scarecrow420">
   <requires>
     <c-pluff version="0.1"/>
@@ -21,10 +21,10 @@
     <summary lang="da_DK">PVR WMC klient</summary>
     <summary lang="de_DE">PVR WMC-Client</summary>
     <summary lang="el_GR">Πελάτης PVR του WMC</summary>
-    <summary lang="en_AU">PVR WMC Client</summary>
-    <summary lang="en_GB">PVR WMC Client</summary>
-    <summary lang="en_NZ">PVR WMC Client</summary>
-    <summary lang="en_US">PVR WMC Client</summary>
+    <summary lang="en_AU">WMC PVR Client Addon is a PVR client for Kodi that allows it to connect to ServerWMC which in turn acts as a gateway to Windows Media Center (WMC) PVR backend software by Microsoft.</summary>
+    <summary lang="en_GB">WMC PVR Client Addon is a PVR client for Kodi that allows it to connect to ServerWMC which in turn acts as a gateway to Windows Media Center (WMC) PVR backend software by Microsoft.</summary>
+    <summary lang="en_NZ">WMC PVR Client Addon is a PVR client for Kodi that allows it to connect to ServerWMC which in turn acts as a gateway to Windows Media Center (WMC) PVR backend software by Microsoft.</summary>
+    <summary lang="en_US">WMC PVR Client Addon is a PVR client for Kodi that allows it to connect to ServerWMC which in turn acts as a gateway to Windows Media Center (WMC) PVR backend software by Microsoft.</summary>
     <summary lang="es_AR">Cliente PVR WMC</summary>
     <summary lang="es_ES">Cliente PVR WMC</summary>
     <summary lang="fi_FI">PVR WMC asiakas</summary>
