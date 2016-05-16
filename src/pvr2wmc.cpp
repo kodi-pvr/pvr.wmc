@@ -18,7 +18,7 @@
  *
  */
 
-#include "kodi/util/XMLUtils.h"
+#include "util/XMLUtils.h"
 #include "pvr2wmc.h"
 #include "utilities.h"
 #include "p8-platform/util/timeutils.h"

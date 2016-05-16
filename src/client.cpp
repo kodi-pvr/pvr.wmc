@@ -19,7 +19,7 @@
  */
 
 #include "client.h"
-#include "kodi/xbmc_pvr_dll.h"
+#include "xbmc_pvr_dll.h"
 #include "pvr2wmc.h"
 #include "utilities.h"
 #include "p8-platform/util/util.h"
