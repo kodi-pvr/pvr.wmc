@@ -725,7 +725,7 @@ extern "C" {
 	DemuxPacket* DemuxRead(void) { return NULL; }
 	unsigned int GetChannelSwitchDelay(void) { return 0; }
 	const char * GetLiveStreamURL(const PVR_CHANNEL &channel)  {  return "";  }
-	bool SeekTime(int,bool,double*) { return false; }
+	bool SeekTime(double,bool,double*) { return false; }
 	void SetSpeed(int) {};
 	bool IsRealTimeStream(void) { return true; }
 	PVR_ERROR GetRecordingEdl(const PVR_RECORDING&, PVR_EDL_ENTRY[], int*) { return PVR_ERROR_NOT_IMPLEMENTED; };
