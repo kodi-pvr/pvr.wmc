@@ -10,8 +10,6 @@ Package: kodi-pvr-wmc
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Conflicts: kodi-pvr-tvheadend-hts
-Replaces: kodi-pvr-tvheadend-hts
 Description: WMC PVR for Kodi
  WMC PVR for Kodi
 
