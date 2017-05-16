@@ -19,6 +19,12 @@ set(WMC_SOURCES src/client.cpp
                 src/Socket.cpp
                 src/utilities.cpp)
 
+set(WMC_HEADERS src/client.h
+                src/clientversion.h
+                src/pvr2wmc.h
+                src/Socket.h
+                src/utilities.h)
+
 set(DEPLIBS ${kodiplatform_LIBRARIES}
             ${p8-platform_LIBRARIES})
 
