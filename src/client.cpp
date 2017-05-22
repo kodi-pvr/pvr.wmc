@@ -254,10 +254,6 @@ extern "C" {
 		return ADDON_STATUS_OK;
 	}
 
-	void ADDON_Stop()
-	{
-	}
-
 	/***********************************************************
 	* PVR Client AddOn specific public library functions
 	***********************************************************/
