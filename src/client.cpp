@@ -19,7 +19,7 @@
  */
 
 #include "client.h"
-#include "kodi/xbmc_pvr_dll.h"
+#include "xbmc_pvr_dll.h"
 #include "pvr2wmc.h"
 #include "utilities.h"
 #include "p8-platform/util/util.h"
@@ -231,16 +231,6 @@ extern "C" {
 		_CurStatus = ADDON_STATUS_UNKNOWN;
 	}
 
-	bool ADDON_HasSettings()
-	{
-		return true;
-	}
-
-	unsigned int ADDON_GetSettings(ADDON_StructSetting ***sSet)
-	{
-		return 0;
-	}
-
 	// Called everytime a setting is changed by the user and to inform AddOn about
 	// new setting and to do required stuff to apply it.
 	ADDON_STATUS ADDON_SetSetting(const char *settingName, const void *settingValue)
@@ -264,42 +254,24 @@ extern "C" {
 		return ADDON_STATUS_OK;
 	}
 
-	void ADDON_Stop()
-	{
-	}
-
-	void ADDON_FreeSettings()
-	{
-	}
-
-	void ADDON_Announce(const char *flag, const char *sender, const char *message, const void *data)
-	{
-	}
-
 	/***********************************************************
 	* PVR Client AddOn specific public library functions
 	***********************************************************/
 
-	const char* GetPVRAPIVersion(void)
+	void OnSystemSleep()
 	{
-		static const char *strApiVersion = XBMC_PVR_API_VERSION;
-		return strApiVersion;
 	}
 
-	const char* GetMininumPVRAPIVersion(void)
+	void OnSystemWake()
 	{
-		static const char *strMinApiVersion = XBMC_PVR_MIN_API_VERSION;
-		return strMinApiVersion;
-	}
-	
-	const char* GetGUIAPIVersion(void)
-	{
-		return ""; // GUI API not used
 	}
 
-	const char* GetMininumGUIAPIVersion(void)
+	void OnPowerSavingActivated()
 	{
-		return ""; // GUI API not used
+	}
+
+	void OnPowerSavingDeactivated()
+	{
 	}
 
 	PVR_ERROR GetAddonCapabilities(PVR_ADDON_CAPABILITIES* pCapabilities)
@@ -317,6 +289,9 @@ extern "C" {
 		pCapabilities->bSupportsRecordingPlayCount	= true;
 		pCapabilities->bSupportsLastPlayedPosition	= g_bEnableMultiResume;
 		pCapabilities->bSupportsRecordingEdl		= false;
+		pCapabilities->bSupportsRecordingsRename	= true;
+		pCapabilities->bSupportsRecordingsLifetimeChange	= false;
+		pCapabilities->bSupportsDescrambleInfo = false;
 
 		return PVR_ERROR_NO_ERROR;
 	}
@@ -713,12 +688,14 @@ extern "C" {
 	DemuxPacket* DemuxRead(void) { return NULL; }
 	unsigned int GetChannelSwitchDelay(void) { return 0; }
 	const char * GetLiveStreamURL(const PVR_CHANNEL &channel)  {  return "";  }
-	bool SeekTime(int,bool,double*) { return false; }
+	bool SeekTime(double,bool,double*) { return false; }
 	void SetSpeed(int) {};
 	bool IsRealTimeStream(void) { return true; }
 	PVR_ERROR GetRecordingEdl(const PVR_RECORDING&, PVR_EDL_ENTRY[], int*) { return PVR_ERROR_NOT_IMPLEMENTED; };
 	PVR_ERROR UndeleteRecording(const PVR_RECORDING& recording) { return PVR_ERROR_NOT_IMPLEMENTED; }
 	PVR_ERROR DeleteAllRecordingsFromTrash() { return PVR_ERROR_NOT_IMPLEMENTED; }
 	PVR_ERROR SetEPGTimeFrame(int) { return PVR_ERROR_NOT_IMPLEMENTED; }
+	PVR_ERROR GetDescrambleInfo(PVR_DESCRAMBLE_INFO*) { return PVR_ERROR_NOT_IMPLEMENTED; }
+	PVR_ERROR SetRecordingLifetime(const PVR_RECORDING*) { return PVR_ERROR_NOT_IMPLEMENTED; }
 
 }

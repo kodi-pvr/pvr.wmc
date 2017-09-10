@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 2.6)
 
 enable_language(CXX)
 
-find_package(kodi REQUIRED)
+find_package(Kodi REQUIRED)
 find_package(kodiplatform REQUIRED)
 find_package(p8-platform REQUIRED)
 
@@ -18,6 +18,12 @@ set(WMC_SOURCES src/client.cpp
                 src/pvr2wmc.cpp
                 src/Socket.cpp
                 src/utilities.cpp)
+
+set(WMC_HEADERS src/client.h
+                src/clientversion.h
+                src/pvr2wmc.h
+                src/Socket.h
+                src/utilities.h)
 
 set(DEPLIBS ${kodiplatform_LIBRARIES}
             ${p8-platform_LIBRARIES})

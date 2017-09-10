@@ -1,8 +1,8 @@
 Source: kodi-pvr-wmc
 Priority: extra
 Maintainer: Nobody <nobody@kodi.tv>
-Build-Depends: debhelper (>= 9.0.0), cmake, kodi-pvr-dev,
-               libkodiplatform-dev (>= 16.0.0), kodi-addon-dev
+Build-Depends: debhelper (>= 9.0.0), cmake, libkodiplatform-dev (>= 16.0.0),
+               kodi-addon-dev
 Standards-Version: 3.9.4
 Section: libs
 
@@ -10,8 +10,6 @@ Package: kodi-pvr-wmc
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Conflicts: kodi-pvr-tvheadend-hts
-Replaces: kodi-pvr-tvheadend-hts
 Description: WMC PVR for Kodi
  WMC PVR for Kodi
 
