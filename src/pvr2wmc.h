@@ -20,7 +20,7 @@
 #pragma once
 
 #include <vector>
-#include "p8-platform/util/StdString.h"
+//#include "p8-platform/util/StdString.h"
 #include "client.h"
 #include "Socket.h"
 
@@ -134,14 +134,14 @@ public:
 	time_t GetBufferTimeEnd();
 
 	bool CheckErrorOnServer();
-	void TriggerUpdates(std::vector<CStdString> results);
-	void ExtractDriveSpace(std::vector<CStdString> results);
+	void TriggerUpdates(std::vector<std::string> results);
+	void ExtractDriveSpace(std::vector<std::string> results);
 
 private:
 	int _serverBuild;
-	CStdString Timer2String(const PVR_TIMER &xTmr);
-	CStdString SeriesTimer2String(const PVR_TIMER &xTmr);
-	CStdString Channel2String(const PVR_CHANNEL &xTmr);
+	std::string Timer2String(const PVR_TIMER &xTmr);
+	std::string SeriesTimer2String(const PVR_TIMER &xTmr);
+	std::string Channel2String(const PVR_CHANNEL &xTmr);
 
 	Socket _socketClient;
 
@@ -152,7 +152,7 @@ private:
 	bool _discardSignalStatus;			// flag to discard signal status for channels where the backend had an error
 
 	void* _streamFile;					// handle to a streamed file
-	CStdString _streamFileName;			// the name of the stream file
+	std::string _streamFileName;			// the name of the stream file
 	bool _lostStream;					// set to true if stream is lost
 	
 	bool _streamWTV;					// if true, stream wtv files
@@ -164,7 +164,7 @@ private:
 	long long _initialStreamPosition;	// used to set an initial position (multiple clients watching the same live tv buffer)
 
 	bool _insertDurationHeader;			// if true, insert a duration header for active Rec TS file
-	CStdString _durationHeader;			// the header to insert (received from server)
+	std::string _durationHeader;			// the header to insert (received from server)
 
 	int _defaultPriority;
 	int _defaultLiftetime;

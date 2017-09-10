@@ -179,7 +179,7 @@ class Socket
       _sockaddr.sin_port = htons ( port );
     };
 
-    bool setHostname ( const CStdString& host );
+    bool setHostname ( const std::string& host );
 
     // Server initialization
 
@@ -205,7 +205,7 @@ class Socket
     //bool accept ( Socket& socket ) const;
 
     // Client initialization
-    bool connect ( const CStdString& host, const unsigned short port );
+    bool connect ( const std::string& host, const unsigned short port );
 
     bool reconnect();
 
@@ -217,7 +217,7 @@ class Socket
      * \param data    Reference to a std::string with the data to transmit
      * \return    Number of bytes send or -1 in case of an error
      */
-    int send ( const CStdString& data );
+    int send ( const std::string& data );
 
     /*!
      * Socket send function
@@ -230,7 +230,7 @@ class Socket
 
     bool set_non_blocking ( const bool );
 
-    bool ReadResponses(int &code, std::vector<CStdString> &lines);
+    bool ReadResponses(int &code, std::vector<std::string> &lines);
 
     bool is_valid() const;
 
@@ -256,19 +256,19 @@ class Socket
 
 	// client interface
 	private:
-		CStdString _serverName;
-		CStdString _clientName;
+		std::string _serverName;
+		std::string _clientName;
 		int _port;
-		int SendRequest(CStdString requestStr);
+		int SendRequest(std::string requestStr);
 	public:
-		void SetServerName(CStdString strServerName);
-		void SetClientName(CStdString strClientName);
+		void SetServerName(std::string strServerName);
+		void SetClientName(std::string strClientName);
 		void SetServerPort(int port);
-		std::vector<CStdString> GetVector(const CStdString &request, bool allowRetry, bool allowWOL = true);
-		CStdString GetString(const CStdString &request, bool allowRetry, bool allowWOL = true);
-		bool GetBool(const CStdString &request, bool allowRetry, bool allowWOL = true);
-		int GetInt(const CStdString &request, bool allowRetry, bool allowWOL = true);
-		long long GetLL(const CStdString &request, bool allowRetry, bool allowWOL = true);
+		std::vector<std::string> GetVector(const std::string &request, bool allowRetry, bool allowWOL = true);
+		std::string GetString(const std::string &request, bool allowRetry, bool allowWOL = true);
+		bool GetBool(const std::string &request, bool allowRetry, bool allowWOL = true);
+		int GetInt(const std::string &request, bool allowRetry, bool allowWOL = true);
+		long long GetLL(const std::string &request, bool allowRetry, bool allowWOL = true);
 
 		void SetTimeOut(int tSec);
 };

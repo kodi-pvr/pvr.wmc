@@ -63,7 +63,7 @@ Socket::~Socket()
 	close();
 }
 
-bool Socket::setHostname ( const CStdString& host )
+bool Socket::setHostname ( const std::string& host )
 {
 	if (isalpha(host.c_str()[0]))
 	{
@@ -140,7 +140,7 @@ bool Socket::create()
 	return true;
 }
 
-int Socket::send( const CStdString& data )
+int Socket::send( const std::string& data )
 {
 	if (!is_valid())
 	{
@@ -199,14 +199,14 @@ int Socket::send ( const char* data, const unsigned int len )
 }
 
 //Receive until error or \n
-bool Socket::ReadResponses(int &code, vector<CStdString> &lines)
+bool Socket::ReadResponses(int &code, vector<std::string> &lines)
 {
 	int					result;
 	char				buffer[4096];		// this buff size has to be known in server
 	code = 0;
 	
 	bool readComplete = false;
-	CStdString bigString = "";
+	std::string bigString = "";
 
 	do
 	{
@@ -235,7 +235,7 @@ bool Socket::ReadResponses(int &code, vector<CStdString> &lines)
 	if (EndsWith(bigString, "<EOF>"))
 	{
 		readComplete = true;						// all server data has benn read
-		lines = split(bigString, "<EOL>", true);	// split each reponse by <EOL> delimiters
+		lines = split(bigString, "<EOL>");			// split each reponse by <EOL> delimiters
 		lines.erase(lines.end() - 1);				// erase <EOF> at end
 	}
 	else
@@ -248,7 +248,7 @@ bool Socket::ReadResponses(int &code, vector<CStdString> &lines)
 	return readComplete;
 }
 
-bool Socket::connect ( const CStdString& host, const unsigned short port )
+bool Socket::connect ( const std::string& host, const unsigned short port )
 {
 	if ( !is_valid() )
 	{
@@ -559,12 +559,12 @@ void Socket::osCleanup()
 #endif //TARGET_WINDOWS || TARGET_LINUX || TARGET_DARWIN || TARGET_FREEBSD
 
 
-void Socket::SetServerName(CStdString strServerName)
+void Socket::SetServerName(std::string strServerName)
 {
 	_serverName = strServerName;
 }
 
-void Socket::SetClientName(CStdString strClientName)
+void Socket::SetClientName(std::string strClientName)
 {
 	_clientName = strClientName;
 }
@@ -574,10 +574,11 @@ void Socket::SetServerPort(int port)
 	_port = port;
 }
 
-int Socket::SendRequest(CStdString requestStr)
+int Socket::SendRequest(std::string requestStr)
 {
-	CStdString sRequest;		
-	sRequest.Format("%s|%s<Client Quit>", _clientName.c_str(), requestStr.c_str());	// build the request string
+	std::string sRequest;		
+	//sRequest.Format("%s|%s<Client Quit>", _clientName.c_str(), requestStr.c_str());	// build the request string
+	sRequest = string_format("%s|%s<Client Quit>", _clientName.c_str(), requestStr.c_str());	// build the request string
 	int status = send(sRequest);
 	return status;
 }
@@ -588,7 +589,7 @@ void Socket::SetTimeOut(int tSec)
 	_timeout = tSec;
 }
 
-std::vector<CStdString> Socket::GetVector(const CStdString &request, bool allowRetry, bool allowWOL /* = true*/)
+std::vector<std::string> Socket::GetVector(const std::string &request, bool allowRetry, bool allowWOL /* = true*/)
 {
 	int maxAttempts = 3;
 	int sleepAttemptsMs = 1000;
@@ -596,7 +597,7 @@ std::vector<CStdString> Socket::GetVector(const CStdString &request, bool allowR
 	P8PLATFORM::CLockObject lock(m_mutex);						// only process one request at a time
 
 	int code;
-	std::vector<CStdString> reponses;
+	std::vector<std::string> reponses;
 
 	int cntAttempts = 1;
 	while (cntAttempts <= maxAttempts)
@@ -617,10 +618,10 @@ std::vector<CStdString> Socket::GetVector(const CStdString &request, bool allowR
 				XBMC->Log(LOG_INFO, "Socket::GetVector> Sending WOL packet to %s", g_strServerMAC.c_str());
 				if (g_BackendOnline != BACKEND_UNKNOWN)
 				{
-					CStdString infoStr = XBMC->GetLocalizedString(30026);		
+					std::string infoStr = XBMC->GetLocalizedString(30026);		
 					XBMC->QueueNotification(QUEUE_INFO, infoStr.c_str());	// Notify WOL is being sent
 				}
-				XBMC->WakeOnLan(g_strServerMAC);						// Send WOL request
+				XBMC->WakeOnLan(g_strServerMAC.c_str());						// Send WOL request
 			}
 
 			if (!connect(_serverName, (unsigned short)_port))	// if this fails, it is likely due to server down
@@ -671,30 +672,30 @@ std::vector<CStdString> Socket::GetVector(const CStdString &request, bool allowR
 	return reponses;											// return responses
 }
 
-CStdString Socket::GetString(const CStdString &request, bool allowRetry, bool allowWOL /* = true*/)
+std::string Socket::GetString(const std::string &request, bool allowRetry, bool allowWOL /* = true*/)
 {
-	std::vector<CStdString> result = GetVector(request, allowRetry, allowWOL);
+	std::vector<std::string> result = GetVector(request, allowRetry, allowWOL);
 	return result[0];
 }
 
-bool Socket::GetBool(const CStdString &request, bool allowRetry, bool allowWOL /* = true*/)
+bool Socket::GetBool(const std::string &request, bool allowRetry, bool allowWOL /* = true*/)
 {
 	return GetString(request, allowRetry, allowWOL) == "True";
 }
 
 
-int Socket::GetInt(const CStdString &request, bool allowRetry, bool allowWOL /* = true*/)
+int Socket::GetInt(const std::string &request, bool allowRetry, bool allowWOL /* = true*/)
 {
-	CStdString valStr = GetString(request, allowRetry, allowWOL);
-	long val = strtol(valStr, 0, 10);
+	std::string valStr = GetString(request, allowRetry, allowWOL);
+	long val = strtol(valStr.c_str(), 0, 10);
 	return val;
 }
 
-long long Socket::GetLL(const CStdString &request, bool allowRetry, bool allowWOL /* = true*/)
+long long Socket::GetLL(const std::string &request, bool allowRetry, bool allowWOL /* = true*/)
 {
-	CStdString valStr = GetString(request, allowRetry, allowWOL);
+	std::string valStr = GetString(request, allowRetry, allowWOL);
 #ifdef TARGET_WINDOWS
-		long long val = _strtoi64(valStr, 0, 10);
+		long long val = _strtoi64(valStr.c_str(), 0, 10);
 #else
 		long long val = strtoll(valStr, NULL, 10);
 #endif

@@ -44,15 +44,15 @@ bool			_bIsPlaying     = false;
 PVR_CHANNEL		_currentChannel;
 PVR_MENUHOOK	*menuHook       = NULL;
 
-CStdString		g_strServerName;							// the name of the server to connect to
-CStdString		g_strClientName;							// the name of the computer running addon
+std::string		g_strServerName;							// the name of the server to connect to
+std::string		g_strClientName;							// the name of the computer running addon
 int				g_port;
 bool			g_bWakeOnLAN;								// whether to send wake on LAN to server
-CStdString		g_strServerMAC;								// MAC address of server
+std::string		g_strServerMAC;								// MAC address of server
 bool			g_bSignalEnable;
 int				g_signalThrottle;
 bool			g_bEnableMultiResume;
-CStdString		g_clientOS;									// OS of client, passed to server
+std::string		g_clientOS;									// OS of client, passed to server
 
 backend_status	g_BackendOnline;							// whether the backend is online
 
@@ -60,9 +60,9 @@ backend_status	g_BackendOnline;							// whether the backend is online
 * Default values are defined inside client.h
 * and exported to the other source files.
 */
-CStdString g_strUserPath             = "";
-CStdString g_strClientPath           = "";
-CStdString		g_AddonDataCustom	= "";					// location of custom addondata settings file
+std::string g_strUserPath             = "";
+std::string g_strClientPath           = "";
+std::string	g_AddonDataCustom	= "";					// location of custom addondata settings file
 
 CHelper_libXBMC_addon   *XBMC           = NULL;
 CHelper_libXBMC_pvr   	*PVR            = NULL;
@@ -107,7 +107,7 @@ extern "C" {
 			XBMC->Log(LOG_ERROR, "Couldn't get 'wake_on_lan' setting, using '%s'", DEFAULT_WAKEONLAN_ENABLE);
 		}
 
-		CStdString fileContent;
+		std::string fileContent;
 		if (ReadFileContents(g_AddonDataCustom, fileContent))
 		{
 			g_strServerMAC = fileContent;
@@ -144,7 +144,8 @@ extern "C" {
 		ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
 		osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 		GetVersionEx(&osvi);
-		g_clientOS.Format("windows(%d.%d)", osvi.dwMajorVersion, osvi.dwMinorVersion);	// set windows version string
+		//g_clientOS.Format("windows(%d.%d)", osvi.dwMajorVersion, osvi.dwMinorVersion);	// set windows version string
+		g_clientOS = string_format("windows(%d.%d)", osvi.dwMajorVersion, osvi.dwMinorVersion);	// set windows version string
 #elif defined TARGET_LINUX
 		g_clientOS = "linux";			// set to the client OS name
 #elif defined TARGET_DARWIN
@@ -166,6 +167,7 @@ extern "C" {
 
 		// register the addon
 		XBMC = new CHelper_libXBMC_addon;
+
 		if (!XBMC->RegisterMe(hdl))
 		{
 			SAFE_DELETE(XBMC);
@@ -238,11 +240,11 @@ extern "C" {
 		if (!XBMC)
 			return ADDON_STATUS_OK;
 
-		CStdString sName = settingName;
+		std::string sName = settingName;
 
 		if (sName == "host")
 		{
-			CStdString oldName = g_strServerName;
+			std::string oldName = g_strServerName;
 			g_strServerName = (const char*)settingValue;
 			//if (g_strServerName == ".")
 			//	g_strServerName = LOCALHOST;
@@ -312,8 +314,9 @@ extern "C" {
 
 	const char *GetConnectionString(void)
 	{
-		static CStdString strConnectionString;
-		strConnectionString.Format("%s:%u", g_strServerName, g_port);
+		static std::string strConnectionString;
+		//strConnectionString.Format("%s:%u", g_strServerName, g_port);
+		strConnectionString = string_format("%s:%u", g_strServerName.c_str(), g_port);
 		return strConnectionString.c_str();
 	}
 
@@ -698,4 +701,15 @@ extern "C" {
 	PVR_ERROR GetDescrambleInfo(PVR_DESCRAMBLE_INFO*) { return PVR_ERROR_NOT_IMPLEMENTED; }
 	PVR_ERROR SetRecordingLifetime(const PVR_RECORDING*) { return PVR_ERROR_NOT_IMPLEMENTED; }
 
+
+	PVR_ERROR IsEPGTagPlayable(const EPG_TAG*, bool*) { return PVR_ERROR_NOT_IMPLEMENTED; }
+	PVR_ERROR IsEPGTagRecordable(const EPG_TAG*, bool*) { return PVR_ERROR_NOT_IMPLEMENTED; }
+	PVR_ERROR GetEPGTagStreamProperties(const EPG_TAG*, PVR_NAMED_VALUE*, unsigned int*) { return PVR_ERROR_NOT_IMPLEMENTED; }
+	PVR_ERROR GetStreamTimes(PVR_STREAM_TIMES*) { return PVR_ERROR_NOT_IMPLEMENTED; }
+	PVR_ERROR GetRecordingStreamProperties(const PVR_RECORDING*, PVR_NAMED_VALUE*, unsigned int*) { return PVR_ERROR_NOT_IMPLEMENTED; }
+
+	PVR_ERROR GetChannelStreamProperties(const PVR_CHANNEL* channel, PVR_NAMED_VALUE* properties, unsigned int* iPropertiesCount)
+	{
+		return PVR_ERROR_NOT_IMPLEMENTED;
+	}
 }

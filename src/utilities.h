@@ -21,14 +21,15 @@
 
 #include <vector>
 #include <string>
+#include "stdio.h"
 
+//std::vector<std::string> split(const std::string& s, const std::string& delim);
 
-std::vector<CStdString> split(const CStdString& s, const CStdString& delim, const bool keep_empty = true);
+bool Str2Bool(const std::string str);
 
-bool Str2Bool(const CStdString str);
+bool EndsWith(std::string const &fullString, std::string const &ending);
+bool StartsWith(std::string const &fullString, std::string const &starting);
+std::string GetDirectoryPath(std::string const &path);
+bool ReadFileContents(std::string const &strFileName, std::string &strResult);
+bool WriteFileContents(std::string const &strFileName, std::string &strContent);
 
-bool EndsWith(CStdString const &fullString, CStdString const &ending);
-bool StartsWith(CStdString const &fullString, CStdString const &starting);
-CStdString GetDirectoryPath(CStdString const &path);
-bool ReadFileContents(CStdString const &strFileName, CStdString &strResult);
-bool WriteFileContents(CStdString const &strFileName, CStdString &strContent);

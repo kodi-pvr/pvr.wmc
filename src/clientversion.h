@@ -19,7 +19,7 @@
  */
 #pragma once
 
-inline CStdString PVRWMC_GetClientVersion()
+inline std::string PVRWMC_GetClientVersion()
 {
-	return "1.3.0";	// ALSO CHANGE IN REV NUMBER in 'pvr.wmc/addon.xml.in'
+	return "2.1.2";	// ALSO CHANGE IN REV NUMBER in 'pvr.wmc/addon.xml.in'
 }

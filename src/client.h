@@ -19,28 +19,32 @@
  */
 #pragma once
 
+
 #include "libXBMC_addon.h"
 #include "libXBMC_pvr.h"
 #include "libKODI_guilib.h"
-#include "p8-platform/util/StdString.h"
+#include <p8-platform/util/StringUtils.h>
 
 #include "clientversion.h"
 
+#define string_format StringUtils::Format
+#define split StringUtils::Split
+
 extern bool								m_bCreated;
-extern CStdString						g_strUserPath;
-extern CStdString						g_strClientPath;
-extern CStdString						g_strServerName;		// the name of the server to connect to
-extern CStdString						g_strClientName;		// the name of the computer running addon
-extern CStdString						g_clientOS;				// OS of client, passed to server
+extern std::string						g_strUserPath;
+extern std::string						g_strClientPath;
+extern std::string						g_strServerName;		// the name of the server to connect to
+extern std::string						g_strClientName;		// the name of the computer running addon
+extern std::string						g_clientOS;				// OS of client, passed to server
 extern int								g_port;
 extern bool								g_bSignalEnable;
 extern int								g_signalThrottle;
 extern bool								g_bEnableMultiResume;
 extern ADDON::CHelper_libXBMC_addon		*XBMC;
 extern CHelper_libXBMC_pvr				*PVR;
-extern CStdString						g_strServerMAC;
+extern std::string						g_strServerMAC;
 extern bool								g_bWakeOnLAN;
-extern CStdString						g_AddonDataCustom;
+extern std::string						g_AddonDataCustom;
 
 enum backend_status
   {

@@ -32,7 +32,7 @@ using namespace P8PLATFORM;
 #define null NULL
 
 #define STRCPY(dest, src) strncpy(dest, src, sizeof(dest)-1); 
-#define FOREACH(ss, vv) for(std::vector<CStdString>::iterator ss = vv.begin(); ss != vv.end(); ++ss)
+#define FOREACH(ss, vv) for(std::vector<std::string>::iterator ss = vv.begin(); ss != vv.end(); ++ss)
 
 #define FAKE_TS_LENGTH 2000000			// a fake file length for give to xbmc (used to insert duration headers)
 
@@ -81,10 +81,11 @@ Pvr2Wmc::~Pvr2Wmc(void)
 
 bool Pvr2Wmc::IsServerDown()
 {
-	CStdString request;
-	request.Format("GetServiceStatus|%s|%s", PVRWMC_GetClientVersion(), g_clientOS);
+	std::string request;
+	//request.Format("GetServiceStatus|%s|%s", PVRWMC_GetClientVersion(), g_clientOS);
+	request = string_format("GetServiceStatus|%s|%s", PVRWMC_GetClientVersion().c_str(), g_clientOS.c_str());
 	_socketClient.SetTimeOut(10);											// set a timout interval for checking if server is down
-	vector<CStdString> results = _socketClient.GetVector(request, true);	// get serverstatus
+	vector<std::string> results = _socketClient.GetVector(request, true);	// get serverstatus
 	bool isServerDown = (results[0] != "True");								// true if server is down
 
 	// GetServiceStatus may return any updates requested by server
@@ -105,7 +106,7 @@ const char *Pvr2Wmc::GetBackendVersion(void)
 {
 	if (!IsServerDown())
 	{
-		static CStdString strVersion = "0.0";
+		static std::string strVersion = "0.0";
 
 		// Send client's time (in UTC) to backend
 		time_t now = time(NULL);
@@ -113,30 +114,31 @@ const char *Pvr2Wmc::GetBackendVersion(void)
 		strftime(datestr, 32, "%Y-%m-%d %H:%M:%S", gmtime(&now));
 
 		// Also send this client's setting for backend servername (so server knows how it is being accessed)
-		CStdString request;
-		request.Format("GetServerVersion|%s|%s", datestr, g_strServerName.c_str());
-		vector<CStdString> results = _socketClient.GetVector(request, true);
+		std::string request;
+		//request.Format("GetServerVersion|%s|%s", datestr, g_strServerName.c_str());
+		request = string_format("GetServerVersion|%s|%s", datestr, g_strServerName.c_str());
+		vector<std::string> results = _socketClient.GetVector(request, true);
 		if (results.size() > 0)
 		{
-			strVersion = CStdString(results[0]);
+			strVersion = std::string(results[0]);
 		}
 		if (results.size() > 1)
 		{
-			_serverBuild = atoi(results[1]);			// get server build number for feature checking
+			_serverBuild = atoi(results[1].c_str());			// get server build number for feature checking
 		}
 		// check if recorded tv folder is accessible from client
 		if (results.size() > 2 && results[2] != "")		// if server sends empty string, skip check
 		{
-			if (!XBMC->DirectoryExists(results[2]))
+			if (!XBMC->DirectoryExists(results[2].c_str()))
 			{
 				XBMC->Log(LOG_ERROR, "Recorded tv '%s' does not exist", results[2].c_str());
-				CStdString infoStr = XBMC->GetLocalizedString(30017);		
+				std::string infoStr = XBMC->GetLocalizedString(30017);		
 				XBMC->QueueNotification(QUEUE_ERROR, infoStr.c_str());
 			}
-			else if (!XBMC->CanOpenDirectory(results[2]))
+			else if (!XBMC->CanOpenDirectory(results[2].c_str()))
 			{
 				XBMC->Log(LOG_ERROR, "Recorded tv '%s' count not be opened", results[2].c_str());
-				CStdString infoStr = XBMC->GetLocalizedString(30018);		
+				std::string infoStr = XBMC->GetLocalizedString(30018);		
 				XBMC->QueueNotification(QUEUE_ERROR, infoStr.c_str());
 			}
 		}
@@ -479,7 +481,7 @@ int Pvr2Wmc::GetChannelsAmount(void)
 }
 
 // test for returned error vector from server, handle accompanying messages if any
-bool isServerError(vector<CStdString> results)
+bool isServerError(vector<std::string> results)
 {
 	if (results[0] == "error")
 	{
@@ -492,7 +494,7 @@ bool isServerError(vector<CStdString> results)
 			int errorID = atoi(results[2].c_str());
 			if (errorID != 0)
 			{
-				CStdString errStr = XBMC->GetLocalizedString(errorID);
+				std::string errStr = XBMC->GetLocalizedString(errorID);
 				XBMC->QueueNotification(QUEUE_ERROR, errStr.c_str());
 			}
 		}
@@ -503,11 +505,11 @@ bool isServerError(vector<CStdString> results)
 }
 
 // look at result vector from server and perform any updates requested
-void Pvr2Wmc::TriggerUpdates(vector<CStdString> results)
+void Pvr2Wmc::TriggerUpdates(vector<std::string> results)
 {
 	FOREACH(response, results)
 	{
-		vector<CStdString> v = split(*response, "|");				// split to unpack string
+		vector<std::string> v = split(*response, "|");				// split to unpack string
 
 		if (v.size() < 1)
 		{
@@ -540,7 +542,7 @@ void Pvr2Wmc::TriggerUpdates(vector<CStdString> results)
 			}
 
 			XBMC->Log(LOG_INFO, "Received message from backend: %s", response->c_str());
-			CStdString infoStr;
+			std::string infoStr;
 
 			// Get notification level
 			int level = atoi(v[1].c_str());
@@ -588,11 +590,11 @@ void Pvr2Wmc::TriggerUpdates(vector<CStdString> results)
 	}
 }
 
-void Pvr2Wmc::ExtractDriveSpace(vector<CStdString> results)
+void Pvr2Wmc::ExtractDriveSpace(vector<std::string> results)
 {
 	FOREACH(response, results)
 	{
-		vector<CStdString> v = split(*response, "|");				// split to unpack string
+		vector<std::string> v = split(*response, "|");				// split to unpack string
 
 		if (v.size() < 1)
 		{
@@ -619,16 +621,18 @@ PVR_ERROR Pvr2Wmc::GetChannels(ADDON_HANDLE handle, bool bRadio)
 	if (IsServerDown())
 		return PVR_ERROR_SERVER_ERROR;
 
-	CStdString request;
-	request.Format("GetChannels|%s", bRadio ? "True" : "False");
-	vector<CStdString> results = _socketClient.GetVector(request, true);
+	std::string request;
+	//request.Format("GetChannels|%s", bRadio ? "True" : "False");
+	request = string_format("GetChannels|%s", bRadio ? "True" : "False");
+	vector<std::string> results = _socketClient.GetVector(request, true);
 	
 	FOREACH(response, results)
 	{ 
 		PVR_CHANNEL xChannel;
 
 		memset(&xChannel, 0, sizeof(PVR_CHANNEL));							// set all mem to zero
-		vector<CStdString> v = split(*response, "|");
+		//vector<std::string> v = split(*response, "|");
+		vector<std::string> v = StringUtils::Split(*response, "|");
 		// packing: id, bradio, c.OriginalNumber, c.CallSign, c.IsEncrypted, imageStr, c.IsBlocked
 
 		if (v.size() < 9)
@@ -638,7 +642,7 @@ PVR_ERROR Pvr2Wmc::GetChannels(ADDON_HANDLE handle, bool bRadio)
 		}
 
 		// Populate Channel (and optionally subchannel if one was provided)
-		vector<CStdString> c = split(v[7], ".");
+		vector<std::string> c = split(v[7], ".");
 		if (c.size() > 1)
 		{
 			xChannel.iChannelNumber = atoi(c[0].c_str());
@@ -653,15 +657,9 @@ PVR_ERROR Pvr2Wmc::GetChannels(ADDON_HANDLE handle, bool bRadio)
 		xChannel.bIsRadio = Str2Bool(v[1]);
 		STRCPY(xChannel.strChannelName, v[3].c_str());
 		xChannel.iEncryptionSystem = Str2Bool(v[4]);
-		if (v[5].compare("NULL") != 0)										// if icon path is null
+		if (v[5].compare("NULL") != 0)										// if icon path is not null
 			STRCPY(xChannel.strIconPath, v[5].c_str());
 		xChannel.bIsHidden = Str2Bool(v[6]);
-
-		// Populate Stream DLNA URL if present
-		if (v.size() >= 10 && v[9] != "")
-		{
-			STRCPY(xChannel.strStreamURL, v[9].c_str());
-		}
 
 		PVR->TransferChannelEntry(handle, &xChannel);
 	}
@@ -681,16 +679,17 @@ PVR_ERROR Pvr2Wmc::GetChannelGroups(ADDON_HANDLE handle, bool bRadio)
 	if (IsServerDown())
 		return PVR_ERROR_SERVER_ERROR;
 
-	CStdString request;
-	request.Format("GetChannelGroups|%s", bRadio ? "True" : "False");
-	vector<CStdString> results = _socketClient.GetVector(request, true);
+	std::string request;
+	//request.Format("GetChannelGroups|%s", bRadio ? "True" : "False");
+	request = string_format("GetChannelGroups|%s", bRadio ? "True" : "False");
+	vector<std::string> results = _socketClient.GetVector(request, true);
 
 	FOREACH(response, results)
 	{ 
 		PVR_CHANNEL_GROUP xGroup;
 		memset(&xGroup, 0, sizeof(PVR_CHANNEL_GROUP));
 
-		vector<CStdString> v = split(*response, "|");
+		vector<std::string> v = split(*response, "|");
 
 		if (v.size() < 1)
 		{
@@ -718,16 +717,17 @@ PVR_ERROR Pvr2Wmc::GetChannelGroupMembers(ADDON_HANDLE handle, const PVR_CHANNEL
 	if (IsServerDown())
 		return PVR_ERROR_SERVER_ERROR;
 
-	CStdString request;
-	request.Format("GetChannelGroupMembers|%s|%s", group.bIsRadio ? "True" : "False", group.strGroupName);
-	vector<CStdString> results = _socketClient.GetVector(request, true);
+	std::string request;
+	//request.Format("GetChannelGroupMembers|%s|%s", group.bIsRadio ? "True" : "False", group.strGroupName);
+	request = string_format("GetChannelGroupMembers|%s|%s", group.bIsRadio ? "True" : "False", group.strGroupName);
+	vector<std::string> results = _socketClient.GetVector(request, true);
 
 	FOREACH(response, results)
 	{ 
 		PVR_CHANNEL_GROUP_MEMBER xGroupMember;
 		memset(&xGroupMember, 0, sizeof(PVR_CHANNEL_GROUP_MEMBER));
 
-		vector<CStdString> v = split(*response, "|");
+		vector<std::string> v = split(*response, "|");
 
 		if (v.size() < 2)
 		{
@@ -750,16 +750,17 @@ PVR_ERROR Pvr2Wmc::GetEPGForChannel(ADDON_HANDLE handle, const PVR_CHANNEL &chan
 	if (IsServerDown())
 		return PVR_ERROR_SERVER_ERROR;
 
-	CStdString request;
-	request.Format("GetEntries|%d|%d|%d", channel.iUniqueId, iStart, iEnd);			// build the request string
+	std::string request;
+	//request.Format("GetEntries|%d|%d|%d", channel.iUniqueId, iStart, iEnd);			// build the request string
+	request = string_format("GetEntries|%u|%lld|%lld", channel.iUniqueId, (long long)iStart, (long long)iEnd);			// build the request string 
 
-	vector<CStdString> results = _socketClient.GetVector(request, true);			// get entries from server
+	vector<std::string> results = _socketClient.GetVector(request, true);			// get entries from server
 	
 	FOREACH(response, results)
 	{ 
 		EPG_TAG xEpg;
 		memset(&xEpg, 0, sizeof(EPG_TAG));											// set all mem to zero
-		vector<CStdString> v = split(*response, "|");								// split to unpack string
+		vector<std::string> v = split(*response, "|");								// split to unpack string
 
 		if (v.size() < 16)
 		{
@@ -774,9 +775,11 @@ PVR_ERROR Pvr2Wmc::GetEPGForChannel(ADDON_HANDLE handle, const PVR_CHANNEL &chan
 		//	e.Program.EpisodeTitle
 		//	(MB3 fields) channelID, audioFormat, GenreString, ProgramType
 		//	actors, directors, writers, year, movieID
+		xEpg.iUniqueChannelId = channel.iUniqueId;			// assign unique channel ID
 		xEpg.iUniqueBroadcastId = atoi(v[0].c_str());		// entry ID
 		xEpg.strTitle = v[1].c_str();						// entry title
-		xEpg.iChannelNumber = atoi(v[2].c_str());			// channel number
+	//	XBMC->Log(LOG_ERROR, xEpg.strTitle); //!!!
+	//	xEpg.iChannelNumber = atoi(v[2].c_str());			// channel number
 		xEpg.startTime = atol(v[3].c_str());				// start time
 		xEpg.endTime = atol(v[4].c_str());					// end time
 		xEpg.strPlotOutline = v[5].c_str();					// short plot description (currently using episode name, if there is one)
@@ -791,6 +794,7 @@ PVR_ERROR Pvr2Wmc::GetEPGForChannel(ADDON_HANDLE handle, const PVR_CHANNEL &chan
 		xEpg.strIconPath = v[14].c_str();					// the icon url
 		xEpg.strEpisodeName = v[15].c_str();				// the episode name
 		xEpg.strGenreDescription = "";
+
 
 		// Kodi PVR API 1.9.6 adds new EPG fields
 		if (v.size() >= 25)
@@ -833,10 +837,10 @@ PVR_ERROR Pvr2Wmc::AddTimer(const PVR_TIMER &xTmr)
 		return PVR_ERROR_SERVER_ERROR;
 
 	// Send request to ServerWMC
-	CStdString command = "";
+	std::string command = "";
 	command = "SetTimerKodi" + Timer2String(xTmr);	// convert timer to string
 
-	vector<CStdString> results = _socketClient.GetVector(command, false);	// get results from server
+	vector<std::string> results = _socketClient.GetVector(command, false);	// get results from server
 
 	PVR->TriggerTimerUpdate();							// update timers regardless of whether there is an error
 
@@ -852,8 +856,8 @@ PVR_ERROR Pvr2Wmc::AddTimer(const PVR_TIMER &xTmr)
 		{
 			FOREACH(result, results)
 			{
-				vector<CStdString> splitResult = split(*result, "|");	// split to unpack extra info on each result
-				CStdString infoStr;
+				vector<std::string> splitResult = split(*result, "|");	// split to unpack extra info on each result
+				std::string infoStr;
 
 				if (splitResult[0] == "recordingNow")					// recording is active now
 				{
@@ -891,22 +895,24 @@ PVR_ERROR Pvr2Wmc::AddTimer(const PVR_TIMER &xTmr)
 	}
 }
 
-CStdString Pvr2Wmc::Timer2String(const PVR_TIMER &xTmr)
+std::string Pvr2Wmc::Timer2String(const PVR_TIMER &xTmr)
 {
-	CStdString tStr;
+	std::string tStr;
 
 	bool bRepeating = xTmr.iTimerType >= TIMER_REPEATING_MIN && xTmr.iTimerType <= TIMER_REPEATING_MAX;
 	bool bKeyword = xTmr.iTimerType == TIMER_REPEATING_KEYWORD || xTmr.iTimerType == TIMER_ONCE_KEYWORD || xTmr.iTimerType == TIMER_ONCE_KEYWORD_CHILD;
 	bool bManual = xTmr.iTimerType == TIMER_ONCE_MANUAL || xTmr.iTimerType == TIMER_ONCE_MANUAL_CHILD || xTmr.iTimerType == TIMER_REPEATING_MANUAL;
 
-	tStr.Format("|%d|%d|%d|%d|%d|%s|%d|%d|%d|%d|%d",
-		xTmr.iClientIndex, xTmr.iClientChannelUid, xTmr.startTime, xTmr.endTime, PVR_TIMER_STATE_NEW,		// 0-4
+	//tStr.Format("|%d|%d|%d|%d|%d|%s|%d|%d|%d|%d|%d",
+	tStr = string_format("|%u|%d|%lld|%lld|%d|%s|%d|%u|%u|%d|%u",
+		xTmr.iClientIndex, xTmr.iClientChannelUid, (long long)xTmr.startTime, (long long)xTmr.endTime, PVR_TIMER_STATE_NEW,		// 0-4
 		xTmr.strTitle, xTmr.iPriority,  xTmr.iMarginStart, xTmr.iMarginEnd, bRepeating,						// 5-9
 		xTmr.iEpgUid);																						// 10
 
 	// Append extra fields from Kodi 16
-	CStdString extra;
-	extra.Format("|%d|%d|%d|%d|%d|%d|%s|%d|%d",
+	std::string extra;
+	//extra.Format("|%d|%d|%d|%d|%d|%d|%s|%d|%d",
+	extra = string_format("|%u|%d|%u|%d|%d|%d|%s|%d|%d",
 		xTmr.iPreventDuplicateEpisodes, xTmr.bStartAnyTime, xTmr.iWeekdays, // 11-13 param
 		xTmr.iLifetime, bKeyword, xTmr.bFullTextEpgSearch, xTmr.strEpgSearchString, xTmr.iMaxRecordings, bManual); // 14-19
 	tStr.append(extra);
@@ -921,10 +927,11 @@ PVR_ERROR Pvr2Wmc::DeleteTimer(const PVR_TIMER &xTmr, bool bForceDelete)
 
 	bool bRepeating = xTmr.iTimerType >= TIMER_REPEATING_MIN && xTmr.iTimerType <= TIMER_REPEATING_MAX;
 
-	CStdString command = "DeleteTimerKodi";
-	command.Format("DeleteTimerKodi|%d|%d", xTmr.iClientIndex, bRepeating);
+	std::string command = "DeleteTimerKodi";
+	//command.Format("DeleteTimerKodi|%d|%d", xTmr.iClientIndex, bRepeating);
+	command = string_format("DeleteTimerKodi|%u|%d", xTmr.iClientIndex, bRepeating);
 	
-	vector<CStdString> results = _socketClient.GetVector(command, false);	// get results from server
+	vector<std::string> results = _socketClient.GetVector(command, false);	// get results from server
 
 	PVR->TriggerTimerUpdate();									// update timers regardless of whether there is an error
 
@@ -944,13 +951,13 @@ PVR_ERROR Pvr2Wmc::GetTimers(ADDON_HANDLE handle)
 	if (IsServerDown())
 		return PVR_ERROR_SERVER_ERROR;
 
-	vector<CStdString> responsesSeries = _socketClient.GetVector("GetSeriesTimers", true);
+	vector<std::string> responsesSeries = _socketClient.GetVector("GetSeriesTimers", true);
 	FOREACH(response, responsesSeries)
 	{
 		PVR_TIMER xTmr;
 		memset(&xTmr, 0, sizeof(PVR_TIMER));						// set all struct to zero
 
-		vector<CStdString> v = split(*response, "|");				// split to unpack string
+		vector<std::string> v = split(*response, "|");				// split to unpack string
 		if (v.size() < 24)
 		{
 			XBMC->Log(LOG_DEBUG, "Wrong number of fields xfered for SeriesTimer data");
@@ -962,7 +969,7 @@ PVR_ERROR Pvr2Wmc::GetTimers(ADDON_HANDLE handle)
 																// [1] Title (superceded by [17] Timer Name)
 		xTmr.iClientChannelUid = atoi(v[2].c_str());			// [2] channel id
 		xTmr.iEpgUid = atoi(v[3].c_str());						// [3] epg ID (same as client ID, except for a 'manual' record)	
-		STRCPY(xTmr.strSummary, v[4].c_str());					// [4] currently set to episode description
+		STRCPY(xTmr.strSummary, v[4].c_str());					// [4] currently set to description
 		xTmr.startTime = atoi(v[5].c_str());					// [5] start time 
 		xTmr.endTime = atoi(v[6].c_str());						// [6] end time 
 		xTmr.iMarginStart = atoi(v[7].c_str());					// [7] rec margin at start (sec)
@@ -997,17 +1004,17 @@ PVR_ERROR Pvr2Wmc::GetTimers(ADDON_HANDLE handle)
 		bool hasKeyword = strlen(xTmr.strEpgSearchString) > 0;
 		bool hasEPG = (xTmr.iEpgUid != PVR_TIMER_NO_EPG_UID);
 		xTmr.iTimerType = hasKeyword ? TIMER_REPEATING_KEYWORD : hasEPG ? TIMER_REPEATING_EPG : TIMER_REPEATING_MANUAL;
-		
+
 		PVR->TransferTimerEntry(handle, &xTmr);
 	}
 
-	vector<CStdString> responsesTimers = _socketClient.GetVector("GetTimers", true);
+	vector<std::string> responsesTimers = _socketClient.GetVector("GetTimers", true);
 	FOREACH(response, responsesTimers)
 	{
 		PVR_TIMER xTmr;
 		memset(&xTmr, 0, sizeof(PVR_TIMER));						// set all struct to zero
 
-		vector<CStdString> v = split(*response, "|");				// split to unpack string
+		vector<std::string> v = split(*response, "|");				// split to unpack string
 		// eId, chId, start_t, end_t, pState,
 		// rp.Program.Title, ""/*recdir*/, rp.Program.EpisodeTitle/*summary?*/, rp.Priority, rp.Request.IsRecurring,
 		// eId, preMargin, postMargin, genre, subgenre
@@ -1026,7 +1033,7 @@ PVR_ERROR Pvr2Wmc::GetTimers(ADDON_HANDLE handle)
 		xTmr.state = (PVR_TIMER_STATE)atoi(v[4].c_str());		// [4] current state of time
 		STRCPY(xTmr.strTitle, v[5].c_str());					// [5] timer name (set to same as Program title)
 		STRCPY(xTmr.strDirectory, v[6].c_str());				// [6] rec directory
-		STRCPY(xTmr.strSummary, v[7].c_str());					// [7] currently set to episode title
+		STRCPY(xTmr.strSummary, v[7].c_str());					// [7] set to program description
 																// [8] WMC Priority (need Kodi compatible value, see [26])
 																// [9] IsRecurring
 		xTmr.iEpgUid = atoi(v[10].c_str());						// [10] epg ID
@@ -1094,14 +1101,14 @@ PVR_ERROR Pvr2Wmc::GetRecordings(ADDON_HANDLE handle)
 	if (IsServerDown())
 		return PVR_ERROR_SERVER_ERROR;
 
-	vector<CStdString> responses = _socketClient.GetVector("GetRecordings", true);				
+	vector<std::string> responses = _socketClient.GetVector("GetRecordings", true);				
 
 	FOREACH(response, responses)
 	{
 		PVR_RECORDING xRec;
 		memset(&xRec, 0, sizeof(PVR_RECORDING));					// set all struct to zero
 
-		vector<CStdString> v = split(*response, "|");				// split to unpack string
+		vector<std::string> v = split(*response, "|");				// split to unpack string
 
 		// r.Id, r.Program.Title, r.FileName, recDir, plotOutline,
 		// plot, r.Channel.CallSign, ""/*icon path*/, ""/*thumbnail path*/, ToTime_t(r.RecordingTime),
@@ -1116,7 +1123,7 @@ PVR_ERROR Pvr2Wmc::GetRecordings(ADDON_HANDLE handle)
 
 		STRCPY(xRec.strRecordingId, v[0].c_str());
 		STRCPY(xRec.strTitle, v[1].c_str());
-		STRCPY(xRec.strStreamURL, v[2].c_str());
+		//STRCPY(xRec.strStreamURL, v[2].c_str());  strStreamURL if obsolete in kodi
 		STRCPY(xRec.strDirectory, v[3].c_str());
 		STRCPY(xRec.strPlotOutline, v[4].c_str());
 		STRCPY(xRec.strPlot, v[5].c_str());
@@ -1157,23 +1164,6 @@ PVR_ERROR Pvr2Wmc::GetRecordings(ADDON_HANDLE handle)
 		/* TODO: PVR API 5.1.0: Implement this */
 		xRec.channelType = PVR_RECORDING_CHANNEL_TYPE_UNKNOWN;
 
-		// fix for advocate99 bug: new recordings won't play until kodi file cache gets a refresh.  
-		// If a recording path is given, but is not in the Kodi cache, use the trick below to force refresh kodi cache.  
-		// Does nothing if swmc doesn't return a path to the recording
-		if (strlen(xRec.strStreamURL) > 0 && !XBMC->FileExists(xRec.strStreamURL, true/*inCache*/))	// path str exists, but rec is not in Kodi cache
-		{
-			CStdString dummyFile = xRec.strStreamURL;
-			dummyFile += "_new_rec_fix.deleteMe";
-			if (XBMC->CreateDirectory(dummyFile))				// create a dummy folder
-				XBMC->RemoveDirectory(dummyFile);				// delete the dummy folder if it was created
-
-			// check to see if fix worked
-			if (XBMC->FileExists(xRec.strStreamURL, true))
-				XBMC->Log(LOG_DEBUG, "recording cache fix for '%s' succeeded", xRec.strStreamURL);
-			else
-				XBMC->Log(LOG_DEBUG, "fix for recording cache bug failed for '%s'", xRec.strStreamURL);
-		}
-
 		PVR->TransferRecordingEntry(handle, &xRec);
 	}
 
@@ -1187,10 +1177,11 @@ PVR_ERROR Pvr2Wmc::DeleteRecording(const PVR_RECORDING &recording)
 	if (IsServerDown())
 		return PVR_ERROR_SERVER_ERROR;
 
-	CStdString command;// = format("DeleteRecording|%s|%s|%s", recording.strRecordingId, recording.strTitle, recording.strStreamURL);
-	command.Format("DeleteRecording|%s|%s|%s", recording.strRecordingId, recording.strTitle, recording.strStreamURL);
+	std::string command;// = format("DeleteRecording|%s|%s|%s", recording.strRecordingId, recording.strTitle, recording.strStreamURL);
+	//command.Format("DeleteRecording|%s|%s|%s", recording.strRecordingId, recording.strTitle, recording.strStreamURL);
+	command = string_format("DeleteRecording|%s|%s|%s", recording.strRecordingId, recording.strTitle, "");
 
-	vector<CStdString> results = _socketClient.GetVector(command, false);	// get results from server
+	vector<std::string> results = _socketClient.GetVector(command, false);	// get results from server
 
 
 	if (isServerError(results))							// did the server do it?
@@ -1216,10 +1207,11 @@ PVR_ERROR Pvr2Wmc::RenameRecording(const PVR_RECORDING &recording)
 	if (IsServerDown())
 		return PVR_ERROR_SERVER_ERROR;
 
-	CStdString command;// = format("RenameRecording|%s|%s", recording.strRecordingId, recording.strTitle);
-	command.Format("RenameRecording|%s|%s", recording.strRecordingId, recording.strTitle);
+	std::string command;// = format("RenameRecording|%s|%s", recording.strRecordingId, recording.strTitle);
+	//command.Format("RenameRecording|%s|%s", recording.strRecordingId, recording.strTitle);
+	command = string_format("RenameRecording|%s|%s", recording.strRecordingId, recording.strTitle);
 
-	vector<CStdString> results = _socketClient.GetVector(command, false);					// get results from server
+	vector<std::string> results = _socketClient.GetVector(command, false);					// get results from server
 
 	if (isServerError(results))							// did the server do it?
 	{
@@ -1239,9 +1231,11 @@ PVR_ERROR Pvr2Wmc::SetRecordingLastPlayedPosition(const PVR_RECORDING &recording
 	if (IsServerDown())
 		return PVR_ERROR_SERVER_ERROR;
 
-	CStdString command;
-	command.Format("SetResumePosition|%s|%d", recording.strRecordingId, lastplayedposition);
-	vector<CStdString> results = _socketClient.GetVector(command, true);					
+	std::string command;
+	//command.Format("SetResumePosition|%s|%d", recording.strRecordingId, lastplayedposition);
+	command = string_format("SetResumePosition|%s|%d", recording.strRecordingId, lastplayedposition);
+	
+	vector<std::string> results = _socketClient.GetVector(command, true);					
 	PVR->TriggerRecordingUpdate();		// this is needed to get the new resume point actually used by the player (xbmc bug)								
 	return PVR_ERROR_NO_ERROR;
 }
@@ -1254,8 +1248,9 @@ int Pvr2Wmc::GetRecordingLastPlayedPosition(const PVR_RECORDING &recording)
 	if (IsServerDown())
 		return PVR_ERROR_SERVER_ERROR;
 
-	CStdString command;
-	command.Format("GetResumePosition|%s", recording.strRecordingId); 
+	std::string command;
+	//command.Format("GetResumePosition|%s", recording.strRecordingId);
+	command = string_format("GetResumePosition|%s", recording.strRecordingId);
 	int pos = _socketClient.GetInt(command, true);
 	return pos;
 }
@@ -1266,20 +1261,22 @@ PVR_ERROR Pvr2Wmc::SetRecordingPlayCount(const PVR_RECORDING &recording, int cou
 	if (IsServerDown())
 		return PVR_ERROR_SERVER_ERROR;
 
-	CStdString command;
-	command.Format("SetPlayCount|%s|%d", recording.strRecordingId, count);
-	vector<CStdString> results = _socketClient.GetVector(command, true);					
+	std::string command;
+	//command.Format("SetPlayCount|%s|%d", recording.strRecordingId, count);
+	command = string_format("SetPlayCount|%s|%d", recording.strRecordingId, count);
+	vector<std::string> results = _socketClient.GetVector(command, true);					
 	if (count <= 0)
 		PVR->TriggerRecordingUpdate();		// this is needed to get the new play count actually used by the player (xbmc bug)								
 	return PVR_ERROR_NO_ERROR;
 }
 
 
-CStdString Pvr2Wmc::Channel2String(const PVR_CHANNEL &xCh)
+std::string Pvr2Wmc::Channel2String(const PVR_CHANNEL &xCh)
 {
 	// packing: id, bradio, c.OriginalNumber, c.CallSign, c.IsEncrypted, imageStr, c.IsBlocked
-	CStdString chStr;
-	chStr.Format("|%d|%d|%d|%s", xCh.iUniqueId, xCh.bIsRadio, xCh.iChannelNumber, xCh.strChannelName);
+	std::string chStr;
+	//chStr.Format("|%d|%d|%d|%s", xCh.iUniqueId, xCh.bIsRadio, xCh.iChannelNumber, xCh.strChannelName);
+	chStr = string_format("|%u|%d|%u|%s", xCh.iUniqueId, xCh.bIsRadio, xCh.iChannelNumber, xCh.strChannelName);
 	return chStr;
 }
 
@@ -1297,8 +1294,8 @@ bool Pvr2Wmc::OpenLiveStream(const PVR_CHANNEL &channel)
 
 	CloseLiveStream(false);							// close current stream (if any)
 
-	CStdString request = "OpenLiveStream" + Channel2String(channel);		// request a live stream using channel
-	vector<CStdString> results = _socketClient.GetVector(request, false);	// try to open live stream, get path to stream file
+	std::string request = "OpenLiveStream" + Channel2String(channel);		// request a live stream using channel
+	vector<std::string> results = _socketClient.GetVector(request, false);	// try to open live stream, get path to stream file
 
 	if (isServerError(results))												// test if server reported an error
 	{
@@ -1321,19 +1318,20 @@ bool Pvr2Wmc::OpenLiveStream(const PVR_CHANNEL &channel)
 		// Check for a specified initial position and save it for the first ReadLiveStream command to use
 		if (results.size() > 2)
 		{
-			_initialStreamPosition = atoll(results[2]);
+			_initialStreamPosition = atoll(results[2].c_str());
 		}
 
 		_streamFile = XBMC->OpenFile(_streamFileName.c_str(), 0);	// open the video file for streaming, same handle
 
 		if (!_streamFile)	// something went wrong
 		{
-			CStdString lastError;
+			std::string lastError;
 #ifdef TARGET_WINDOWS
 			int errorVal = GetLastError();
-			lastError.Format("Error opening stream file, Win32 error code: %d", errorVal);
+			//lastError.Format("Error opening stream file, Win32 error code: %d", errorVal);
+			lastError = string_format("Error opening stream file, Win32 error code: %d", errorVal);
 #else
-			lastError.Format("Error opening stream file");
+			lastError = "Error opening stream file";
 #endif
 			XBMC->Log(LOG_ERROR, lastError.c_str());						// log more info on error
 			
@@ -1357,7 +1355,7 @@ bool Pvr2Wmc::OpenLiveStream(const PVR_CHANNEL &channel)
 
 bool Pvr2Wmc::SwitchChannel(const PVR_CHANNEL &channel)
 {
-	CStdString request = "SwitchChannel|" + g_strClientName + Channel2String(channel);		// request a live stream using channel
+	std::string request = "SwitchChannel|" + g_strClientName + Channel2String(channel);		// request a live stream using channel
 	return _socketClient.GetBool(request, false);		// try to open live stream, get path to stream file
 }
 
@@ -1420,7 +1418,7 @@ int Pvr2Wmc::ReadLiveStream(unsigned char *pBuffer, unsigned int iBufferSize)
 			//char pcr[16] = {0x47, 0x51, 0x00, 0x19, 0x00, 0x00, 0x01, 0xBD, 0x00, 0x00, 0x85, 0x80, 0x05, 0x21, 0x2E, 0xDF};
 			_insertDurationHeader = false;									// only do header insertion once
 			memset(pBuffer, 0xFF, iBufferSize);								// set buffer to all FF (default padding char for packets)
-			vector<CStdString> v = split(_durationHeader, " ");				// get header bytes by unpacking reponse
+			vector<std::string> v = split(_durationHeader, " ");				// get header bytes by unpacking reponse
 			for (int i=0; i<16; i++)										// insert header bytes, creating a fake packet at start of buffer
 			{
 				//*(pBuffer + i) = pcr[i];
@@ -1494,10 +1492,11 @@ bool Pvr2Wmc::CheckErrorOnServer()
 {
 	if (!IsServerDown())
 	{
-		CStdString request;
-		request.Format("CheckError");
+		std::string request;
+		//request.Format("CheckError");
+		request = "CheckError";
 		//request.Format("CheckError|%d|%d|%d", checkCnt, (long)streamPos, (long)streamfileSize);
-		vector<CStdString> results = _socketClient.GetVector(request, true);	// see if server posted an error for active stream
+		vector<std::string> results = _socketClient.GetVector(request, true);	// see if server posted an error for active stream
 		return isServerError(results);
 	}
 	return false;
@@ -1541,8 +1540,9 @@ long long Pvr2Wmc::ActualFileSize(int count)
 	}
 	else
 	{
-		CStdString request;
-		request.Format("StreamFileSize|%d", count);		// request stream size form client, passing number of consecutive queries
+		std::string request;
+		//request.Format("StreamFileSize|%d", count);		// request stream size form client, passing number of consecutive queries
+		request = string_format("StreamFileSize|%d", count);		// request stream size form client, passing number of consecutive queries
 		lFileSize = _socketClient.GetLL(request, true);	// get file size form client
 
 		if (lFileSize < -1)								// if server returns a negative file size, it means the stream file is no longer growing (-1 => error)
@@ -1604,9 +1604,10 @@ bool Pvr2Wmc::OpenRecordedStream(const PVR_RECORDING &recording)
 	int _buffTimeFILTER = 0;
 
 	// request an active recording stream
-	CStdString request;
-	request.Format("OpenRecordingStream|%s", recording.strRecordingId);	
-	vector<CStdString> results = _socketClient.GetVector(request, false);	// try to open recording stream, get path to stream file
+	std::string request;
+	//request.Format("OpenRecordingStream|%s", recording.strRecordingId);
+	request = string_format("OpenRecordingStream|%s", recording.strRecordingId);
+	vector<std::string> results = _socketClient.GetVector(request, false);	// try to open recording stream, get path to stream file
 
 	if (isServerError(results))								// test if server reported an error
 	{
@@ -1641,12 +1642,13 @@ bool Pvr2Wmc::OpenRecordedStream(const PVR_RECORDING &recording)
 
 		if (!_streamFile)	// something went wrong
 		{
-			CStdString lastError;
+			std::string lastError;
 #ifdef TARGET_WINDOWS
 			int errorVal = GetLastError();
-			lastError.Format("Error opening stream file, Win32 error code: %d", errorVal);
+			//lastError.Format("Error opening stream file, Win32 error code: %d", errorVal);
+			lastError = string_format("Error opening stream file, Win32 error code: %d", errorVal);
 #else
-			lastError.Format("Error opening stream file");
+			lastError = "Error opening stream file";
 #endif
 			XBMC->Log(LOG_ERROR, lastError.c_str());						// log more info on error
 			_socketClient.GetBool("StreamStartError|" + _streamFileName, true);	// tell server stream did not start
@@ -1686,10 +1688,11 @@ PVR_ERROR Pvr2Wmc::SignalStatus(PVR_SIGNAL_STATUS &signalStatus)
 		// Reset count to throttle value
 		_signalStatusCount = g_signalThrottle;
 
-		CStdString command;
-		command.Format("SignalStatus");
+		std::string command;
+		//command.Format("SignalStatus");
+		command = "SignalStatus";
 
-		vector<CStdString> results = _socketClient.GetVector(command, true);	// get results from server
+		vector<std::string> results = _socketClient.GetVector(command, true);	// get results from server
 
 		// strDeviceName, strDeviceStatus, strProvider, strService, strMux
 		// iSignal, dVideoBitrate, dAudioBitrate, Error
@@ -1708,9 +1711,9 @@ PVR_ERROR Pvr2Wmc::SignalStatus(PVR_SIGNAL_STATUS &signalStatus)
 				snprintf(cachedSignalStatus.strProviderName, sizeof(cachedSignalStatus.strProviderName), "%s", results[2].c_str());
 				snprintf(cachedSignalStatus.strServiceName, sizeof(cachedSignalStatus.strServiceName), "%s", results[3].c_str());
 				snprintf(cachedSignalStatus.strMuxName, sizeof(cachedSignalStatus.strMuxName), "%s", results[4].c_str());
-				cachedSignalStatus.iSignal = (int)(atoi(results[5]) * 655.35);
+				cachedSignalStatus.iSignal = (int)(atoi(results[5].c_str()) * 655.35);
 			
-				bool error = atoi(results[8]) == 1;
+				bool error = atoi(results[8].c_str()) == 1;
 				if (error)
 				{
 					// Backend indicates it can't provide SignalStatus for this channel
@@ -1747,16 +1750,17 @@ time_t Pvr2Wmc::GetPlayingTime()
 	{
 		_buffTimesCnt = 0;
 		int64_t filePos = XBMC->GetFilePosition(_streamFile);			// get the current file pos so we can convert to play time
-		CStdString request;
-		request.Format("GetBufferTimes|%llu", filePos);
-		vector<CStdString> results = _socketClient.GetVector(request, false);	// have swmc convert file pos to current play time
+		std::string request;
+		//request.Format("GetBufferTimes|%llu", filePos);
+		request = string_format("GetBufferTimes|%llu", filePos);
+		vector<std::string> results = _socketClient.GetVector(request, false);	// have swmc convert file pos to current play time
 
 		if (results.size() > 3)
 		{
-			_buffStart = atol(results[0]);
-			_buffEnd = atol(results[1]);
-			_buffCurrent = atol(results[2]);
-			_buffTimeFILTER = atoi(results[3]);		// get filter value from swmc
+			_buffStart = atol(results[0].c_str());
+			_buffEnd = atol(results[1].c_str());
+			_buffCurrent = atol(results[2].c_str());
+			_buffTimeFILTER = atoi(results[3].c_str());		// get filter value from swmc
 		}
 	}
 	_buffTimesCnt++;
