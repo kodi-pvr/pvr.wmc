@@ -577,7 +577,6 @@ void Socket::SetServerPort(int port)
 int Socket::SendRequest(std::string requestStr)
 {
 	std::string sRequest;		
-	//sRequest.Format("%s|%s<Client Quit>", _clientName.c_str(), requestStr.c_str());	// build the request string
 	sRequest = string_format("%s|%s<Client Quit>", _clientName.c_str(), requestStr.c_str());	// build the request string
 	int status = send(sRequest);
 	return status;

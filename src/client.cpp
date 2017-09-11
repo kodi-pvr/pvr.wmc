@@ -304,7 +304,6 @@ extern "C" {
 	const char *GetConnectionString(void)
 	{
 		static std::string strConnectionString;
-		//strConnectionString.Format("%s:%u", g_strServerName, g_port);
 		strConnectionString = string_format("%s:%u", g_strServerName.c_str(), g_port);
 		return strConnectionString.c_str();
 	}

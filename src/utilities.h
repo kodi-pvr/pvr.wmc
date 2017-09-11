@@ -25,7 +25,7 @@
 
 //std::vector<std::string> split(const std::string& s, const std::string& delim);
 
-bool Str2Bool(const std::string str);
+bool Str2Bool(const std::string& str);
 
 bool EndsWith(std::string const &fullString, std::string const &ending);
 bool StartsWith(std::string const &fullString, std::string const &starting);

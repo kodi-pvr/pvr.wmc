@@ -18,7 +18,6 @@
  *
  */
 
-//#include "p8-platform/util/StdString.h"
 #include "util/XMLUtils.h"
 #include "utilities.h"
 
@@ -26,23 +25,16 @@
 #include <string>
 #include <stdio.h>
 #include <cstdarg>
-#ifdef TARGET_WINDOWS
-    #include <windows.h>
-#else
-    #include <stdarg.h>
-#endif
 
 using namespace ADDON;
 
 // format related string functions taken from:
 // http://www.flipcode.com/archives/Safe_sprintf.shtml
 
-bool Str2Bool(const std::string str)
+bool Str2Bool(const std::string& str)
 {
 	return str.compare("True") == 0 ? true:false;
 }
-
-
 
 bool EndsWith(std::string const &fullString, std::string const &ending)
 {
@@ -105,5 +97,3 @@ bool WriteFileContents(std::string const &strFileName, std::string &strContent)
 	}
 	return false;
 }
-
-
