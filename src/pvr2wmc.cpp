@@ -1353,12 +1353,6 @@ bool Pvr2Wmc::OpenLiveStream(const PVR_CHANNEL &channel)
 	}
 }
 
-bool Pvr2Wmc::SwitchChannel(const PVR_CHANNEL &channel)
-{
-	std::string request = "SwitchChannel|" + g_strClientName + Channel2String(channel);		// request a live stream using channel
-	return _socketClient.GetBool(request, false);		// try to open live stream, get path to stream file
-}
-
 
 // read from the live stream file opened in OpenLiveStream
 int Pvr2Wmc::ReadLiveStream(unsigned char *pBuffer, unsigned int iBufferSize)

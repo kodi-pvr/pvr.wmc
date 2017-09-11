@@ -694,10 +694,6 @@ int Socket::GetInt(const std::string &request, bool allowRetry, bool allowWOL /*
 long long Socket::GetLL(const std::string &request, bool allowRetry, bool allowWOL /* = true*/)
 {
 	std::string valStr = GetString(request, allowRetry, allowWOL);
-//#ifdef TARGET_WINDOWS
-//		long long val = _strtoi64(valStr.c_str(), 0, 10);
-//#else
-		long long val = strtoll(valStr.c_str(), NULL, 10);
-//#endif
+	long long val = strtoll(valStr.c_str(), NULL, 10);
 	return val;
 }

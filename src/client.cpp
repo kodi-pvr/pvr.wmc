@@ -24,12 +24,8 @@
 #include "utilities.h"
 #include "p8-platform/util/util.h"
 
-using namespace std;
 using namespace ADDON;
 
-#ifdef TARGET_WINDOWS
-#define snprintf _snprintf
-#endif
 
 #define DEFAULT_PORT 9080
 #define DEFAULT_WAKEONLAN_ENABLE false
@@ -62,7 +58,7 @@ backend_status	g_BackendOnline;							// whether the backend is online
 */
 std::string g_strUserPath             = "";
 std::string g_strClientPath           = "";
-std::string	g_AddonDataCustom	= "";					// location of custom addondata settings file
+std::string	g_AddonDataCustom	= "";						// location of custom addondata settings file
 
 CHelper_libXBMC_addon   *XBMC           = NULL;
 CHelper_libXBMC_pvr   	*PVR            = NULL;
@@ -139,13 +135,7 @@ extern "C" {
 		g_strClientName = buffer;		// send this computers name to server
 
 #ifdef TARGET_WINDOWS
-		// get windows version
-		OSVERSIONINFO osvi;
-		ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
-		osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-		GetVersionEx(&osvi);
-		//g_clientOS.Format("windows(%d.%d)", osvi.dwMajorVersion, osvi.dwMinorVersion);	// set windows version string
-		g_clientOS = string_format("windows(%d.%d)", osvi.dwMajorVersion, osvi.dwMinorVersion);	// set windows version string
+		g_clientOS = "windows";			// set to the client OS name
 #elif defined TARGET_LINUX
 		g_clientOS = "linux";			// set to the client OS name
 #elif defined TARGET_DARWIN
@@ -153,7 +143,7 @@ extern "C" {
 #elif defined TARGET_FREEBSD
 		g_clientOS = "freeBSD";			// set to the client OS name
 #else
-		g_clientOS = "";					// set blank client OS name
+		g_clientOS = "";				// set blank client OS name
 #endif
 	}
 
@@ -246,8 +236,7 @@ extern "C" {
 		{
 			std::string oldName = g_strServerName;
 			g_strServerName = (const char*)settingValue;
-			//if (g_strServerName == ".")
-			//	g_strServerName = LOCALHOST;
+
 			XBMC->Log(LOG_INFO, "Setting 'host' changed from %s to %s", g_strServerName.c_str(), (const char*) settingValue);
 			if (oldName != g_strServerName)
 				return ADDON_STATUS_NEED_RESTART;
@@ -341,10 +330,6 @@ extern "C" {
 		return PVR_ERROR_SERVER_ERROR;
 	}
 
-	PVR_ERROR GetStreamProperties(PVR_STREAM_PROPERTIES* pProperties)
-	{
-		return PVR_ERROR_NOT_IMPLEMENTED;
-	}
 
 	PVR_ERROR SignalStatus(PVR_SIGNAL_STATUS &signalStatus)
 	{
@@ -354,7 +339,8 @@ extern "C" {
 		return PVR_ERROR_NO_ERROR;
 	}
 
-	// channel functions
+	// channel functions -----------------------------
+
 	int GetChannelsAmount(void)
 	{
 		if (_wmc)
@@ -396,7 +382,8 @@ extern "C" {
 	}
 
 
-	// timer functions
+	// timer functions -----------------------
+
 	PVR_ERROR GetTimerTypes(PVR_TIMER_TYPE types[], int *size)
 	{
 		if (_wmc)
@@ -415,7 +402,6 @@ extern "C" {
 
 	PVR_ERROR GetTimers(ADDON_HANDLE handle) 
 	{ 
-		/* TODO: Change implementation to get support for the timer features introduced with PVR API 1.9.7 */
 		if (_wmc)
 			return _wmc->GetTimers(handle);
 
@@ -467,29 +453,13 @@ extern "C" {
 		return PVR_ERROR_NOT_IMPLEMENTED; 
 	}
 
-	//#define TRUESWITCH
 
-	bool SwitchChannel(const PVR_CHANNEL &channel)
-	{
-		//CloseLiveStream();				
-#ifdef TRUESWITCH
+	// live stream functions ---------------------------
 
-		if (_wmc)
-		{ 
-			return _wmc->SwitchChannel(channel);
-		} 
-		return false;
-#else
-		return OpenLiveStream(channel);		// this will perform the closing of a current live stream itself
-#endif
-	}
-
-	// live stream functions
 	bool OpenLiveStream(const PVR_CHANNEL &channel)
 	{
 		if (_wmc)
 		{
-			//CloseLiveStream();
 			if (_wmc->OpenLiveStream(channel))
 			{
 				_bIsPlaying = true;
@@ -557,7 +527,8 @@ extern "C" {
 		return true; 
 	}
 
-	// recorded stream functions (other "Open" these just call the live stream functions)
+	// recorded stream functions -----------------------------
+
 	bool OpenRecordedStream(const PVR_RECORDING &recording) 
 	{ 
 		if (_wmc)
@@ -614,7 +585,8 @@ extern "C" {
 			return -1; 
 	}
 
-	// recorded file functions
+	// recorded file functions -----------------
+
 	PVR_ERROR DeleteRecording(const PVR_RECORDING &recording) 
 	{ 
 		if (_wmc)
@@ -629,6 +601,7 @@ extern "C" {
 			return _wmc->SetRecordingLastPlayedPosition(recording, lastplayedposition);
 		return PVR_ERROR_NOT_IMPLEMENTED; 
 	}
+
 	int GetRecordingLastPlayedPosition(const PVR_RECORDING &recording) 
 	{ 
 		if (_wmc && g_bEnableMultiResume)
@@ -643,11 +616,7 @@ extern "C" {
 		return PVR_ERROR_NOT_IMPLEMENTED; 
 	}
 
-
-	PVR_ERROR CallMenuHook(const PVR_MENUHOOK &menuhook, const PVR_MENUHOOK_DATA &item)
-	{ 
-		return PVR_ERROR_NOT_IMPLEMENTED;
-	}
+	// time shift functions -----------------
 
 	bool IsTimeshifting(void)
 	{
@@ -689,8 +658,6 @@ extern "C" {
 	void DemuxFlush(void) {}
 	void DemuxAbort(void) {}
 	DemuxPacket* DemuxRead(void) { return NULL; }
-	unsigned int GetChannelSwitchDelay(void) { return 0; }
-	const char * GetLiveStreamURL(const PVR_CHANNEL &channel)  {  return "";  }
 	bool SeekTime(double,bool,double*) { return false; }
 	void SetSpeed(int) {};
 	bool IsRealTimeStream(void) { return true; }
@@ -700,16 +667,14 @@ extern "C" {
 	PVR_ERROR SetEPGTimeFrame(int) { return PVR_ERROR_NOT_IMPLEMENTED; }
 	PVR_ERROR GetDescrambleInfo(PVR_DESCRAMBLE_INFO*) { return PVR_ERROR_NOT_IMPLEMENTED; }
 	PVR_ERROR SetRecordingLifetime(const PVR_RECORDING*) { return PVR_ERROR_NOT_IMPLEMENTED; }
-
+	PVR_ERROR CallMenuHook(const PVR_MENUHOOK &menuhook, const PVR_MENUHOOK_DATA &item) { return PVR_ERROR_NOT_IMPLEMENTED; }
 
 	PVR_ERROR IsEPGTagPlayable(const EPG_TAG*, bool*) { return PVR_ERROR_NOT_IMPLEMENTED; }
 	PVR_ERROR IsEPGTagRecordable(const EPG_TAG*, bool*) { return PVR_ERROR_NOT_IMPLEMENTED; }
 	PVR_ERROR GetEPGTagStreamProperties(const EPG_TAG*, PVR_NAMED_VALUE*, unsigned int*) { return PVR_ERROR_NOT_IMPLEMENTED; }
 	PVR_ERROR GetStreamTimes(PVR_STREAM_TIMES*) { return PVR_ERROR_NOT_IMPLEMENTED; }
-	PVR_ERROR GetRecordingStreamProperties(const PVR_RECORDING*, PVR_NAMED_VALUE*, unsigned int*) { return PVR_ERROR_NOT_IMPLEMENTED; }
 
-	PVR_ERROR GetChannelStreamProperties(const PVR_CHANNEL* channel, PVR_NAMED_VALUE* properties, unsigned int* iPropertiesCount)
-	{
-		return PVR_ERROR_NOT_IMPLEMENTED;
-	}
+	PVR_ERROR GetStreamProperties(PVR_STREAM_PROPERTIES* pProperties) { return PVR_ERROR_NOT_IMPLEMENTED; }
+	PVR_ERROR GetChannelStreamProperties(const PVR_CHANNEL* channel, PVR_NAMED_VALUE* properties, unsigned int* iPropertiesCount) { return PVR_ERROR_NOT_IMPLEMENTED; }
+	PVR_ERROR GetRecordingStreamProperties(const PVR_RECORDING*, PVR_NAMED_VALUE*, unsigned int*) { return PVR_ERROR_NOT_IMPLEMENTED; }
 }
