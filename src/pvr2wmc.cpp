@@ -628,7 +628,6 @@ PVR_ERROR Pvr2Wmc::GetChannels(ADDON_HANDLE handle, bool bRadio)
 		PVR_CHANNEL xChannel;
 
 		memset(&xChannel, 0, sizeof(PVR_CHANNEL));							// set all mem to zero
-		//vector<std::string> v = split(*response, "|");
 		vector<std::string> v = StringUtils::Split(*response, "|");
 		// packing: id, bradio, c.OriginalNumber, c.CallSign, c.IsEncrypted, imageStr, c.IsBlocked
 
@@ -772,8 +771,6 @@ PVR_ERROR Pvr2Wmc::GetEPGForChannel(ADDON_HANDLE handle, const PVR_CHANNEL &chan
 		xEpg.iUniqueChannelId = channel.iUniqueId;			// assign unique channel ID
 		xEpg.iUniqueBroadcastId = atoi(v[0].c_str());		// entry ID
 		xEpg.strTitle = v[1].c_str();						// entry title
-	//	XBMC->Log(LOG_ERROR, xEpg.strTitle); //!!!
-	//	xEpg.iChannelNumber = atoi(v[2].c_str());			// channel number
 		xEpg.startTime = atol(v[3].c_str());				// start time
 		xEpg.endTime = atol(v[4].c_str());					// end time
 		xEpg.strPlotOutline = v[5].c_str();					// short plot description (currently using episode name, if there is one)
@@ -788,7 +785,6 @@ PVR_ERROR Pvr2Wmc::GetEPGForChannel(ADDON_HANDLE handle, const PVR_CHANNEL &chan
 		xEpg.strIconPath = v[14].c_str();					// the icon url
 		xEpg.strEpisodeName = v[15].c_str();				// the episode name
 		xEpg.strGenreDescription = "";
-
 
 		// Kodi PVR API 1.9.6 adds new EPG fields
 		if (v.size() >= 25)
@@ -1116,7 +1112,6 @@ PVR_ERROR Pvr2Wmc::GetRecordings(ADDON_HANDLE handle)
 
 		STRCPY(xRec.strRecordingId, v[0].c_str());
 		STRCPY(xRec.strTitle, v[1].c_str());
-		//STRCPY(xRec.strStreamURL, v[2].c_str());  strStreamURL if obsolete in kodi
 		STRCPY(xRec.strDirectory, v[3].c_str());
 		STRCPY(xRec.strPlotOutline, v[4].c_str());
 		STRCPY(xRec.strPlot, v[5].c_str());
@@ -1170,7 +1165,7 @@ PVR_ERROR Pvr2Wmc::DeleteRecording(const PVR_RECORDING &recording)
 	if (IsServerDown())
 		return PVR_ERROR_SERVER_ERROR;
 
-	std::string command;// = format("DeleteRecording|%s|%s|%s", recording.strRecordingId, recording.strTitle, recording.strStreamURL);
+	std::string command;
 	command = string_format("DeleteRecording|%s|%s|%s", recording.strRecordingId, recording.strTitle, "");
 
 	vector<std::string> results = _socketClient.GetVector(command, false);	// get results from server
@@ -1568,8 +1563,6 @@ bool Pvr2Wmc::CloseLiveStream(bool notifyServer /*=true*/)
 }
 
 
-// this is only called if a recording is actively being recorded, xbmc detects this when the server
-// doesn't enter a path in the strStreamURL field during a "GetRecordings"
 bool Pvr2Wmc::OpenRecordedStream(const PVR_RECORDING &recording)
 {
 	if (IsServerDown())
