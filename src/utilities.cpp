@@ -18,7 +18,6 @@
  *
  */
 
-#include "p8-platform/util/StdString.h"
 #include "util/XMLUtils.h"
 #include "utilities.h"
 
@@ -26,44 +25,18 @@
 #include <string>
 #include <stdio.h>
 #include <cstdarg>
-#ifdef TARGET_WINDOWS
-    #include <windows.h>
-#else
-    #include <stdarg.h>
-#endif
 
 using namespace ADDON;
 
 // format related string functions taken from:
 // http://www.flipcode.com/archives/Safe_sprintf.shtml
 
-bool Str2Bool(const CStdString str)
+bool Str2Bool(const std::string& str)
 {
 	return str.compare("True") == 0 ? true:false;
 }
 
-std::vector<CStdString> split(const CStdString& s, const CStdString& delim, const bool keep_empty) {
-    std::vector<CStdString> result;
-    if (delim.empty()) {
-        result.push_back(s);
-        return result;
-    }
-    CStdString::const_iterator substart = s.begin(), subend;
-    while (true) {
-        subend = search(substart, s.end(), delim.begin(), delim.end());
-        CStdString temp(substart, subend);
-        if (keep_empty || !temp.empty()) {
-            result.push_back(temp);
-        }
-        if (subend == s.end()) {
-            break;
-        }
-        substart = subend + delim.size();
-    }
-    return result;
-}
-
-bool EndsWith(CStdString const &fullString, CStdString const &ending)
+bool EndsWith(std::string const &fullString, std::string const &ending)
 {
     if (fullString.length() >= ending.length()) {
         return (0 == fullString.compare (fullString.length() - ending.length(), ending.length(), ending));
@@ -72,7 +45,7 @@ bool EndsWith(CStdString const &fullString, CStdString const &ending)
     }
 }
 
-bool StartsWith(CStdString const &fullString, CStdString const &starting)
+bool StartsWith(std::string const &fullString, std::string const &starting)
 {
     if (fullString.length() >= starting.length()) {
         return (0 == fullString.compare(0, starting.length(), starting));
@@ -82,16 +55,16 @@ bool StartsWith(CStdString const &fullString, CStdString const &starting)
 }
 
 // return the directory from the input file path
-CStdString GetDirectoryPath(CStdString const &path)
+std::string GetDirectoryPath(std::string const &path)
 {
 	size_t found = path.find_last_of("/\\");
-	if (found != CStdString::npos)
+	if (found != std::string::npos)
 		return path.substr(0, found);
 	else
 		return path;
 }
 
-bool ReadFileContents(CStdString const &strFileName, CStdString &strContent)
+bool ReadFileContents(std::string const &strFileName, std::string &strContent)
 {
 	void* fileHandle = XBMC->OpenFile(strFileName.c_str(), 0);
 	if (fileHandle)
@@ -105,7 +78,7 @@ bool ReadFileContents(CStdString const &strFileName, CStdString &strContent)
 	return false;
 }
 
-bool WriteFileContents(CStdString const &strFileName, CStdString &strContent)
+bool WriteFileContents(std::string const &strFileName, std::string &strContent)
 {
 	void* fileHandle = XBMC->OpenFileForWrite(strFileName.c_str(), true);
 	if (fileHandle)
