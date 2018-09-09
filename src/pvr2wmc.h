@@ -128,9 +128,7 @@ public:
 
 	// time shifting
 	bool IsTimeShifting();
-	time_t GetPlayingTime();
-	time_t GetBufferTimeStart();
-	time_t GetBufferTimeEnd();
+	PVR_ERROR GetStreamTimes(PVR_STREAM_TIMES*);
 
 	bool CheckErrorOnServer();
 	void TriggerUpdates(std::vector<std::string> results);

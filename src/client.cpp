@@ -624,7 +624,7 @@ extern "C" {
 		else
 			return false;
 	}
-	time_t GetPlayingTime()
+	/*time_t GetPlayingTime()
 	{
 		if (_wmc)
 			return _wmc->GetPlayingTime();
@@ -644,6 +644,15 @@ extern "C" {
 			return _wmc->GetBufferTimeEnd();
 		else
 			return 0;
+	}*/
+
+
+	PVR_ERROR GetStreamTimes(PVR_STREAM_TIMES *strTimes)
+	{
+		if (_wmc)
+			return _wmc->GetStreamTimes(strTimes);
+		else
+			return PVR_ERROR_SERVER_ERROR;
 	}
 
 	/** UNUSED API FUNCTIONS */
@@ -672,7 +681,6 @@ extern "C" {
 	PVR_ERROR IsEPGTagRecordable(const EPG_TAG*, bool*) { return PVR_ERROR_NOT_IMPLEMENTED; }
 	PVR_ERROR GetEPGTagStreamProperties(const EPG_TAG*, PVR_NAMED_VALUE*, unsigned int*) { return PVR_ERROR_NOT_IMPLEMENTED; }
 	PVR_ERROR GetEPGTagEdl(const EPG_TAG* epgTag, PVR_EDL_ENTRY edl[], int *size) { return PVR_ERROR_NOT_IMPLEMENTED; }
-	PVR_ERROR GetStreamTimes(PVR_STREAM_TIMES*) { return PVR_ERROR_NOT_IMPLEMENTED; }
 
 	PVR_ERROR GetStreamProperties(PVR_STREAM_PROPERTIES* pProperties) { return PVR_ERROR_NOT_IMPLEMENTED; }
 	PVR_ERROR GetChannelStreamProperties(const PVR_CHANNEL* channel, PVR_NAMED_VALUE* properties, unsigned int* iPropertiesCount) { return PVR_ERROR_NOT_IMPLEMENTED; }
