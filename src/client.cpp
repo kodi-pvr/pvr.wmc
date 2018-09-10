@@ -624,28 +624,6 @@ extern "C" {
 		else
 			return false;
 	}
-	/*time_t GetPlayingTime()
-	{
-		if (_wmc)
-			return _wmc->GetPlayingTime();
-		else
-			return 0;
-	}
-	time_t GetBufferTimeStart()
-	{
-		if (_wmc)
-			return _wmc->GetBufferTimeStart();
-		else
-			return 0;
-	}
-	time_t GetBufferTimeEnd()
-	{
-		if (_wmc)
-			return _wmc->GetBufferTimeEnd();
-		else
-			return 0;
-	}*/
-
 
 	PVR_ERROR GetStreamTimes(PVR_STREAM_TIMES *strTimes)
 	{

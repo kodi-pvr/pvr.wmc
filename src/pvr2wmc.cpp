@@ -1673,8 +1673,10 @@ PVR_ERROR Pvr2Wmc::GetStreamTimes(PVR_STREAM_TIMES *strTimes)
 			_buffTimesCnt = 0;
 			vector<std::string> results = _socketClient.GetVector("GetBufferTimes", false);		// get buffer status
 
-			if (results.size() < 3)
+			if (results.size() < 3)		
+			{
 				return PVR_ERROR_SERVER_ERROR;
+			}
 
 			strTimes->startTime = atoll(results[0].c_str());				// get time_t utc of when stream was started
 			strTimes->ptsStart = 0;											// relative to the above time, time when the stream starts (?)
