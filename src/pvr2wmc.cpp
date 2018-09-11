@@ -36,8 +36,8 @@ using namespace P8PLATFORM;
 
 int64_t _lastRecordingUpdateTime;		// the time of the last recording display update
 
-int _buffTimesCnt;						// filter how often we do buffer status reads
-int _buffTimeFILTER;
+long _buffTimesCnt;						// filter how often we do buffer status reads
+long _buffTimeFILTER;
 
 Pvr2Wmc::Pvr2Wmc(void)
 {
@@ -1266,8 +1266,8 @@ bool Pvr2Wmc::OpenLiveStream(const PVR_CHANNEL &channel)
 
 	_lostStream = true;								// init
 	_readCnt = 0;
-	int _buffTimesCnt = 0;							
-	int _buffTimeFILTER = 0;
+	_buffTimesCnt = 0;						
+	_buffTimeFILTER = 0;
 
 	CloseLiveStream(false);							// close current stream (if any)
 
@@ -1536,8 +1536,8 @@ bool Pvr2Wmc::OpenRecordedStream(const PVR_RECORDING &recording)
 
 	_lostStream = true;								// init
 	_readCnt = 0;
-	int _buffTimesCnt = 0;
-	int _buffTimeFILTER = 0;
+	_buffTimesCnt = 0;
+	_buffTimeFILTER = 0;
 
 	// request an active recording stream
 	std::string request;
@@ -1653,7 +1653,7 @@ PVR_ERROR Pvr2Wmc::SignalStatus(PVR_SIGNAL_STATUS &signalStatus)
 
 bool Pvr2Wmc::IsTimeShifting()
 {
-	if (_streamFile)		// ?not sure if this should be false if playtime is at buffer end)
+	if (_streamFile)		
 		return true;		
 	else
 		return false;
@@ -1668,7 +1668,7 @@ PVR_ERROR Pvr2Wmc::GetStreamTimes(PVR_STREAM_TIMES *strTimes)
 {
 	if (_streamFile)
 	{
-		if (_buffTimesCnt >= _buffTimeFILTER)									// filter queries to slow down queries to swmc
+		if (_buffTimesCnt >= _buffTimeFILTER)								// filter queries to slow down queries to swmc
 		{
 			_buffTimesCnt = 0;
 			vector<std::string> results = _socketClient.GetVector("GetBufferTimes", false);		// get buffer status
@@ -1680,12 +1680,11 @@ PVR_ERROR Pvr2Wmc::GetStreamTimes(PVR_STREAM_TIMES *strTimes)
 
 			strTimes->startTime = atoll(results[0].c_str());				// get time_t utc of when stream was started
 			strTimes->ptsStart = 0;											// relative to the above time, time when the stream starts (?)
-			strTimes->ptsBegin = 0;											// how far back the buffer data goes, which is always to zero for swmc
-			strTimes->ptsEnd = atoll(results[1].c_str()) * DVD_TIME_BASE;	// get the current length of the buffer (uSec)
-			_savBuffStart = strTimes->startTime;							// aave values last found to filter queries
+			strTimes->ptsBegin = 0;											// how far back the buffer data goes, which is always stream start for swmc
+			strTimes->ptsEnd = atoll(results[1].c_str()) * DVD_TIME_BASE;	// get the current length of the live buffer or recording duration (uSec)
+			_savBuffStart = strTimes->startTime;							// save values last found to filter queries
 			_savBuffEnd = strTimes->ptsEnd;
-			_buffTimeFILTER = atoi(results[2].c_str());						// get filter value from swmc
-			
+			_buffTimeFILTER = atol(results[2].c_str());						// get filter value from swmc
 		}
 		else
 		{
