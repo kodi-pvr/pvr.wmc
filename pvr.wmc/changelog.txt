@@ -1,3 +1,6 @@
+﻿2.4.0
+- implemented GetStreamTimes, removed BufferTime functions
+
 2.3.0
 - Updated to PVR addon API v5.10.0
 
