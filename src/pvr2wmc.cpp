@@ -34,12 +34,10 @@ using namespace P8PLATFORM;
 #define STRCPY(dest, src) strncpy(dest, src, sizeof(dest)-1); 
 #define FOREACH(ss, vv) for(std::vector<std::string>::iterator ss = vv.begin(); ss != vv.end(); ++ss)
 
-#define FAKE_TS_LENGTH 2000000			// a fake file length for give to xbmc (used to insert duration headers)
-
 int64_t _lastRecordingUpdateTime;		// the time of the last recording display update
 
-int _buffTimesCnt;						// filter how often we do buffer status reads
-int _buffTimeFILTER;
+long _buffTimesCnt;						// filter how often we do buffer status reads
+long _buffTimeFILTER;
 
 Pvr2Wmc::Pvr2Wmc(void)
 {
@@ -59,9 +57,6 @@ Pvr2Wmc::Pvr2Wmc(void)
 
 	_initialStreamResetCnt = 0;		// used to count how many times we reset the stream position (due to 2 pass demuxer)
 	_initialStreamPosition = 0;		// used to set an initial position (multiple clients watching the same live tv buffer)
-	
-	_insertDurationHeader = false;	// if true, insert a duration header for active Rec TS file
-	_durationHeader = "";			// the header to insert (received from server)
 	
 	_lastRecordingUpdateTime = 0;	// time of last recording display update
 	_lostStream = false;			// set to true if stream is lost
@@ -1271,8 +1266,8 @@ bool Pvr2Wmc::OpenLiveStream(const PVR_CHANNEL &channel)
 
 	_lostStream = true;								// init
 	_readCnt = 0;
-	int _buffTimesCnt = 0;							
-	int _buffTimeFILTER = 0;
+	_buffTimesCnt = 0;						
+	_buffTimeFILTER = 0;
 
 	CloseLiveStream(false);							// close current stream (if any)
 
@@ -1329,7 +1324,6 @@ bool Pvr2Wmc::OpenLiveStream(const PVR_CHANNEL &channel)
 		_lostStream = false;						// if we got to here, stream started ok, so set default values
 		_lastStreamSize = 0;
 		_isStreamFileGrowing = true;
-		_insertDurationHeader = false;				// only used for active recordings
 		return true;								// stream is up
 	}
 }
@@ -1340,13 +1334,13 @@ int Pvr2Wmc::ReadLiveStream(unsigned char *pBuffer, unsigned int iBufferSize)
 {
 	if (_lostStream)									// if stream has already been flagged as lost, return 0 bytes 
 		return 0;										// after this happens a few time, xbmc will call CloseLiveStream
-
 	_readCnt++;											// keep a count of the number of reads executed
 
 	if (!_streamWTV)									// if NOT streaming wtv, make sure stream is big enough before it is read
 	{						
 		int timeout = 0;								// reset timeout counter
 
+	
 		// If we are trying to skip to an initial start position (eg we are watching an existing live stream
 		// in a multiple client scenario), we need to do it here, as the Seek command didnt work in OpenLiveStream,
 		// XBMC just started playing from the start of the file anyway.  But once the stream is open, XBMC repeatedly 
@@ -1380,32 +1374,6 @@ int Pvr2Wmc::ReadLiveStream(unsigned char *pBuffer, unsigned int iBufferSize)
 		}
 
 		long long currentPos = PositionLiveStream();	// get the current file position
-
-		// this is a hack to set the time duration of an ACTIVE recording file. Xbmc reads the ts duration by looking for timestamps
-		// (pts/dts) toward the end of the ts file.  Since our ts file is very small at the start, xbmc skips trying to get the duration
-		// and just sets it to zero, this makes FF,RW,Skip work poorly and gives bad OSD feedback during playback.  The hack is 
-		// to tell xbmc that the ts file is 'FAKE_TS_LENGTH' in length at the start of the playback (see LengthLiveStream).  Then when xbmc 
-		// tries to read the duration by probing the end of the file (it starts looking at fileLength-250k), we catch this read below and feed
-		// it a packet that contains a pts with the duration we want (this packet header is received from the server).  After this, everything 
-		// is set back to normal.
-		if (_insertDurationHeader && FAKE_TS_LENGTH - 250000 == currentPos) // catch xbmc probing for timestamps at end of file
-		{
-			//char pcr[16] = {0x47, 0x51, 0x00, 0x19, 0x00, 0x00, 0x01, 0xBD, 0x00, 0x00, 0x85, 0x80, 0x05, 0x21, 0x2E, 0xDF};
-			_insertDurationHeader = false;									// only do header insertion once
-			memset(pBuffer, 0xFF, iBufferSize);								// set buffer to all FF (default padding char for packets)
-			vector<std::string> v = split(_durationHeader, " ");				// get header bytes by unpacking reponse
-			for (int i=0; i<16; i++)										// insert header bytes, creating a fake packet at start of buffer
-			{
-				//*(pBuffer + i) = pcr[i];
-				*(pBuffer + i) = (char)strtol(v[i].c_str(), NULL, 16);
-			}
-			return iBufferSize;												// terminate read here after header is inserted
-		} 
-		// in case something goes wrong, turn off fake header insertion flag.
-		// the header insertion usually happens around _readCnt=21, so 50 should be safe
-		if (_readCnt > 50)
-			_insertDurationHeader = false;
-
 		long long fileSize = _lastStreamSize;			// use the last fileSize found, rather than querying host
 
 		if (_isStreamFileGrowing && currentPos + iBufferSize > fileSize)	// if its not big enough for the readsize
@@ -1530,8 +1498,6 @@ long long Pvr2Wmc::ActualFileSize(int count)
 // return the length of the current stream file
 long long Pvr2Wmc::LengthLiveStream(void)
 {
-	if (_insertDurationHeader)			// if true, return a fake file 2Mb length to xbmc, this makes xbmc try to determine
-		return FAKE_TS_LENGTH;			// the ts time duration giving us a chance to insert the real duration
 	if (_lastStreamSize > 0)
 		return _lastStreamSize;
 	return -1;
@@ -1570,8 +1536,8 @@ bool Pvr2Wmc::OpenRecordedStream(const PVR_RECORDING &recording)
 
 	_lostStream = true;								// init
 	_readCnt = 0;
-	int _buffTimesCnt = 0;
-	int _buffTimeFILTER = 0;
+	_buffTimesCnt = 0;
+	_buffTimeFILTER = 0;
 
 	// request an active recording stream
 	std::string request;
@@ -1595,17 +1561,6 @@ bool Pvr2Wmc::OpenRecordedStream(const PVR_RECORDING &recording)
 			XBMC->Log(LOG_DEBUG, "OpenRecordedStream> opening stream: %s", results[2].c_str());		// log password safe path of client if available
 		else
 			XBMC->Log(LOG_DEBUG, "OpenRecordedStream> opening stream: %s", _streamFileName.c_str());	
-
-		if (results.size() > 3 && results[3] != "")											// get header to set duration of ts file
-		{
-			_durationHeader = results[3];													
-			_insertDurationHeader = true;
-		}
-		else
-		{
-			_durationHeader = "";
-			_insertDurationHeader = false;
-		}
 
 		_streamFile = XBMC->OpenFile(_streamFileName.c_str(), 0);	// open the video file for streaming, same handle
 
@@ -1698,55 +1653,49 @@ PVR_ERROR Pvr2Wmc::SignalStatus(PVR_SIGNAL_STATUS &signalStatus)
 
 bool Pvr2Wmc::IsTimeShifting()
 {
-	if (_streamFile)		// ?not sure if this should be false if playtime is at buffer end)
+	if (_streamFile)		
 		return true;		
 	else
 		return false;
 }
 
-time_t _buffStart;
-time_t _buffEnd;
-time_t _buffCurrent;
+// save the last pos of buffer pointers so that we can filter how often swmc is quered for buff data
+time_t _savBuffStart;
+int64_t _savBuffEnd;
 
-// get current playing time from swmc remux, this method also recieves buffer start and buffer end
-// to minimize traffic to swmc, since Kodi calls this like crazy, the calls are filtered.  The size
-// of the filter is passed in from swmc
-time_t Pvr2Wmc::GetPlayingTime()
+
+PVR_ERROR Pvr2Wmc::GetStreamTimes(PVR_STREAM_TIMES *strTimes)
 {
-	if (_streamFile && _buffTimesCnt >= _buffTimeFILTER)				// filter so we don't query swmc too much
+	if (_streamFile)
 	{
-		_buffTimesCnt = 0;
-		int64_t filePos = XBMC->GetFilePosition(_streamFile);			// get the current file pos so we can convert to play time
-		std::string request;
-		request = string_format("GetBufferTimes|%llu", filePos);
-		vector<std::string> results = _socketClient.GetVector(request, false);	// have swmc convert file pos to current play time
-
-		if (results.size() > 3)
+		if (_buffTimesCnt >= _buffTimeFILTER)								// filter queries to slow down queries to swmc
 		{
-			_buffStart = atol(results[0].c_str());
-			_buffEnd = atol(results[1].c_str());
-			_buffCurrent = atol(results[2].c_str());
-			_buffTimeFILTER = atoi(results[3].c_str());		// get filter value from swmc
+			_buffTimesCnt = 0;
+			vector<std::string> results = _socketClient.GetVector("GetBufferTimes", false);		// get buffer status
+
+			if (results.size() < 3)		
+			{
+				return PVR_ERROR_SERVER_ERROR;
+			}
+
+			strTimes->startTime = atoll(results[0].c_str());				// get time_t utc of when stream was started
+			strTimes->ptsStart = 0;											// relative to the above time, time when the stream starts (?)
+			strTimes->ptsBegin = 0;											// how far back the buffer data goes, which is always stream start for swmc
+			strTimes->ptsEnd = atoll(results[1].c_str()) * DVD_TIME_BASE;	// get the current length of the live buffer or recording duration (uSec)
+			_savBuffStart = strTimes->startTime;							// save values last found to filter queries
+			_savBuffEnd = strTimes->ptsEnd;
+			_buffTimeFILTER = atol(results[2].c_str());						// get filter value from swmc
 		}
+		else
+		{
+			// if filtering, used saved values
+			strTimes->startTime = _savBuffStart;					
+			strTimes->ptsStart = 0;				
+			strTimes->ptsBegin = 0;				
+			strTimes->ptsEnd = _savBuffEnd;		
+			_buffTimesCnt++;					// increment how many times saved values were used
+		}
+		return PVR_ERROR_NO_ERROR;
 	}
-	_buffTimesCnt++;
-	return _buffCurrent;
-}
-
-time_t Pvr2Wmc::GetBufferTimeStart()
-{
-	if (_streamFile)
-	{
-		return _buffStart;
-	}
-	return 0;
-}
-
-time_t Pvr2Wmc::GetBufferTimeEnd()
-{
-	if (_streamFile)
-	{
-		return _buffEnd;
-	}
-	return 0;
+	return PVR_ERROR_SERVER_ERROR;
 }
