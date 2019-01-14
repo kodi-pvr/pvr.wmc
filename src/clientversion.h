@@ -21,5 +21,5 @@
 
 inline std::string PVRWMC_GetClientVersion()
 {
-	return "2.4.0";	// ALSO CHANGE IN REV NUMBER in 'pvr.wmc/addon.xml.in'
+	return "2.4.5";	// ALSO CHANGE IN REV NUMBER in 'pvr.wmc/addon.xml.in'
 }

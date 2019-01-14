@@ -1,4 +1,7 @@
-﻿2.4.0
+﻿2.4.5
+- implemented GetRecordingEdl
+
+2.4.0
 - implemented GetStreamTimes, removed BufferTime functions
 
 2.3.0
