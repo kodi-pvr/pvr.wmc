@@ -279,7 +279,7 @@ extern "C" {
 		pCapabilities->bHandlesDemuxing				= false;
 		pCapabilities->bSupportsRecordingPlayCount	= true;
 		pCapabilities->bSupportsLastPlayedPosition	= g_bEnableMultiResume;
-		pCapabilities->bSupportsRecordingEdl		= false;
+		pCapabilities->bSupportsRecordingEdl		= true;
 		pCapabilities->bSupportsRecordingsRename	= true;
 		pCapabilities->bSupportsRecordingsLifetimeChange	= false;
 		pCapabilities->bSupportsDescrambleInfo = false;
@@ -633,6 +633,15 @@ extern "C" {
 			return PVR_ERROR_SERVER_ERROR;
 	}
 
+
+	PVR_ERROR GetRecordingEdl(const PVR_RECORDING &recording, PVR_EDL_ENTRY edlEntries[], int *count)
+	{
+		if (_wmc)
+			return _wmc->GetRecordingEdl(recording, edlEntries, count);
+		else
+			return PVR_ERROR_SERVER_ERROR;
+	}
+
 	/** UNUSED API FUNCTIONS */
 	PVR_ERROR OpenDialogChannelScan(void) { return PVR_ERROR_NOT_IMPLEMENTED; }
 	PVR_ERROR DeleteChannel(const PVR_CHANNEL &channel) { return PVR_ERROR_NOT_IMPLEMENTED; }
@@ -647,7 +656,6 @@ extern "C" {
 	bool SeekTime(double,bool,double*) { return false; }
 	void SetSpeed(int) {};
 	bool IsRealTimeStream(void) { return true; }
-	PVR_ERROR GetRecordingEdl(const PVR_RECORDING&, PVR_EDL_ENTRY[], int*) { return PVR_ERROR_NOT_IMPLEMENTED; };
 	PVR_ERROR UndeleteRecording(const PVR_RECORDING& recording) { return PVR_ERROR_NOT_IMPLEMENTED; }
 	PVR_ERROR DeleteAllRecordingsFromTrash() { return PVR_ERROR_NOT_IMPLEMENTED; }
 	PVR_ERROR SetEPGTimeFrame(int) { return PVR_ERROR_NOT_IMPLEMENTED; }

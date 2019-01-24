@@ -130,6 +130,9 @@ public:
 	bool IsTimeShifting();
 	PVR_ERROR GetStreamTimes(PVR_STREAM_TIMES*);
 
+	// comm skip
+	PVR_ERROR GetRecordingEdl(const PVR_RECORDING&, PVR_EDL_ENTRY[], int*);
+
 	bool CheckErrorOnServer();
 	void TriggerUpdates(std::vector<std::string> results);
 	void ExtractDriveSpace(std::vector<std::string> results);

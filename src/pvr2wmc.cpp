@@ -1553,7 +1553,7 @@ bool Pvr2Wmc::OpenRecordedStream(const PVR_RECORDING &recording)
 		_streamFileName = results[0];
 		_streamWTV = EndsWith(_streamFileName, "wtv");		// true if stream file is a wtv file
 
-		// hand additional args from server
+		// handle additional args from server
 		if (results.size() >  1)
 			XBMC->Log(LOG_DEBUG, "OpenRecordedStream> rec stream type: %s", results[1].c_str());		// either a 'passive' or 'active' WTV OR a TS file
 		
@@ -1698,4 +1698,59 @@ PVR_ERROR Pvr2Wmc::GetStreamTimes(PVR_STREAM_TIMES *strTimes)
 		return PVR_ERROR_NO_ERROR;
 	}
 	return PVR_ERROR_SERVER_ERROR;
+}
+
+PVR_ERROR Pvr2Wmc::GetRecordingEdl(const PVR_RECORDING &recording, PVR_EDL_ENTRY entries[], int *size)
+{
+
+	if (_streamFileName != "")		// read the edl for the current stream file
+	{
+		// see if edl file for currently streaming recording exists
+		std::string theEdlFile = _streamFileName;
+		// swap .wtv extension for .edl
+		std::string::size_type result = theEdlFile.find_last_of('.');
+		if (std::string::npos != result)
+			theEdlFile.erase(result);
+		else
+		{
+			XBMC->Log(LOG_DEBUG, "File extender error: '%s'", theEdlFile.c_str());
+			return PVR_ERROR_FAILED;
+		}
+		theEdlFile.append(".edl");
+
+		XBMC->Log(LOG_DEBUG, "Opening EDL file: '%s'", theEdlFile.c_str());
+
+		void* fileHandle = XBMC->OpenFile(theEdlFile.c_str(), 0);
+		if (fileHandle)
+		{
+			int index = 0;
+			char buffer[256];
+			while (XBMC->ReadFileString(fileHandle, buffer, 1024))
+			{
+				std::string svals(buffer); 
+				svals = StringUtils::TrimRight(svals, "\r");		// trim windows /r if its there
+				vector<std::string> vals = split(svals, "\t");		// split on tabs
+				if (vals.size() == 3)
+				{
+					PVR_EDL_ENTRY entry;
+					entry.start = std::strtod(vals[0].c_str(), null) * 1000;	// convert s to ms
+					entry.end = std::strtod(vals[1].c_str(), null) * 1000;
+					entry.type = (PVR_EDL_TYPE)atoi(vals[2].c_str());
+					entries[index] = entry;
+					index++;
+				}
+			}
+			if (index > 0)
+				XBMC->Log(LOG_DEBUG, "EDL data found.");
+			else
+				XBMC->Log(LOG_DEBUG, "No EDL data found.");
+			*size = index;
+			XBMC->CloseFile(fileHandle);
+			return PVR_ERROR_NO_ERROR;
+		}
+		else
+			XBMC->Log(LOG_DEBUG, "No EDL file found.");
+
+	}
+	return PVR_ERROR_FAILED;
 }
