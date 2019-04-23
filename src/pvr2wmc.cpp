@@ -734,13 +734,13 @@ PVR_ERROR Pvr2Wmc::GetChannelGroupMembers(ADDON_HANDLE handle, const PVR_CHANNEL
 	return PVR_ERROR_NO_ERROR;
 }
 
-PVR_ERROR Pvr2Wmc::GetEPGForChannel(ADDON_HANDLE handle, const PVR_CHANNEL &channel, time_t iStart, time_t iEnd)
+PVR_ERROR Pvr2Wmc::GetEPGForChannel(ADDON_HANDLE handle, int iChannelUid, time_t iStart, time_t iEnd)
 {
 	if (IsServerDown())
 		return PVR_ERROR_SERVER_ERROR;
 
 	std::string request;
-	request = string_format("GetEntries|%u|%lld|%lld", channel.iUniqueId, (long long)iStart, (long long)iEnd);			// build the request string 
+	request = string_format("GetEntries|%u|%lld|%lld", iChannelUid, (long long)iStart, (long long)iEnd);			// build the request string 
 
 	vector<std::string> results = _socketClient.GetVector(request, true);			// get entries from server
 	
@@ -763,7 +763,7 @@ PVR_ERROR Pvr2Wmc::GetEPGForChannel(ADDON_HANDLE handle, const PVR_CHANNEL &chan
 		//	e.Program.EpisodeTitle
 		//	(MB3 fields) channelID, audioFormat, GenreString, ProgramType
 		//	actors, directors, writers, year, movieID
-		xEpg.iUniqueChannelId = channel.iUniqueId;			// assign unique channel ID
+		xEpg.iUniqueChannelId = iChannelUid;			// assign unique channel ID
 		xEpg.iUniqueBroadcastId = atoi(v[0].c_str());		// entry ID
 		xEpg.strTitle = v[1].c_str();						// entry title
 		xEpg.startTime = atol(v[3].c_str());				// start time
