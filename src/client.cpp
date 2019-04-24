@@ -321,10 +321,10 @@ extern "C" {
 		return PVR_ERROR_SERVER_ERROR;
 	}
 
-	PVR_ERROR GetEPGForChannel(ADDON_HANDLE handle, const PVR_CHANNEL &channel, time_t iStart, time_t iEnd)
+	PVR_ERROR GetEPGForChannel(ADDON_HANDLE handle, int iChannelUid, time_t iStart, time_t iEnd)
 	{
 		if (_wmc)
-			return _wmc->GetEPGForChannel(handle, channel, iStart, iEnd);
+			return _wmc->GetEPGForChannel(handle, iChannelUid, iStart, iEnd);
 
 		return PVR_ERROR_SERVER_ERROR;
 	}
@@ -653,6 +653,7 @@ extern "C" {
 	void DemuxFlush(void) {}
 	void DemuxAbort(void) {}
 	DemuxPacket* DemuxRead(void) { return NULL; }
+	void FillBuffer(bool mode) {}
 	bool SeekTime(double,bool,double*) { return false; }
 	void SetSpeed(int) {};
 	bool IsRealTimeStream(void) { return true; }
