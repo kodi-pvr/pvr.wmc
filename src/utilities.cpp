@@ -18,7 +18,6 @@
  *
  */
 
-#include "util/XMLUtils.h"
 #include "utilities.h"
 
 #include "client.h"
