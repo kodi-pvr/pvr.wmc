@@ -18,7 +18,7 @@
  *
  */
 
-#include "libXBMC_addon.h"
+#include "kodi/libXBMC_addon.h"
 #include <string>
 #include "p8-platform/os.h"
 #include "client.h"
