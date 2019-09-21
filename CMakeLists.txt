@@ -1,14 +1,11 @@
+cmake_minimum_required(VERSION 3.5)
 project(pvr.wmc)
-
-cmake_minimum_required(VERSION 2.6)
-
-enable_language(CXX)
 
 find_package(Kodi REQUIRED)
 find_package(p8-platform REQUIRED)
 
 include_directories(${p8-platform_INCLUDE_DIRS}
-                    ${KODI_INCLUDE_DIR})
+                    ${KODI_INCLUDE_DIR}/..) # Hack way with "/..", need bigger Kodi cmake rework to match right include ways
 
 add_definitions(-DUSE_DEMUX)
 
@@ -27,6 +24,7 @@ set(DEPLIBS ${p8-platform_LIBRARIES})
 
 if (WIN32)
   list(APPEND DEPLIBS ws2_32)
+  add_compile_options(/wd4996) # Need gethostbyname and inet_addr change to prevent
 endif()
 
 build_addon(pvr.wmc WMC DEPLIBS)
