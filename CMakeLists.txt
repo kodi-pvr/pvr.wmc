@@ -24,6 +24,7 @@ set(DEPLIBS ${p8-platform_LIBRARIES})
 
 if (WIN32)
   list(APPEND DEPLIBS ws2_32)
+  add_compile_options(/wd4996) # Need gethostbyname and inet_addr change to prevent
 endif()
 
 build_addon(pvr.wmc WMC DEPLIBS)
