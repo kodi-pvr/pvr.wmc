@@ -1,5 +1,4 @@
 [![Build Status](https://travis-ci.org/kodi-pvr/pvr.wmc.svg?branch=Matrix)](https://travis-ci.org/kodi-pvr/pvr.wmc/branches)
-[![Build Status](https://ci.appveyor.com/api/projects/status/github/kodi-pvr/pvr.wmc?branch=Matrix&svg=true)](https://ci.appveyor.com/project/kodi-pvr/pvr-wmc?branch=Matrix)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/5120/badge.svg)](https://scan.coverity.com/projects/5120)
 
 # Windows Media Center PVR
