@@ -1,3 +1,8 @@
+3.2.2
+- Replace AppVeyor with Azure for test build (better performance)
+- Add p8-platform to addon depends instead of from kodi
+- Updated Language files from Transifex
+
 3.2.1
 - Update build sytem version
 - Update addon interface header usage
