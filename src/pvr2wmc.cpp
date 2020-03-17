@@ -733,6 +733,20 @@ PVR_ERROR Pvr2Wmc::GetChannelGroupMembers(ADDON_HANDLE handle, const PVR_CHANNEL
 	return PVR_ERROR_NO_ERROR;
 }
 
+namespace
+{
+
+std::string ParseAsW3CDateString(time_t time)
+{
+  std::tm* tm = std::localtime(&time);
+  char buffer[16];
+  std::strftime(buffer, 16, "%Y-%m-%d", tm);
+
+  return buffer;
+}
+
+} // unnamed namespace
+
 PVR_ERROR Pvr2Wmc::GetEPGForChannel(ADDON_HANDLE handle, int iChannelUid, time_t iStart, time_t iEnd)
 {
 	if (IsServerDown())
@@ -769,11 +783,19 @@ PVR_ERROR Pvr2Wmc::GetEPGForChannel(ADDON_HANDLE handle, int iChannelUid, time_t
 		xEpg.endTime = atol(v[4].c_str());					// end time
 		xEpg.strPlotOutline = v[5].c_str();					// short plot description (currently using episode name, if there is one)
 		xEpg.strPlot = v[6].c_str();						// long plot description
-		xEpg.firstAired = atol(v[7].c_str());				// orig air date
+		time_t firstAired = atol(v[7].c_str());				// orig air date
+		std::string strFirstAired((firstAired > 0) ? ParseAsW3CDateString(firstAired) : "");
+		xEpg.strFirstAired = strFirstAired.c_str();
 		xEpg.iParentalRating = atoi(v[8].c_str());			// tv rating
 		xEpg.iStarRating = atoi(v[9].c_str());				// star rating
 		xEpg.iSeriesNumber = atoi(v[10].c_str());			// season (?) number
 		xEpg.iEpisodeNumber = atoi(v[11].c_str());			// episode number
+		if (xEpg.iSeriesNumber == 0 && xEpg.iEpisodeNumber == 0)
+		{
+			xEpg.iSeriesNumber = EPG_TAG_INVALID_SERIES_EPISODE;
+			xEpg.iEpisodeNumber = EPG_TAG_INVALID_SERIES_EPISODE;
+		}
+		xEpg.iEpisodePartNumber = EPG_TAG_INVALID_SERIES_EPISODE;
 		xEpg.iGenreType = atoi(v[12].c_str());				// season (?) number
 		xEpg.iGenreSubType = atoi(v[13].c_str());			// general genre type
 		xEpg.strIconPath = v[14].c_str();					// the icon url
@@ -1090,6 +1112,8 @@ PVR_ERROR Pvr2Wmc::GetRecordings(ADDON_HANDLE handle)
 	{
 		PVR_RECORDING xRec;
 		memset(&xRec, 0, sizeof(PVR_RECORDING));					// set all struct to zero
+		xRec.iSeriesNumber = PVR_RECORDING_INVALID_SERIES_EPISODE;
+		xRec.iEpisodeNumber = PVR_RECORDING_INVALID_SERIES_EPISODE;
 
 		vector<std::string> v = split(*response, "|");				// split to unpack string
 
