@@ -158,5 +158,8 @@
     <disclaimer lang="zh_CN">试验性软件，使用风险自担。</disclaimer>
     <disclaimer lang="zh_TW">這是開發中的軟體。使用上您須自行考慮到可能有的風險。</disclaimer>
     <platform>@PLATFORM@</platform>
+    <assets>
+      <icon>icon.png</icon>
+    </assets>
   </extension>
 </addon>
