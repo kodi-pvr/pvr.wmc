@@ -548,23 +548,23 @@ void Pvr2Wmc::TriggerUpdates(vector<std::string> results)
 			// Send XBMC Notification (support up to 4 parameter replaced arguments from the backend)
 			if (v.size() == 4)
 			{
-				XBMC->QueueNotification((ADDON::queue_msg)level, infoStr.c_str());
+				XBMC->QueueNotification((queue_msg)level, infoStr.c_str());
 			}
 			else if (v.size() == 5)
 			{
-				XBMC->QueueNotification((ADDON::queue_msg)level, infoStr.c_str(), v[4].c_str());
+				XBMC->QueueNotification((queue_msg)level, infoStr.c_str(), v[4].c_str());
 			}
 			else if (v.size() == 6)
 			{
-				XBMC->QueueNotification((ADDON::queue_msg)level, infoStr.c_str(), v[4].c_str(), v[5].c_str());
+				XBMC->QueueNotification((queue_msg)level, infoStr.c_str(), v[4].c_str(), v[5].c_str());
 			}
 			else if (v.size() == 7)
 			{
-				XBMC->QueueNotification((ADDON::queue_msg)level, infoStr.c_str(), v[4].c_str(), v[5].c_str(), v[6].c_str());
+				XBMC->QueueNotification((queue_msg)level, infoStr.c_str(), v[4].c_str(), v[5].c_str(), v[6].c_str());
 			}
 			else
 			{
-				XBMC->QueueNotification((ADDON::queue_msg)level, infoStr.c_str(), v[4].c_str(), v[5].c_str(), v[6].c_str(), v[7].c_str());
+				XBMC->QueueNotification((queue_msg)level, infoStr.c_str(), v[4].c_str(), v[5].c_str(), v[6].c_str(), v[7].c_str());
 			}
 		}
 	}
