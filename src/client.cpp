@@ -141,7 +141,7 @@ extern "C" {
 		if (!hdl || !props)
 			return ADDON_STATUS_UNKNOWN;
 
-		PVR_PROPERTIES* pvrprops = (PVR_PROPERTIES*)props;
+		AddonProperties_PVR* pvrprops = (AddonProperties_PVR*)props;
 
 		// register the addon
 		XBMC = new CHelper_libXBMC_addon;
