@@ -1604,7 +1604,7 @@ bool Pvr2Wmc::OpenRecordedStream(const PVR_RECORDING &recording)
 	}
 }
 
-PVR_ERROR Pvr2Wmc::SignalStatus(PVR_SIGNAL_STATUS &signalStatus)
+PVR_ERROR Pvr2Wmc::SignalStatus(PVR_SIGNAL_STATUS *signalStatus)
 {
 	if (!g_bSignalEnable || _discardSignalStatus)
 	{
@@ -1657,7 +1657,7 @@ PVR_ERROR Pvr2Wmc::SignalStatus(PVR_SIGNAL_STATUS &signalStatus)
 		}
 	}
 	
-	signalStatus = cachedSignalStatus;
+	*signalStatus = cachedSignalStatus;
 	return PVR_ERROR_NO_ERROR;
 }
 
