@@ -141,7 +141,7 @@ extern "C" {
 		if (!hdl || !props)
 			return ADDON_STATUS_UNKNOWN;
 
-		PVR_PROPERTIES* pvrprops = (PVR_PROPERTIES*)props;
+		AddonProperties_PVR* pvrprops = (AddonProperties_PVR*)props;
 
 		// register the addon
 		XBMC = new CHelper_libXBMC_addon;
@@ -253,7 +253,7 @@ extern "C" {
 	{
 	}
 
-	PVR_ERROR GetAddonCapabilities(PVR_ADDON_CAPABILITIES* pCapabilities)
+	PVR_ERROR GetCapabilities(PVR_ADDON_CAPABILITIES* pCapabilities)
 	{
 		pCapabilities->bSupportsEPG					= true;
 		pCapabilities->bSupportsTV					= true;
@@ -318,7 +318,7 @@ extern "C" {
 	}
 
 
-	PVR_ERROR SignalStatus(PVR_SIGNAL_STATUS &signalStatus)
+	PVR_ERROR GetSignalStatus(int channelUid, PVR_SIGNAL_STATUS *signalStatus)
 	{
 		if (_wmc)
 			return _wmc->SignalStatus(signalStatus);
@@ -634,7 +634,6 @@ extern "C" {
 	PVR_ERROR OpenDialogChannelScan(void) { return PVR_ERROR_NOT_IMPLEMENTED; }
 	PVR_ERROR DeleteChannel(const PVR_CHANNEL &channel) { return PVR_ERROR_NOT_IMPLEMENTED; }
 	PVR_ERROR RenameChannel(const PVR_CHANNEL &channel) { return PVR_ERROR_NOT_IMPLEMENTED; }
-	PVR_ERROR MoveChannel(const PVR_CHANNEL &channel) { return PVR_ERROR_NOT_IMPLEMENTED; }
 	PVR_ERROR OpenDialogChannelSettings(const PVR_CHANNEL &channel)  {  return PVR_ERROR_NOT_IMPLEMENTED;  }
 	PVR_ERROR OpenDialogChannelAdd(const PVR_CHANNEL &channel) { return PVR_ERROR_NOT_IMPLEMENTED; }
 	void DemuxReset(void) {}
@@ -649,7 +648,7 @@ extern "C" {
 	PVR_ERROR DeleteAllRecordingsFromTrash() { return PVR_ERROR_NOT_IMPLEMENTED; }
 	PVR_ERROR GetRecordingSize(const PVR_RECORDING* recording, int64_t* sizeInBytes) { return PVR_ERROR_NOT_IMPLEMENTED; }
 	PVR_ERROR SetEPGTimeFrame(int) { return PVR_ERROR_NOT_IMPLEMENTED; }
-	PVR_ERROR GetDescrambleInfo(PVR_DESCRAMBLE_INFO*) { return PVR_ERROR_NOT_IMPLEMENTED; }
+	PVR_ERROR GetDescrambleInfo(int channelUid, PVR_DESCRAMBLE_INFO*) { return PVR_ERROR_NOT_IMPLEMENTED; }
 	PVR_ERROR SetRecordingLifetime(const PVR_RECORDING*) { return PVR_ERROR_NOT_IMPLEMENTED; }
 	PVR_ERROR CallMenuHook(const PVR_MENUHOOK &menuhook, const PVR_MENUHOOK_DATA &item) { return PVR_ERROR_NOT_IMPLEMENTED; }
 

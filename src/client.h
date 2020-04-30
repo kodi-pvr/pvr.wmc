@@ -10,7 +10,6 @@
 
 #include "kodi/libXBMC_addon.h"
 #include "kodi/libXBMC_pvr.h"
-#include "kodi/libKODI_guilib.h"
 #include <p8-platform/util/StringUtils.h>
 
 #include "clientversion.h"

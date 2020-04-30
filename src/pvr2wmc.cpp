@@ -548,23 +548,23 @@ void Pvr2Wmc::TriggerUpdates(vector<std::string> results)
 			// Send XBMC Notification (support up to 4 parameter replaced arguments from the backend)
 			if (v.size() == 4)
 			{
-				XBMC->QueueNotification((queue_msg)level, infoStr.c_str());
+				XBMC->QueueNotification((QueueMsg)level, infoStr.c_str());
 			}
 			else if (v.size() == 5)
 			{
-				XBMC->QueueNotification((queue_msg)level, infoStr.c_str(), v[4].c_str());
+				XBMC->QueueNotification((QueueMsg)level, infoStr.c_str(), v[4].c_str());
 			}
 			else if (v.size() == 6)
 			{
-				XBMC->QueueNotification((queue_msg)level, infoStr.c_str(), v[4].c_str(), v[5].c_str());
+				XBMC->QueueNotification((QueueMsg)level, infoStr.c_str(), v[4].c_str(), v[5].c_str());
 			}
 			else if (v.size() == 7)
 			{
-				XBMC->QueueNotification((queue_msg)level, infoStr.c_str(), v[4].c_str(), v[5].c_str(), v[6].c_str());
+				XBMC->QueueNotification((QueueMsg)level, infoStr.c_str(), v[4].c_str(), v[5].c_str(), v[6].c_str());
 			}
 			else
 			{
-				XBMC->QueueNotification((queue_msg)level, infoStr.c_str(), v[4].c_str(), v[5].c_str(), v[6].c_str(), v[7].c_str());
+				XBMC->QueueNotification((QueueMsg)level, infoStr.c_str(), v[4].c_str(), v[5].c_str(), v[6].c_str(), v[7].c_str());
 			}
 		}
 	}
@@ -1604,7 +1604,7 @@ bool Pvr2Wmc::OpenRecordedStream(const PVR_RECORDING &recording)
 	}
 }
 
-PVR_ERROR Pvr2Wmc::SignalStatus(PVR_SIGNAL_STATUS &signalStatus)
+PVR_ERROR Pvr2Wmc::SignalStatus(PVR_SIGNAL_STATUS *signalStatus)
 {
 	if (!g_bSignalEnable || _discardSignalStatus)
 	{
@@ -1657,7 +1657,7 @@ PVR_ERROR Pvr2Wmc::SignalStatus(PVR_SIGNAL_STATUS &signalStatus)
 		}
 	}
 	
-	signalStatus = cachedSignalStatus;
+	*signalStatus = cachedSignalStatus;
 	return PVR_ERROR_NO_ERROR;
 }
 
