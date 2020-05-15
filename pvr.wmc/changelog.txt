@@ -1,3 +1,6 @@
+3.2.8
+- Fully implement IsRealtimeStream
+
 3.2.7
 - Update PVR API 6.5.0
 
