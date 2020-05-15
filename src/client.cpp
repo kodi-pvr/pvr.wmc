@@ -39,6 +39,7 @@ ADDON_STATUS	_CurStatus      = ADDON_STATUS_UNKNOWN;
 bool			_bIsPlaying     = false;
 PVR_CHANNEL		_currentChannel;
 PVR_MENUHOOK	*menuHook       = NULL;
+bool			m_bRecordingPlayback = false;
 
 std::string		g_strServerName;							// the name of the server to connect to
 std::string		g_strClientName;							// the name of the computer running addon
@@ -536,6 +537,7 @@ extern "C" {
 			if (_wmc->OpenRecordedStream(recording))
 			{
 				_bIsPlaying = true;
+				m_bRecordingPlayback = true;
 				return true;
 			}
 		}
@@ -554,6 +556,7 @@ extern "C" {
 	void CloseRecordedStream(void) 
 	{
 		_bIsPlaying = false;
+		m_bRecordingPlayback = false;
 		if (_wmc)
 		{
 			_wmc->CloseLiveStream();
@@ -642,6 +645,11 @@ extern "C" {
 			return PVR_ERROR_SERVER_ERROR;
 	}
 
+	bool IsRealTimeStream()
+	{ 
+  		return !m_bRecordingPlayback; 
+	}
+
 	/** UNUSED API FUNCTIONS */
 	PVR_ERROR OpenDialogChannelScan(void) { return PVR_ERROR_NOT_IMPLEMENTED; }
 	PVR_ERROR DeleteChannel(const PVR_CHANNEL &channel) { return PVR_ERROR_NOT_IMPLEMENTED; }
@@ -655,7 +663,6 @@ extern "C" {
 	DemuxPacket* DemuxRead(void) { return NULL; }
 	bool SeekTime(double,bool,double*) { return false; }
 	void SetSpeed(int) {};
-	bool IsRealTimeStream(void) { return true; }
 	PVR_ERROR UndeleteRecording(const PVR_RECORDING& recording) { return PVR_ERROR_NOT_IMPLEMENTED; }
 	PVR_ERROR DeleteAllRecordingsFromTrash() { return PVR_ERROR_NOT_IMPLEMENTED; }
 	PVR_ERROR SetEPGTimeFrame(int) { return PVR_ERROR_NOT_IMPLEMENTED; }

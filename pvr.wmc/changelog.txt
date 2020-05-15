@@ -1,3 +1,6 @@
+2.4.6
+- Fully implement IsRealtimeStream
+
  2.4.5
 - Update build sytem version
 - Update addon interface header usage
