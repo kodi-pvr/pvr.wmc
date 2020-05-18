@@ -137,7 +137,7 @@ extern "C" {
 	}
 
 	// create this addon (called by xbmc)
-	ADDON_STATUS ADDON_Create(void* hdl, void* props)
+	ADDON_STATUS ADDON_Create(void* hdl, const char* globalApiVersion, void* props)
 	{
 		if (!hdl || !props)
 			return ADDON_STATUS_UNKNOWN;
