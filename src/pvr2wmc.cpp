@@ -69,7 +69,7 @@ Pvr2Wmc::~Pvr2Wmc(void)
 bool Pvr2Wmc::IsServerDown()
 {
   std::string request;
-  request = string_format("GetServiceStatus|%s|%s", PVRWMC_GetClientVersion().c_str(),
+  request = string_format("GetServiceStatus|%s|%s", STR(WMC_VERSION),
                           g_clientOS.c_str());
   _socketClient.SetTimeOut(10); // set a timout interval for checking if server is down
   vector<std::string> results = _socketClient.GetVector(request, true); // get serverstatus

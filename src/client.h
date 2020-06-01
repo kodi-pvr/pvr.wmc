@@ -8,12 +8,11 @@
 
 #pragma once
 
-#include "clientversion.h"
-
 #include "kodi/libXBMC_addon.h"
 #include "kodi/libXBMC_pvr.h"
 
 #include <p8-platform/util/StringUtils.h>
+#include <string>
 
 #define string_format StringUtils::Format
 #define split StringUtils::Split

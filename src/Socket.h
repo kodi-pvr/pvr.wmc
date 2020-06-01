@@ -41,6 +41,7 @@ typedef unsigned short port_t;
 #include <fcntl.h>
 #include <netdb.h> /* for gethostbyname */
 #include <netinet/in.h> /* for htons */
+#include <string>
 #include <sys/socket.h> /* for socket,connect */
 #include <sys/types.h> /* for socket,connect */
 #include <sys/un.h> /* for Unix socket */

@@ -15,7 +15,6 @@ set(WMC_SOURCES src/client.cpp
                 src/utilities.cpp)
 
 set(WMC_HEADERS src/client.h
-                src/clientversion.h
                 src/pvr2wmc.h
                 src/Socket.h
                 src/utilities.h)
@@ -28,5 +27,7 @@ if (WIN32)
 endif()
 
 build_addon(pvr.wmc WMC DEPLIBS)
+
+add_definitions(-DWMC_VERSION=${WMC_VERSION})
 
 include(CPack)
