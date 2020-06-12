@@ -8,17 +8,15 @@
 
 #include "utilities.h"
 
-#include "client.h"
-
 #include <cstdarg>
+#include <kodi/Filesystem.h>
 #include <stdio.h>
 #include <string>
 
-using namespace ADDON;
-
 #define FORMAT_BLOCK_SIZE 2048 // # of bytes to increment per try
 
-using namespace Utils;
+namespace Utils
+{
 
 // format related string functions taken from:
 // http://www.flipcode.com/archives/Safe_sprintf.shtml
@@ -28,7 +26,9 @@ bool Str2Bool(const std::string& str)
   return str.compare("True") == 0 ? true : false;
 }
 
-std::vector<std::string> Split(const std::string& input, const std::string& delimiter, unsigned int iMaxStrings /* = 0 */)
+std::vector<std::string> Split(const std::string& input,
+                               const std::string& delimiter,
+                               unsigned int iMaxStrings /* = 0 */)
 {
   std::vector<std::string> results;
   if (input.empty())
@@ -62,12 +62,12 @@ std::vector<std::string> Split(const std::string& input, const std::string& deli
   if (iMaxStrings > 0 && numFound >= iMaxStrings)
     numFound = iMaxStrings - 1;
 
-  for ( unsigned int i = 0; i <= numFound; i++ )
+  for (unsigned int i = 0; i <= numFound; i++)
   {
     std::string s;
-    if ( i == 0 )
+    if (i == 0)
     {
-      if ( i == numFound )
+      if (i == numFound)
         s = input;
       else
         s = input.substr(i, positions[i]);
@@ -75,13 +75,12 @@ std::vector<std::string> Split(const std::string& input, const std::string& deli
     else
     {
       size_t offset = positions[i - 1] + sizeS2;
-      if ( offset < isize )
+      if (offset < isize)
       {
-        if ( i == numFound )
+        if (i == numFound)
           s = input.substr(offset);
-        else if ( i > 0 )
-          s = input.substr( positions[i - 1] + sizeS2,
-                         positions[i] - positions[i - 1] - sizeS2 );
+        else if (i > 0)
+          s = input.substr(positions[i - 1] + sizeS2, positions[i] - positions[i - 1] - sizeS2);
       }
     }
     results.push_back(s);
@@ -89,7 +88,7 @@ std::vector<std::string> Split(const std::string& input, const std::string& deli
   return results;
 }
 
-std::string Format(const char *fmt, ...)
+std::string Format(const char* fmt, ...)
 {
   va_list args;
   va_start(args, fmt);
@@ -99,7 +98,7 @@ std::string Format(const char *fmt, ...)
   return str;
 }
 
-std::string FormatV(const char *fmt, va_list args)
+std::string FormatV(const char* fmt, va_list args)
 {
   if (fmt == nullptr)
     return "";
@@ -107,7 +106,7 @@ std::string FormatV(const char *fmt, va_list args)
   int size = FORMAT_BLOCK_SIZE;
   va_list argCopy;
 
-  char *cstr = reinterpret_cast<char*>(malloc(sizeof(char) * size));
+  char* cstr = reinterpret_cast<char*>(malloc(sizeof(char) * size));
   if (cstr == nullptr)
     return "";
 
@@ -124,12 +123,12 @@ std::string FormatV(const char *fmt, va_list args)
       free(cstr);
       return str;
     }
-    if (nActual > -1)                   // Exactly what we will need (glibc 2.1)
+    if (nActual > -1) // Exactly what we will need (glibc 2.1)
       size = nActual + 1;
-    else                                // Let's try to double the size (glibc 2.0)
+    else // Let's try to double the size (glibc 2.0)
       size *= 2;
 
-    char *new_cstr = reinterpret_cast<char*>(realloc(cstr, sizeof(char) * size));
+    char* new_cstr = reinterpret_cast<char*>(realloc(cstr, sizeof(char) * size));
     if (new_cstr == nullptr)
     {
       free(cstr);
@@ -180,34 +179,34 @@ std::string GetDirectoryPath(std::string const& path)
 
 bool ReadFileContents(std::string const& strFileName, std::string& strContent)
 {
-  void* fileHandle = XBMC->OpenFile(strFileName.c_str(), 0);
-  if (fileHandle)
+  kodi::vfs::CFile fileHandle;
+  if (fileHandle.OpenFile(strFileName))
   {
-    char buffer[1024];
-    while (XBMC->ReadFileString(fileHandle, buffer, 1024))
+    std::string buffer;
+    while (fileHandle.ReadLine(buffer))
       strContent.append(buffer);
-    XBMC->CloseFile(fileHandle);
     return true;
   }
   return false;
 }
 
-bool WriteFileContents(std::string const& strFileName, std::string& strContent)
+bool WriteFileContents(std::string const& strFileName, const std::string& strContent)
 {
-  void* fileHandle = XBMC->OpenFileForWrite(strFileName.c_str(), true);
-  if (fileHandle)
+  kodi::vfs::CFile fileHandle;
+  if (fileHandle.OpenFileForWrite(strFileName, true))
   {
-    int rc = XBMC->WriteFile(fileHandle, strContent.c_str(), strContent.length());
+    int rc = fileHandle.Write(strContent.c_str(), strContent.length());
     if (rc)
     {
-      XBMC->Log(LOG_DEBUG, "wrote file %s", strFileName.c_str());
+      kodi::Log(ADDON_LOG_DEBUG, "wrote file %s", strFileName.c_str());
     }
     else
     {
-      XBMC->Log(LOG_ERROR, "can not write to %s", strFileName.c_str());
+      kodi::Log(ADDON_LOG_ERROR, "can not write to %s", strFileName.c_str());
     }
-    XBMC->CloseFile(fileHandle);
     return rc >= 0;
   }
   return false;
 }
+
+} /* namespace Utils */

@@ -8,7 +8,9 @@
 
 #pragma once
 
-//Include platform specific datatypes, header files, defines and constants:
+#include <kodi/AddonBase.h>
+
+// Include platform specific datatypes, header files, defines and constants:
 #if defined TARGET_WINDOWS
 #define WIN32_LEAN_AND_MEAN // Enable LEAN_AND_MEAN support
 #pragma warning(disable : 4005) // Disable "warning C4005: '_WINSOCKAPI_' : macro redefinition"
@@ -64,6 +66,8 @@ typedef sockaddr_in SOCKADDR_IN;
 #define MAXCONNECTIONS 1 ///< Maximum number of pending connections before "Connection refused"
 #define MAXRECV 1500 ///< Maximum packet size
 
+class Pvr2Wmc;
+
 enum SocketFamily
 {
 #ifdef CONFIG_SOCKET_IPV6
@@ -102,7 +106,7 @@ enum SocketProtocol
 #endif
 };
 
-class Socket
+class ATTRIBUTE_HIDDEN Socket
 {
 public:
   /*!
@@ -112,19 +116,19 @@ public:
    * If the socket cannot be created, an exception is thrown.
    *
    * \param family Socket family (IPv4 or IPv6)
-   * \param domain The domain parameter specifies a communications domain within which communication will take place;
-   * this selects the protocol family which should be used.
-   * \param type base type and protocol family of the socket.
-   * \param protocol specific protocol to apply.
+   * \param domain The domain parameter specifies a communications domain within which communication
+   * will take place; this selects the protocol family which should be used. \param type base type
+   * and protocol family of the socket. \param protocol specific protocol to apply.
    */
-  Socket(const enum SocketFamily family,
+  Socket(Pvr2Wmc& client,
+         const enum SocketFamily family,
          const enum SocketDomain domain,
          const enum SocketType type,
          const enum SocketProtocol protocol = tcp);
-  Socket(void);
+  Socket(Pvr2Wmc& client);
   virtual ~Socket();
 
-  //Socket settings
+  // Socket settings
 
   /*!
    * Socket setFamily
@@ -177,9 +181,9 @@ public:
   /*!
    * Socket bind
    */
-  //bool bind ( const unsigned short port );
-  //bool listen() const;
-  //bool accept ( Socket& socket ) const;
+  // bool bind ( const unsigned short port );
+  // bool listen() const;
+  // bool accept ( Socket& socket ) const;
 
   // Client initialization
   bool connect(const std::string& host, const unsigned short port);
@@ -222,8 +226,8 @@ private:
 
 #ifdef TARGET_WINDOWS
   WSADATA _wsaData; ///< Windows Socket data
-  static int
-      win_usage_count; ///< Internal Windows usage counter used to prevent a global WSACleanup when more than one Socket object is used
+  static int win_usage_count; ///< Internal Windows usage counter used to prevent a global
+      ///< WSACleanup when more than one Socket object is used
 #endif
 
   void errormessage(int errornum, const char* functionname = NULL) const;
@@ -233,6 +237,7 @@ private:
 
   // client interface
 private:
+  Pvr2Wmc& _client;
   std::string _serverName;
   std::string _clientName;
   int _port;

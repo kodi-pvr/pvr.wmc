@@ -8,28 +8,27 @@
 
 #include "Socket.h"
 
-#include "client.h"
+#include "pvr2wmc.h"
 #include "utilities.h"
 
-#include "kodi/libXBMC_addon.h"
-#include "p8-platform/os.h"
-#include "p8-platform/threads/mutex.h"
-#include "p8-platform/util/timeutils.h"
-
+#include <chrono>
+#include <kodi/General.h>
+#include <kodi/Network.h>
+#include <mutex>
 #include <string>
+#include <thread>
 
-using namespace std;
-using namespace ADDON;
-
-P8PLATFORM::CMutex m_mutex;
+std::mutex m_mutex;
 
 /* Master defines for client control */
 //#define RECEIVE_TIMEOUT 6 //sec
 
-Socket::Socket(const enum SocketFamily family,
+Socket::Socket(Pvr2Wmc& client,
+               const enum SocketFamily family,
                const enum SocketDomain domain,
                const enum SocketType type,
                const enum SocketProtocol protocol)
+  : _client(client)
 {
   _sd = INVALID_SOCKET;
   _family = family;
@@ -37,10 +36,10 @@ Socket::Socket(const enum SocketFamily family,
   _type = type;
   _protocol = protocol;
   memset(&_sockaddr, 0, sizeof(_sockaddr));
-  //set_non_blocking(1);
+  // set_non_blocking(1);
 }
 
-Socket::Socket()
+Socket::Socket(Pvr2Wmc& client) : _client(client)
 {
   // Default constructor, default settings
   _sd = INVALID_SOCKET;
@@ -109,9 +108,9 @@ bool Socket::create()
   }
 
   _sd = socket(_family, _type, _protocol);
-  //0 indicates that the default protocol for the type selected is to be used.
-  //For example, IPPROTO_TCP is chosen for the protocol if the type  was set to
-  //SOCK_STREAM and the address family is AF_INET.
+  // 0 indicates that the default protocol for the type selected is to be used.
+  // For example, IPPROTO_TCP is chosen for the protocol if the type  was set to
+  // SOCK_STREAM and the address family is AF_INET.
 
   if (_sd == INVALID_SOCKET)
   {
@@ -170,13 +169,13 @@ int Socket::send(const char* data, const unsigned int len)
 
   if (result < 0)
   {
-    XBMC->Log(LOG_ERROR, "Socket::send  - select failed");
+    kodi::Log(ADDON_LOG_ERROR, "Socket::send  - select failed");
     _sd = INVALID_SOCKET;
     return 0;
   }
   if (FD_ISSET(_sd, &set_w))
   {
-    XBMC->Log(LOG_ERROR, "Socket::send  - failed to send data");
+    kodi::Log(ADDON_LOG_ERROR, "Socket::send  - failed to send data");
     _sd = INVALID_SOCKET;
     return 0;
   }
@@ -186,14 +185,14 @@ int Socket::send(const char* data, const unsigned int len)
   if (status == -1)
   {
     errormessage(getLastError(), "Socket::send");
-    XBMC->Log(LOG_ERROR, "Socket::send  - failed to send data");
+    kodi::Log(ADDON_LOG_ERROR, "Socket::send  - failed to send data");
     _sd = INVALID_SOCKET;
   }
   return status;
 }
 
-//Receive until error or \n
-bool Socket::ReadResponses(int& code, vector<std::string>& lines)
+// Receive until error or \n
+bool Socket::ReadResponses(int& code, std::vector<std::string>& lines)
 {
   int result;
   char buffer[4096]; // this buff size has to be known in server
@@ -209,9 +208,9 @@ bool Socket::ReadResponses(int& code, vector<std::string>& lines)
     {
 #ifdef TARGET_WINDOWS
       int errorCode = WSAGetLastError();
-      XBMC->Log(LOG_DEBUG, "ReadResponse ERROR - recv failed, Err: %d", errorCode);
+      kodi::Log(ADDON_LOG_DEBUG, "ReadResponse ERROR - recv failed, Err: %d", errorCode);
 #else
-      XBMC->Log(LOG_DEBUG, "ReadResponse ERROR - recv failed");
+      kodi::Log(ADDON_LOG_DEBUG, "ReadResponse ERROR - recv failed");
 #endif
       code = 1;
       _sd = INVALID_SOCKET;
@@ -227,15 +226,15 @@ bool Socket::ReadResponses(int& code, vector<std::string>& lines)
   } while (result >
            0); // keep reading until result returns '0', meaning server is done sending reponses
 
-  if (EndsWith(bigString, "<EOF>"))
+  if (Utils::EndsWith(bigString, "<EOF>"))
   {
     readComplete = true; // all server data has benn read
-    lines = split(bigString, "<EOL>"); // split each reponse by <EOL> delimiters
+    lines = Utils::Split(bigString, "<EOL>"); // split each reponse by <EOL> delimiters
     lines.erase(lines.end() - 1); // erase <EOF> at end
   }
   else
   {
-    XBMC->Log(LOG_DEBUG, "ReadResponse ERROR - <EOF> in read reponses not found");
+    kodi::Log(ADDON_LOG_DEBUG, "ReadResponse ERROR - <EOF> in read reponses not found");
     _sd = INVALID_SOCKET;
   }
 
@@ -255,7 +254,7 @@ bool Socket::connect(const std::string& host, const unsigned short port)
 
   if (!setHostname(host))
   {
-    XBMC->Log(LOG_ERROR, "Socket::setHostname(%s) failed.\n", host.c_str());
+    kodi::Log(ADDON_LOG_ERROR, "Socket::setHostname(%s) failed.\n", host.c_str());
     return false;
   }
 
@@ -263,7 +262,7 @@ bool Socket::connect(const std::string& host, const unsigned short port)
 
   if (status == SOCKET_ERROR)
   {
-    XBMC->Log(LOG_ERROR, "Socket::connect %s:%u\n", host.c_str(), port);
+    kodi::Log(ADDON_LOG_ERROR, "Socket::connect %s:%u\n", host.c_str(), port);
     errormessage(getLastError(), "Socket::connect");
     return false;
   }
@@ -309,7 +308,8 @@ bool Socket::set_non_blocking(const bool b)
 
   if (ioctlsocket(_sd, FIONBIO, &iMode) == -1)
   {
-    XBMC->Log(LOG_ERROR, "Socket::set_non_blocking - Can't set socket condition to: %i", iMode);
+    kodi::Log(ADDON_LOG_ERROR, "Socket::set_non_blocking - Can't set socket condition to: %i",
+              iMode);
     return false;
   }
 
@@ -400,7 +400,7 @@ void Socket::errormessage(int errnum, const char* functionname) const
     default:
       errmsg = "WSA Error";
   }
-  XBMC->Log(LOG_ERROR, "%s: (Winsock error=%i) %s\n", functionname, errnum, errmsg);
+  kodi::Log(ADDON_LOG_ERROR, "%s: (Winsock error=%i) %s\n", functionname, errnum, errmsg);
 }
 
 int Socket::getLastError() const
@@ -408,7 +408,7 @@ int Socket::getLastError() const
   return WSAGetLastError();
 }
 
-int Socket::win_usage_count = 0; //Declared static in Socket class
+int Socket::win_usage_count = 0; // Declared static in Socket class
 
 bool Socket::osInit()
 {
@@ -458,7 +458,7 @@ bool Socket::set_non_blocking(const bool b)
 
   if (fcntl(_sd, F_SETFL, opts) == -1)
   {
-    XBMC->Log(LOG_ERROR, "Socket::set_non_blocking - Can't set socket flags to: %i", opts);
+    kodi::Log(ADDON_LOG_ERROR, "Socket::set_non_blocking - Can't set socket flags to: %i", opts);
     return false;
   }
   return true;
@@ -470,7 +470,7 @@ void Socket::errormessage(int errnum, const char* functionname) const
 
   switch (errnum)
   {
-    case EAGAIN: //same as EWOULDBLOCK
+    case EAGAIN: // same as EWOULDBLOCK
       errmsg = "EAGAIN: The socket is marked non-blocking and the requested operation would block";
       break;
     case EBADF:
@@ -532,13 +532,13 @@ void Socket::errormessage(int errnum, const char* functionname) const
       errmsg = "ENOTCONN: The socket is associated with a connection-oriented protocol and has not "
                "been connected";
       break;
-      //case E:
+      // case E:
       //	errmsg = "";
       //	break;
     default:
       break;
   }
-  XBMC->Log(LOG_ERROR, "%s: (errno=%i) %s\n", functionname, errnum, errmsg);
+  kodi::Log(ADDON_LOG_ERROR, "%s: (errno=%i) %s\n", functionname, errnum, errmsg);
 }
 
 int Socket::getLastError() const
@@ -556,7 +556,7 @@ void Socket::osCleanup()
 {
   // Not needed for Linux
 }
-#endif //TARGET_WINDOWS || TARGET_LINUX || TARGET_DARWIN || TARGET_FREEBSD
+#endif // TARGET_WINDOWS || TARGET_LINUX || TARGET_DARWIN || TARGET_FREEBSD
 
 
 void Socket::SetServerName(std::string strServerName)
@@ -577,7 +577,7 @@ void Socket::SetServerPort(int port)
 int Socket::SendRequest(std::string requestStr)
 {
   std::string sRequest;
-  sRequest = string_format("%s|%s<Client Quit>", _clientName.c_str(),
+  sRequest = Utils::Format("%s|%s<Client Quit>", _clientName.c_str(),
                            requestStr.c_str()); // build the request string
   int status = send(sRequest);
   return status;
@@ -596,7 +596,7 @@ std::vector<std::string> Socket::GetVector(const std::string& request,
   int maxAttempts = 3;
   int sleepAttemptsMs = 1000;
 
-  P8PLATFORM::CLockObject lock(m_mutex); // only process one request at a time
+  std::lock_guard<std::mutex> lock(m_mutex); // only process one request at a time
 
   int code;
   std::vector<std::string> reponses;
@@ -604,47 +604,49 @@ std::vector<std::string> Socket::GetVector(const std::string& request,
   int cntAttempts = 1;
   while (cntAttempts <= maxAttempts)
   {
-    XBMC->Log(LOG_DEBUG, "Socket::GetVector> Send request \"%s\"", request.c_str());
+    kodi::Log(ADDON_LOG_DEBUG, "Socket::GetVector> Send request \"%s\"", request.c_str());
     reponses.clear();
 
     if (!create()) // create the socket
     {
-      XBMC->Log(LOG_ERROR, "Socket::GetVector> error could not create socket");
+      kodi::Log(ADDON_LOG_ERROR, "Socket::GetVector> error could not create socket");
       reponses.push_back("SocketError"); // set a SocketError message (not fatal)
     }
     else // socket created OK
     {
       // Attempt Wake On Lan
-      if (g_BackendOnline != BACKEND_UP && allowWOL && g_bWakeOnLAN && g_strServerMAC != "")
+      if (_client.GetBackendStatus() != BACKEND_UP && allowWOL &&
+          _client.GetSettings().GetWakeOnLAN() && !_client.GetSettings().GetServerMAC().empty())
       {
-        XBMC->Log(LOG_INFO, "Socket::GetVector> Sending WOL packet to %s", g_strServerMAC.c_str());
-        if (g_BackendOnline != BACKEND_UNKNOWN)
+        kodi::Log(ADDON_LOG_INFO, "Socket::GetVector> Sending WOL packet to %s",
+                  _client.GetSettings().GetServerMAC().c_str());
+        if (_client.GetBackendStatus() != BACKEND_UNKNOWN)
         {
-          std::string infoStr = XBMC->GetLocalizedString(30026);
-          XBMC->QueueNotification(QUEUE_INFO, infoStr.c_str()); // Notify WOL is being sent
+          std::string infoStr = kodi::GetLocalizedString(30026);
+          kodi::QueueNotification(QUEUE_INFO, "", infoStr); // Notify WOL is being sent
         }
-        XBMC->WakeOnLan(g_strServerMAC.c_str()); // Send WOL request
+        kodi::network::WakeOnLan(_client.GetSettings().GetServerMAC()); // Send WOL request
       }
 
       if (!connect(_serverName,
                    (unsigned short)_port)) // if this fails, it is likely due to server down
       {
         // Failed to connect
-        g_BackendOnline = BACKEND_DOWN;
-        XBMC->Log(LOG_ERROR, "Socket::GetVector> Server is down");
+        _client.SetBackendStatus(BACKEND_DOWN);
+        kodi::Log(ADDON_LOG_ERROR, "Socket::GetVector> Server is down");
         reponses.push_back("ServerDown"); // set a server down error message (not fatal)
       }
       else
       {
         // Connected OK
-        g_BackendOnline = BACKEND_UP;
+        _client.SetBackendStatus(BACKEND_UP);
         int bytesSent = SendRequest(request.c_str()); // send request to server
 
         if (bytesSent > 0) // if request was sent successfully
         {
           if (!ReadResponses(code, reponses))
           {
-            XBMC->Log(LOG_ERROR, "Socket::GetVector> error getting responses");
+            kodi::Log(ADDON_LOG_ERROR, "Socket::GetVector> error getting responses");
             reponses.clear();
             reponses.push_back("SocketError");
           }
@@ -655,7 +657,7 @@ std::vector<std::string> Socket::GetVector(const std::string& request,
         }
         else // error sending request
         {
-          XBMC->Log(LOG_ERROR, "Socket::GetVector> error sending server request");
+          kodi::Log(ADDON_LOG_ERROR, "Socket::GetVector> error sending server request");
           reponses.push_back("SocketError");
         }
       }
@@ -667,8 +669,8 @@ std::vector<std::string> Socket::GetVector(const std::string& request,
     }
 
     cntAttempts++;
-    XBMC->Log(LOG_DEBUG, "Socket::GetVector> Retrying in %ims", sleepAttemptsMs);
-    usleep(sleepAttemptsMs * 1000);
+    kodi::Log(ADDON_LOG_DEBUG, "Socket::GetVector> Retrying in %ims", sleepAttemptsMs);
+    std::this_thread::sleep_for(std::chrono::milliseconds(sleepAttemptsMs));
   }
 
   close(); // close socket
