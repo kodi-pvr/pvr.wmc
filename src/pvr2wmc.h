@@ -8,155 +8,229 @@
 
 #pragma once
 
-#include <vector>
-#include "client.h"
 #include "Socket.h"
+#include "addon.h"
+#include "settings.h"
+
+#include <chrono>
+#include <kodi/Filesystem.h>
+#include <kodi/addon-instance/PVR.h>
 
 /* timer type ids */
-#define TIMER_MANUAL_MIN			(PVR_TIMER_TYPE_NONE + 1)
-#define TIMER_ONCE_MANUAL			(TIMER_MANUAL_MIN + 0)
-#define TIMER_ONCE_EPG				(TIMER_MANUAL_MIN + 1)
-#define TIMER_ONCE_KEYWORD			(TIMER_MANUAL_MIN + 2)
-#define TIMER_ONCE_MANUAL_CHILD		(TIMER_MANUAL_MIN + 3)
-#define TIMER_ONCE_EPG_CHILD		(TIMER_MANUAL_MIN + 4)
-#define TIMER_ONCE_KEYWORD_CHILD	(TIMER_MANUAL_MIN + 5)
-#define TIMER_MANUAL_MAX			(TIMER_MANUAL_MIN + 5)
+#define TIMER_MANUAL_MIN (PVR_TIMER_TYPE_NONE + 1)
+#define TIMER_ONCE_MANUAL (TIMER_MANUAL_MIN + 0)
+#define TIMER_ONCE_EPG (TIMER_MANUAL_MIN + 1)
+#define TIMER_ONCE_KEYWORD (TIMER_MANUAL_MIN + 2)
+#define TIMER_ONCE_MANUAL_CHILD (TIMER_MANUAL_MIN + 3)
+#define TIMER_ONCE_EPG_CHILD (TIMER_MANUAL_MIN + 4)
+#define TIMER_ONCE_KEYWORD_CHILD (TIMER_MANUAL_MIN + 5)
+#define TIMER_MANUAL_MAX (TIMER_MANUAL_MIN + 5)
 
-#define TIMER_REPEATING_MIN			(TIMER_MANUAL_MAX + 1)
-#define TIMER_REPEATING_MANUAL		(TIMER_REPEATING_MIN + 0)
-#define TIMER_REPEATING_EPG			(TIMER_REPEATING_MIN + 1)
-#define TIMER_REPEATING_KEYWORD		(TIMER_REPEATING_MIN + 2)
-#define TIMER_REPEATING_MAX			(TIMER_REPEATING_MIN + 2)
+#define TIMER_REPEATING_MIN (TIMER_MANUAL_MAX + 1)
+#define TIMER_REPEATING_MANUAL (TIMER_REPEATING_MIN + 0)
+#define TIMER_REPEATING_EPG (TIMER_REPEATING_MIN + 1)
+#define TIMER_REPEATING_KEYWORD (TIMER_REPEATING_MIN + 2)
+#define TIMER_REPEATING_MAX (TIMER_REPEATING_MIN + 2)
 
-typedef enum {
-	WMC_PRIORITY_NORMAL = 0,
-	WMC_PRIORITY_HIGH = 1,
-	WMC_PRIORITY_LOW = 2
+typedef enum
+{
+  WMC_PRIORITY_NORMAL = 0,
+  WMC_PRIORITY_HIGH = 1,
+  WMC_PRIORITY_LOW = 2
 } wmc_priority_t;
 
-typedef enum {
-	WMC_SHOWTYPE_ANY = 0,
-	WMC_SHOWTYPE_FIRSTRUNONLY = 1,
-	WMC_SHOWTYPE_LIVEONLY = 2
+typedef enum
+{
+  WMC_SHOWTYPE_ANY = 0,
+  WMC_SHOWTYPE_FIRSTRUNONLY = 1,
+  WMC_SHOWTYPE_LIVEONLY = 2
 } wmc_showtype_t;
 
-typedef enum {
-	WMC_LIFETIME_NOTSET = -4,
-	WMC_LIFETIME_LATEST = -3,
-	WMC_LIFETIME_WATCHED = -2,
-	WMC_LIFETIME_ELIGIBLE = -1,
-	WMC_LIFETIME_DELETED = 0,
-	WMC_LIFETIME_ONEWEEK = 7
+typedef enum
+{
+  WMC_LIFETIME_NOTSET = -4,
+  WMC_LIFETIME_LATEST = -3,
+  WMC_LIFETIME_WATCHED = -2,
+  WMC_LIFETIME_ELIGIBLE = -1,
+  WMC_LIFETIME_DELETED = 0,
+  WMC_LIFETIME_ONEWEEK = 7
 } wmc_lifetime_t;
 
-typedef enum {
-	WMC_LIMIT_ASMANY = -1,
-	WMC_LIMIT_1 = 1,
-	WMC_LIMIT_2 = 2,
-	WMC_LIMIT_3 = 3,
-	WMC_LIMIT_4 = 4,
-	WMC_LIMIT_5 = 5,
-	WMC_LIMIT_6 = 6,
-	WMC_LIMIT_7 = 7,
-	WMC_LIMIT_10 = 10
+typedef enum
+{
+  WMC_LIMIT_ASMANY = -1,
+  WMC_LIMIT_1 = 1,
+  WMC_LIMIT_2 = 2,
+  WMC_LIMIT_3 = 3,
+  WMC_LIMIT_4 = 4,
+  WMC_LIMIT_5 = 5,
+  WMC_LIMIT_6 = 6,
+  WMC_LIMIT_7 = 7,
+  WMC_LIMIT_10 = 10
 } wmc_recordinglimit_t;
 
-class Pvr2Wmc 
+enum backend_status
+{
+  BACKEND_UNKNOWN,
+  BACKEND_DOWN,
+  BACKEND_UP
+};
+
+class ATTRIBUTE_HIDDEN Pvr2Wmc : public kodi::addon::CInstancePVRClient
 {
 public:
-	Pvr2Wmc(void);
-	virtual ~Pvr2Wmc(void);
+  Pvr2Wmc(CPvr2WmcAddon& addon, KODI_HANDLE instance, const std::string& kodiVersion);
+  ~Pvr2Wmc() override = default;
 
-	virtual bool IsServerDown();
-	virtual void UnLoading();
-	const char *GetBackendVersion(void);
-	PVR_ERROR GetTimerTypes ( PVR_TIMER_TYPE types[], int *size );
-	virtual PVR_ERROR GetDriveSpace(long long *iTotal, long long *iUsed);
+  bool IsServerDown();
+  void UnLoading();
 
-	// channels
-	virtual int GetChannelsAmount(void);
-	virtual PVR_ERROR GetChannels(ADDON_HANDLE handle, bool bRadio);
-	
-	virtual int GetChannelGroupsAmount(void);
-	virtual PVR_ERROR GetChannelGroups(ADDON_HANDLE handle, bool bRadio);
-	virtual PVR_ERROR GetChannelGroupMembers(ADDON_HANDLE handle, const PVR_CHANNEL_GROUP &group);
+  PVR_ERROR GetCapabilities(kodi::addon::PVRCapabilities& capabilities) override;
+  PVR_ERROR GetBackendName(std::string& name) override;
+  PVR_ERROR GetBackendVersion(std::string& version) override;
+  PVR_ERROR GetBackendHostname(std::string& hostname) override;
+  PVR_ERROR GetConnectionString(std::string& connection) override;
+  PVR_ERROR GetDriveSpace(uint64_t& total, uint64_t& used) override;
 
-	// epg
-	virtual PVR_ERROR GetEPGForChannel(ADDON_HANDLE handle, int iChannelUid, time_t iStart, time_t iEnd);
-	
-	// timers
-	virtual PVR_ERROR GetTimers(ADDON_HANDLE handle);
-	virtual PVR_ERROR AddTimer(const PVR_TIMER &timer);
-	virtual PVR_ERROR DeleteTimer(const PVR_TIMER &timer, bool bForceDelete);
-	virtual int GetTimersAmount(void);
+  // channels
+  PVR_ERROR GetChannelsAmount(int& amount) override;
+  PVR_ERROR GetChannels(bool radio, kodi::addon::PVRChannelsResultSet& results) override;
 
-	// recording files
-	virtual PVR_ERROR GetRecordings(ADDON_HANDLE handle);
-	PVR_ERROR DeleteRecording(const PVR_RECORDING &recording);
-	PVR_ERROR RenameRecording(const PVR_RECORDING &recording);
-	PVR_ERROR SetRecordingLastPlayedPosition(const PVR_RECORDING &recording, int lastplayedposition);
-	int GetRecordingLastPlayedPosition(const PVR_RECORDING &recording);
-	PVR_ERROR SetRecordingPlayCount(const PVR_RECORDING &recording, int count);
+  PVR_ERROR GetChannelGroupsAmount(int& amount) override;
+  PVR_ERROR GetChannelGroups(bool radio, kodi::addon::PVRChannelGroupsResultSet& results) override;
+  PVR_ERROR GetChannelGroupMembers(const kodi::addon::PVRChannelGroup& group,
+                                   kodi::addon::PVRChannelGroupMembersResultSet& results) override;
 
-	// recording streams
-	bool OpenRecordedStream(const PVR_RECORDING &recording);
-	virtual int GetRecordingsAmount(void);
-	void UpdateRecordingTimer(int msec);
+  PVR_ERROR GetSignalStatus(int channelUid, kodi::addon::PVRSignalStatus& signalStatus) override;
 
-	// live tv
-	bool OpenLiveStream(const PVR_CHANNEL &channel);
-	bool CloseLiveStream(bool notifyServer = true);
-	int ReadLiveStream(unsigned char *pBuffer, unsigned int iBufferSize);
-	void PauseStream(bool bPaused);
-	long long SeekLiveStream(long long iPosition, int iWhence /* = SEEK_SET */) ;
-	long long PositionLiveStream(void) ;
-	bool SwitchChannel(const PVR_CHANNEL &channel);
-	long long LengthLiveStream(void);
-	long long ActualFileSize(int count);
-	PVR_ERROR SignalStatus(PVR_SIGNAL_STATUS *signalStatus);
+  // epg
+  PVR_ERROR GetEPGForChannel(int channelUid,
+                             time_t start,
+                             time_t end,
+                             kodi::addon::PVREPGTagsResultSet& results) override;
 
-	// time shifting
-	bool IsTimeShifting();
-	PVR_ERROR GetStreamTimes(PVR_STREAM_TIMES*);
+  // timers
+  PVR_ERROR GetTimerTypes(std::vector<kodi::addon::PVRTimerType>& types) override;
 
-	// comm skip
-	PVR_ERROR GetRecordingEdl(const PVR_RECORDING&, PVR_EDL_ENTRY[], int*);
+  PVR_ERROR GetTimers(kodi::addon::PVRTimersResultSet& results) override;
+  PVR_ERROR AddTimer(const kodi::addon::PVRTimer& timer) override;
+  PVR_ERROR DeleteTimer(const kodi::addon::PVRTimer& timer, bool forceDelete) override;
+  PVR_ERROR GetTimersAmount(int& amount) override;
 
-	bool CheckErrorOnServer();
-	void TriggerUpdates(std::vector<std::string> results);
-	void ExtractDriveSpace(std::vector<std::string> results);
+  // recording files
+  PVR_ERROR GetRecordingsAmount(bool deleted, int& amount) override;
+  PVR_ERROR GetRecordings(bool deleted, kodi::addon::PVRRecordingsResultSet& results) override;
+  PVR_ERROR DeleteRecording(const kodi::addon::PVRRecording& recording) override;
+  PVR_ERROR RenameRecording(const kodi::addon::PVRRecording& recording) override;
+  PVR_ERROR SetRecordingLastPlayedPosition(const kodi::addon::PVRRecording& recording,
+                                           int lastplayedposition) override;
+  PVR_ERROR GetRecordingLastPlayedPosition(const kodi::addon::PVRRecording& recording,
+                                           int& position) override;
+  PVR_ERROR SetRecordingPlayCount(const kodi::addon::PVRRecording& recording, int count) override;
+
+  // comm skip
+  PVR_ERROR GetRecordingEdl(const kodi::addon::PVRRecording& recording,
+                            std::vector<kodi::addon::PVREDLEntry>& edl) override;
+
+  // recording streams
+  bool OpenRecordedStream(const kodi::addon::PVRRecording& recording) override;
+  void CloseRecordedStream() override { CloseStream(); }
+  int ReadRecordedStream(unsigned char* buffer, unsigned int size) override
+  {
+    return ReadStream(buffer, size);
+  }
+  int64_t SeekRecordedStream(int64_t position, int whence) override
+  {
+    return SeekStream(position, whence);
+  }
+  int64_t LengthRecordedStream() override { return LengthStream(); }
+
+  // live tv
+  bool OpenLiveStream(const kodi::addon::PVRChannel& channel) override;
+  void CloseLiveStream() override { CloseStream(); }
+  int ReadLiveStream(unsigned char* buffer, unsigned int size) override
+  {
+    return ReadStream(buffer, size);
+  }
+  int64_t SeekLiveStream(int64_t position, int whence) override
+  {
+    return SeekStream(position, whence);
+  }
+  int64_t LengthLiveStream() override { return LengthStream(); }
+
+  // time shifting
+  PVR_ERROR GetStreamTimes(kodi::addon::PVRStreamTimes& times) override;
+  bool IsRealTimeStream() override { return !_bRecordingPlayback; }
+  bool CanPauseStream() override { return true; }
+  bool CanSeekStream() override { return true; }
+
+  const CSettings& GetSettings() const { return _addon.GetSettings(); }
+
+  void SetBackendStatus(backend_status status) { _BackendOnline = status; }
+  backend_status GetBackendStatus() const { return _BackendOnline; }
 
 private:
-	int _serverBuild;
-	std::string Timer2String(const PVR_TIMER &xTmr);
-	std::string SeriesTimer2String(const PVR_TIMER &xTmr);
-	std::string Channel2String(const PVR_CHANNEL &xTmr);
+  int _serverBuild;
+  std::string Timer2String(const kodi::addon::PVRTimer& xTmr);
+  std::string Channel2String(const kodi::addon::PVRChannel& xTmr);
 
-	Socket _socketClient;
+  bool CloseStream(bool notifyServer = true);
+  int ReadStream(unsigned char* pBuffer, unsigned int iBufferSize);
+  int64_t SeekStream(int64_t iPosition, int iWhence /* = SEEK_SET */);
+  int64_t PositionStream();
+  int64_t LengthStream();
+  int64_t ActualFileSize(int count);
 
-	long long _diskTotal;
-	long long _diskUsed;
+  bool CheckErrorOnServer();
+  void TriggerUpdates(std::vector<std::string> results);
+  void ExtractDriveSpace(std::vector<std::string> results);
 
-	int _signalStatusCount;				// call backend for signal status every N calls (because XBMC calls every 1 second!)
-	bool _discardSignalStatus;			// flag to discard signal status for channels where the backend had an error
+  Socket _socketClient;
 
-	void* _streamFile;					// handle to a streamed file
-	std::string _streamFileName;			// the name of the stream file
-	bool _lostStream;					// set to true if stream is lost
-	
-	bool _streamWTV;					// if true, stream wtv files
-	long long _lastStreamSize;			// last value found for file stream
-	bool _isStreamFileGrowing;			// true if server reports that a live/rec stream is still growing
-	long long _readCnt;					// keep a count of the number of reads executed during playback
+  uint64_t _diskTotal = 0;
+  uint64_t _diskUsed = 0;
 
-	int _initialStreamResetCnt;			// used to count how many times we reset the stream position (due to 2 pass demuxer)
-	long long _initialStreamPosition;	// used to set an initial position (multiple clients watching the same live tv buffer)
+  int _signalStatusCount =
+      0; // call backend for signal status every N calls (because XBMC calls every 1 second!)
+  bool _discardSignalStatus =
+      false; // flag to discard signal status for channels where the backend had an error
 
-	bool _insertDurationHeader;			// if true, insert a duration header for active Rec TS file
-	std::string _durationHeader;			// the header to insert (received from server)
+  kodi::vfs::CFile _streamFile; // handle to a streamed file
+  std::string _streamFileName; // the name of the stream file
+  bool _lostStream = false; // set to true if stream is lost
+  bool _bRecordingPlayback = false;
 
-	int _defaultPriority;
-	int _defaultLiftetime;
-	int _defaultLimit;
-	int _defaultShowType;
+  // save the last pos of buffer pointers so that we can filter how often swmc is quered for buff
+  // data
+  time_t _savBuffStart;
+  int64_t _savBuffEnd;
+
+  static long _buffTimesCnt; // filter how often we do buffer status reads
+  static long _buffTimeFILTER;
+
+  bool _streamWTV = true; // if true, stream wtv files
+  int64_t _lastStreamSize = 0; // last value found for file stream
+  bool _isStreamFileGrowing =
+      false; // true if server reports that a live/rec stream is still growing
+  int64_t _readCnt = 0; // keep a count of the number of reads executed during playback
+
+  int _initialStreamResetCnt =
+      0; // used to count how many times we reset the stream position (due to 2 pass demuxer)
+  int64_t _initialStreamPosition =
+      0; // used to set an initial position (multiple clients watching the same live tv buffer)
+
+  bool _insertDurationHeader = false; // if true, insert a duration header for active Rec TS file
+  std::string _durationHeader; // the header to insert (received from server)
+
+  int _defaultPriority = WMC_PRIORITY_NORMAL;
+  int _defaultLiftetime = WMC_LIFETIME_ELIGIBLE;
+  int _defaultLimit = WMC_LIMIT_ASMANY;
+  int _defaultShowType = WMC_SHOWTYPE_ANY;
+
+  std::chrono::high_resolution_clock::time_point
+      _lastRecordingUpdateTime; // the time of the last recording display update
+
+  backend_status _BackendOnline = BACKEND_DOWN;
+
+  CPvr2WmcAddon& _addon;
 };
