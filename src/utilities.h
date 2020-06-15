@@ -10,6 +10,7 @@
 
 #include "stdio.h"
 
+#include <cstdarg>
 #include <string>
 #include <vector>
 
