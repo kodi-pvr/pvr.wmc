@@ -1713,7 +1713,7 @@ PVR_ERROR Pvr2Wmc::GetStreamTimes(kodi::addon::PVRStreamTimes& times)
           0); // how far back the buffer data goes, which is always stream start for swmc
       times.SetPTSEnd(
           std::stoll(results[1]) *
-          DVD_TIME_BASE); // get the current length of the live buffer or recording duration (uSec)
+          STREAM_TIME_BASE); // get the current length of the live buffer or recording duration (uSec)
       _savBuffStart = times.GetStartTime(); // save values last found to filter queries
       _savBuffEnd = times.GetPTSEnd();
       _buffTimeFILTER = std::stol(results[2]); // get filter value from swmc
