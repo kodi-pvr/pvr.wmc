@@ -224,7 +224,7 @@ bool Socket::ReadResponses(int& code, std::vector<std::string>& lines)
     }
 
   } while (result >
-           0); // keep reading until result returns '0', meaning server is done sending reponses
+           0); // keep reading until result returns '0', meaning server is done sending responses
 
   if (Utils::EndsWith(bigString, "<EOF>"))
   {
@@ -234,7 +234,7 @@ bool Socket::ReadResponses(int& code, std::vector<std::string>& lines)
   }
   else
   {
-    kodi::Log(ADDON_LOG_DEBUG, "ReadResponse ERROR - <EOF> in read reponses not found");
+    kodi::Log(ADDON_LOG_DEBUG, "ReadResponse ERROR - <EOF> in read responses not found");
     _sd = INVALID_SOCKET;
   }
 
@@ -599,18 +599,18 @@ std::vector<std::string> Socket::GetVector(const std::string& request,
   std::lock_guard<std::mutex> lock(m_mutex); // only process one request at a time
 
   int code;
-  std::vector<std::string> reponses;
+  std::vector<std::string> responses;
 
   int cntAttempts = 1;
   while (cntAttempts <= maxAttempts)
   {
     kodi::Log(ADDON_LOG_DEBUG, "Socket::GetVector> Send request \"%s\"", request.c_str());
-    reponses.clear();
+    responses.clear();
 
     if (!create()) // create the socket
     {
       kodi::Log(ADDON_LOG_ERROR, "Socket::GetVector> error could not create socket");
-      reponses.push_back("SocketError"); // set a SocketError message (not fatal)
+      responses.push_back("SocketError"); // set a SocketError message (not fatal)
     }
     else // socket created OK
     {
@@ -634,7 +634,7 @@ std::vector<std::string> Socket::GetVector(const std::string& request,
         // Failed to connect
         _client.SetBackendStatus(BACKEND_DOWN);
         kodi::Log(ADDON_LOG_ERROR, "Socket::GetVector> Server is down");
-        reponses.push_back("ServerDown"); // set a server down error message (not fatal)
+        responses.push_back("ServerDown"); // set a server down error message (not fatal)
       }
       else
       {
@@ -644,11 +644,11 @@ std::vector<std::string> Socket::GetVector(const std::string& request,
 
         if (bytesSent > 0) // if request was sent successfully
         {
-          if (!ReadResponses(code, reponses))
+          if (!ReadResponses(code, responses))
           {
             kodi::Log(ADDON_LOG_ERROR, "Socket::GetVector> error getting responses");
-            reponses.clear();
-            reponses.push_back("SocketError");
+            responses.clear();
+            responses.push_back("SocketError");
           }
           else
           {
@@ -658,7 +658,7 @@ std::vector<std::string> Socket::GetVector(const std::string& request,
         else // error sending request
         {
           kodi::Log(ADDON_LOG_ERROR, "Socket::GetVector> error sending server request");
-          reponses.push_back("SocketError");
+          responses.push_back("SocketError");
         }
       }
     }
@@ -674,7 +674,7 @@ std::vector<std::string> Socket::GetVector(const std::string& request,
   }
 
   close(); // close socket
-  return reponses; // return responses
+  return responses; // return responses
 }
 
 std::string Socket::GetString(const std::string& request,
