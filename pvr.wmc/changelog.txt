@@ -1,3 +1,6 @@
+5.0.2
+- Fix spelling errors identified by Lintian
+
 5.0.1
 - src/utilities.h: add cstdarg include
 
