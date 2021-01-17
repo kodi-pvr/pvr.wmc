@@ -1,3 +1,6 @@
+6.1.1
+- Replace stoi, stoul, stol, stoll, stoull and stold with c string calls
+
 6.1.0
 - Update PVR API 7.1.0
 
