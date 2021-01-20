@@ -96,7 +96,7 @@ PVR_ERROR Pvr2Wmc::GetBackendVersion(std::string& version)
     }
     if (results.size() > 1)
     {
-      _serverBuild = std::stoi(results[1]); // get server build number for feature checking
+      _serverBuild = atoi(results[1].c_str()); // get server build number for feature checking
     }
     // check if recorded tv folder is accessible from client
     if (results.size() > 2 && results[2] != "") // if server sends empty string, skip check
@@ -412,7 +412,7 @@ bool isServerError(std::vector<std::string> results)
     }
     if (results.size() > 2 != 0)
     {
-      int errorID = std::stoi(results[2]);
+      int errorID = atoi(results[2].c_str());
       if (errorID != 0)
       {
         std::string errStr = kodi::GetLocalizedString(errorID);
@@ -450,7 +450,7 @@ void Pvr2Wmc::TriggerUpdates(std::vector<std::string> results)
     {
       if (v.size() > 1)
       {
-        unsigned int channelUid = strtoul(v[1].c_str(), 0, 10);
+        unsigned int channelUid = strtoul(v[1].c_str(), nullptr, 10);
         kodi::addon::CInstancePVRClient::TriggerEpgUpdate(channelUid);
       }
     }
@@ -466,7 +466,7 @@ void Pvr2Wmc::TriggerUpdates(std::vector<std::string> results)
       std::string infoStr;
 
       // Get notification level
-      int level = std::stoi(v[1]);
+      int level = atoi(v[1].c_str());
       if (level < QUEUE_INFO)
       {
         level = QUEUE_INFO;
@@ -477,7 +477,7 @@ void Pvr2Wmc::TriggerUpdates(std::vector<std::string> results)
       }
 
       // Get localised string for this stringID
-      int stringId = std::stoi(v[2]);
+      int stringId = atoi(v[2].c_str());
       infoStr = kodi::GetLocalizedString(stringId);
 
       // Use text from backend if stringID not found
@@ -530,9 +530,9 @@ void Pvr2Wmc::ExtractDriveSpace(std::vector<std::string> results)
       if (v.size() > 1)
       {
 
-        uint64_t totalSpace = std::stoull(v[1]);
-        uint64_t freeSpace = std::stoull(v[2]);
-        uint64_t usedSpace = std::stoull(v[3]);
+        uint64_t totalSpace = strtoull(v[1].c_str(), nullptr, 10);
+        uint64_t freeSpace = strtoull(v[2].c_str(), nullptr, 10);
+        uint64_t usedSpace = strtoull(v[3].c_str(), nullptr, 10);
         _diskTotal = totalSpace / 1024;
         _diskUsed = usedSpace / 1024;
       }
@@ -567,15 +567,15 @@ PVR_ERROR Pvr2Wmc::GetChannels(bool radio, kodi::addon::PVRChannelsResultSet& ch
     std::vector<std::string> c = Utils::Split(v[7], ".");
     if (c.size() > 1)
     {
-      xChannel.SetChannelNumber(std::stoi(c[0]));
-      xChannel.SetSubChannelNumber(std::stoi(c[1]));
+      xChannel.SetChannelNumber(atoi(c[0].c_str()));
+      xChannel.SetSubChannelNumber(atoi(c[1].c_str()));
     }
     else
     {
-      xChannel.SetChannelNumber(std::stoi(v[2]));
+      xChannel.SetChannelNumber(atoi(v[2].c_str()));
     }
 
-    xChannel.SetUniqueId(std::stoul(v[0])); // convert to unsigned int
+    xChannel.SetUniqueId(strtoul(v[0].c_str(), nullptr, 10)); // convert to unsigned int
     xChannel.SetIsRadio(Utils::Str2Bool(v[1]));
     xChannel.SetChannelName(v[3]);
     xChannel.SetEncryptionSystem(Utils::Str2Bool(v[4]));
@@ -625,7 +625,7 @@ PVR_ERROR Pvr2Wmc::GetChannelGroups(bool radio,
     // PVR API 1.9.6 adds Position field
     if (v.size() >= 2)
     {
-      xGroup.SetPosition(std::stoi(v[1]));
+      xGroup.SetPosition(atoi(v[1].c_str()));
     }
 
     groupResults.Add(xGroup);
@@ -659,8 +659,8 @@ PVR_ERROR Pvr2Wmc::GetChannelGroupMembers(
     }
 
     xGroupMember.SetGroupName(group.GetGroupName());
-    xGroupMember.SetChannelUniqueId(std::stoul(v[0])); // convert to unsigned int
-    xGroupMember.SetChannelNumber(std::stoi(v[1]));
+    xGroupMember.SetChannelUniqueId(strtoul(v[0].c_str(), nullptr, 10)); // convert to unsigned int
+    xGroupMember.SetChannelNumber(atoi(v[1].c_str()));
 
     groupMemberResults.Add(xGroupMember);
   }
@@ -716,28 +716,28 @@ PVR_ERROR Pvr2Wmc::GetEPGForChannel(int channelUid,
     //	(MB3 fields) channelID, audioFormat, GenreString, ProgramType
     //	actors, directors, writers, year, movieID
     xEpg.SetUniqueChannelId(channelUid); // assign unique channel ID
-    xEpg.SetUniqueBroadcastId(std::stoi(v[0])); // entry ID
+    xEpg.SetUniqueBroadcastId(atoi(v[0].c_str())); // entry ID
     xEpg.SetTitle(v[1]); // entry title
-    xEpg.SetStartTime(std::stol(v[3])); // start time
-    xEpg.SetEndTime(std::stol(v[4])); // end time
+    xEpg.SetStartTime(atol(v[3].c_str())); // start time
+    xEpg.SetEndTime(atol(v[4].c_str())); // end time
     xEpg.SetPlotOutline(
         v[5]); // short plot description (currently using episode name, if there is one)
     xEpg.SetPlot(v[6]); // long plot description
-    time_t firstAired = std::stol(v[7]); // orig air date
+    time_t firstAired = atol(v[7].c_str()); // orig air date
     std::string strFirstAired((firstAired > 0) ? ParseAsW3CDateString(firstAired) : "");
     xEpg.SetFirstAired(strFirstAired);
-    xEpg.SetParentalRating(std::stoi(v[8])); // tv rating
-    xEpg.SetStarRating(std::stoi(v[9])); // star rating
-    xEpg.SetSeriesNumber(std::stoi(v[10])); // season (?) number
-    xEpg.SetEpisodeNumber(std::stoi(v[11])); // episode number
+    xEpg.SetParentalRating(atoi(v[8].c_str())); // tv rating
+    xEpg.SetStarRating(atoi(v[9].c_str())); // star rating
+    xEpg.SetSeriesNumber(atoi(v[10].c_str())); // season (?) number
+    xEpg.SetEpisodeNumber(atoi(v[11].c_str())); // episode number
     if (xEpg.GetSeriesNumber() == 0 && xEpg.GetEpisodeNumber() == 0)
     {
       xEpg.SetSeriesNumber(EPG_TAG_INVALID_SERIES_EPISODE);
       xEpg.SetEpisodeNumber(EPG_TAG_INVALID_SERIES_EPISODE);
     }
     xEpg.SetEpisodePartNumber(EPG_TAG_INVALID_SERIES_EPISODE);
-    xEpg.SetGenreType(std::stoi(v[12])); // season (?) number
-    xEpg.SetGenreSubType(std::stoi(v[13])); // general genre type
+    xEpg.SetGenreType(atoi(v[12].c_str())); // season (?) number
+    xEpg.SetGenreSubType(atoi(v[13].c_str())); // general genre type
     xEpg.SetIconPath(v[14]); // the icon url
     xEpg.SetEpisodeName(v[15]); // the episode name
     xEpg.SetGenreDescription("");
@@ -748,7 +748,7 @@ PVR_ERROR Pvr2Wmc::GetEPGForChannel(int channelUid,
       xEpg.SetCast(v[20]);
       xEpg.SetDirector(v[21]);
       xEpg.SetWriter(v[22]);
-      xEpg.SetYear(std::stoi(v[23]));
+      xEpg.SetYear(atoi(v[23].c_str()));
       xEpg.SetIMDBNumber(v[24]);
     }
 
@@ -937,14 +937,14 @@ PVR_ERROR Pvr2Wmc::GetTimers(kodi::addon::PVRTimersResultSet& results)
     xTmr.SetTimerType(PVR_TIMER_TYPE_NONE);
     // [0] Timer ID (need UINT32 value, see [21])
     // [1] Title (superceded by [17] Timer Name)
-    xTmr.SetClientChannelUid(std::stoi(v[2])); // [2] channel id
+    xTmr.SetClientChannelUid(atoi(v[2].c_str())); // [2] channel id
     xTmr.SetEPGUid(
-        std::stoul(v[3])); // [3] epg ID (same as client ID, except for a 'manual' record)
+        strtoul(v[3].c_str(), nullptr, 10)); // [3] epg ID (same as client ID, except for a 'manual' record)
     xTmr.SetSummary(v[4]); // [4] currently set to description
-    xTmr.SetStartTime(std::stoi(v[5])); // [5] start time
-    xTmr.SetEndTime(std::stoi(v[6])); // [6] end time
-    xTmr.SetMarginStart(std::stoul(v[7])); // [7] rec margin at start (sec)
-    xTmr.SetMarginEnd(std::stoul(v[8])); // [8] rec margin at end (sec)
+    xTmr.SetStartTime(atoi(v[5].c_str())); // [5] start time
+    xTmr.SetEndTime(atoi(v[6].c_str())); // [6] end time
+    xTmr.SetMarginStart(strtoul(v[7].c_str(), nullptr, 10)); // [7] rec margin at start (sec)
+    xTmr.SetMarginEnd(strtoul(v[8].c_str(), nullptr, 10)); // [8] rec margin at end (sec)
         // [9] isPreMarginRequired
         // [10] isPostMarginRequired
         // [11] WMC Priority (need Kodi compatible value, see [26])
@@ -959,18 +959,18 @@ PVR_ERROR Pvr2Wmc::GetTimers(kodi::addon::PVRTimersResultSet& results)
       xTmr.SetEndAnyTime(true);
     }
     xTmr.SetWeekdays(
-        std::stoul(v[15])); // [15] DaysOfWeek (converted to Kodi values in the backend)
-    xTmr.SetState((PVR_TIMER_STATE)std::stoi(v[16])); // [16] current state of timer
+        strtoul(v[15].c_str(), nullptr, 10)); // [15] DaysOfWeek (converted to Kodi values in the backend)
+    xTmr.SetState((PVR_TIMER_STATE)atoi(v[16].c_str())); // [16] current state of timer
     xTmr.SetTitle(v[17]); // [17] timer name
-    xTmr.SetGenreType(std::stoi(v[18])); // [18] genre ID
-    xTmr.SetGenreSubType(std::stoi(v[19])); // [19] sub genre ID
-    xTmr.SetPreventDuplicateEpisodes(std::stoul(v[20])); // [20] WMC RunType
-    xTmr.SetClientIndex(std::stoul(v[21])); // [21] Timer ID (in UINT32 form)
+    xTmr.SetGenreType(atoi(v[18].c_str())); // [18] genre ID
+    xTmr.SetGenreSubType(atoi(v[19].c_str())); // [19] sub genre ID
+    xTmr.SetPreventDuplicateEpisodes(strtoul(v[20].c_str(), nullptr, 10)); // [20] WMC RunType
+    xTmr.SetClientIndex(strtoul(v[21].c_str(), nullptr, 10)); // [21] Timer ID (in UINT32 form)
     xTmr.SetEPGSearchString(v[22]); // [22] Keyword Search
     xTmr.SetFullTextEpgSearch(Utils::Str2Bool(v[23])); // [23] Keyword is FullText
-    xTmr.SetLifetime(std::stoi(v[24])); // [24] Lifetime
-    xTmr.SetMaxRecordings(std::stoi(v[25])); // [25] Maximum Recordings (Recording Limit)
-    xTmr.SetPriority(std::stoi(v[26])); // [26] Priority (in Kodi enum value form)
+    xTmr.SetLifetime(atoi(v[24].c_str())); // [24] Lifetime
+    xTmr.SetMaxRecordings(atoi(v[25].c_str())); // [25] Maximum Recordings (Recording Limit)
+    xTmr.SetPriority(atoi(v[26].c_str())); // [26] Priority (in Kodi enum value form)
 
     // Determine TimerType
     bool hasKeyword = !xTmr.GetEPGSearchString().empty();
@@ -998,26 +998,26 @@ PVR_ERROR Pvr2Wmc::GetTimers(kodi::addon::PVRTimersResultSet& results)
     }
 
     xTmr.SetTimerType(PVR_TIMER_TYPE_NONE);
-    xTmr.SetClientIndex(std::stoul(v[0])); // [0] Timer ID
-    xTmr.SetClientChannelUid(std::stoi(v[1])); // [1] channel id
-    xTmr.SetStartTime(std::stoi(v[2])); // [2] start time
-    xTmr.SetEndTime(std::stoi(v[3])); // [3] end time
-    xTmr.SetState((PVR_TIMER_STATE)std::stoi(v[4])); // [4] current state of time
+    xTmr.SetClientIndex(strtoul(v[0].c_str(), nullptr, 10)); // [0] Timer ID
+    xTmr.SetClientChannelUid(atoi(v[1].c_str())); // [1] channel id
+    xTmr.SetStartTime(atoi(v[2].c_str())); // [2] start time
+    xTmr.SetEndTime(atoi(v[3].c_str())); // [3] end time
+    xTmr.SetState((PVR_TIMER_STATE)atoi(v[4].c_str())); // [4] current state of time
     xTmr.SetTitle(v[5]); // [5] timer name (set to same as Program title)
     xTmr.SetDirectory(v[6]); // [6] rec directory
     xTmr.SetSummary(v[7]); // [7] set to program description
         // [8] WMC Priority (need Kodi compatible value, see [26])
         // [9] IsRecurring
-    xTmr.SetEPGUid(std::stoul(v[10])); // [10] epg ID
-    xTmr.SetMarginStart(std::stoul(v[11])); // [11] rec margin at start (sec)
-    xTmr.SetMarginEnd(std::stoul(v[12])); // [12] rec margin at end (sec)
-    xTmr.SetGenreType(std::stoi(v[13])); // [13] genre ID
-    xTmr.SetGenreSubType(std::stoi(v[14])); // [14] sub genre ID
+    xTmr.SetEPGUid(strtoul(v[10].c_str(), nullptr, 10)); // [10] epg ID
+    xTmr.SetMarginStart(strtoul(v[11].c_str(), nullptr, 10)); // [11] rec margin at start (sec)
+    xTmr.SetMarginEnd(strtoul(v[12].c_str(), nullptr, 10)); // [12] rec margin at end (sec)
+    xTmr.SetGenreType(atoi(v[13].c_str())); // [13] genre ID
+    xTmr.SetGenreSubType(atoi(v[14].c_str())); // [14] sub genre ID
         // [15] epg ID (duplicated from [9] for some reason)
         // [16] Parent Series ID (need in UINT32 form, see [23])
         // [17] isPreMarginRequired
         // [18] isPostMarginRequired
-    xTmr.SetPreventDuplicateEpisodes(std::stoul(v[19])); // [19] WMC runType
+    xTmr.SetPreventDuplicateEpisodes(strtoul(v[19].c_str(), nullptr, 10)); // [19] WMC runType
     if (Utils::Str2Bool(v[20].c_str())) // [20] Any Channel
     {
       // As this is a child instance recording, we want to preserve the actual channel
@@ -1027,11 +1027,11 @@ PVR_ERROR Pvr2Wmc::GetTimers(kodi::addon::PVRTimersResultSet& results)
       // As this is a child instance recording, we want to preserve the actual start/finish times
     }
     xTmr.SetWeekdays(
-        std::stoul(v[22])); // [22] DaysOfWeek (converted to Kodi values in the backend)
-    xTmr.SetParentClientIndex(std::stoul(v[23])); // [23] Parent Series ID (in UINT32 form)
-    xTmr.SetLifetime(std::stoi((v[24]))); // [24] Lifetime
-    xTmr.SetMaxRecordings(std::stoi(v[25])); // [25] Maximum Recordings (Recording Limit)
-    xTmr.SetPriority(std::stoi(v[26])); // [26] Priority (in Kodi enum value form)
+        strtoul(v[22].c_str(), nullptr, 10)); // [22] DaysOfWeek (converted to Kodi values in the backend)
+    xTmr.SetParentClientIndex(strtoul(v[23].c_str(), nullptr, 10)); // [23] Parent Series ID (in UINT32 form)
+    xTmr.SetLifetime(atoi((v[24].c_str()))); // [24] Lifetime
+    xTmr.SetMaxRecordings(atoi(v[25].c_str())); // [25] Maximum Recordings (Recording Limit)
+    xTmr.SetPriority(atoi(v[26].c_str())); // [26] Priority (in Kodi enum value form)
     xTmr.SetEPGSearchString(v[27]); // [27] Keyword Search
     xTmr.SetFullTextEpgSearch(Utils::Str2Bool(v[28].c_str())); // [28] Keyword is FullText
 
@@ -1111,31 +1111,31 @@ PVR_ERROR Pvr2Wmc::GetRecordings(bool deleted, kodi::addon::PVRRecordingsResultS
     xRec.SetChannelName(v[6]);
     xRec.SetIconPath(v[7]);
     xRec.SetThumbnailPath(v[8]);
-    xRec.SetRecordingTime(std::stoi(v[9]));
-    xRec.SetDuration(std::stoi(v[10]));
-    xRec.SetPriority(std::stoi(v[11]));
-    xRec.SetLifetime(std::stoi(v[12]));
-    xRec.SetGenreType(std::stoi(v[13]));
-    xRec.SetGenreSubType(std::stoi(v[14]));
+    xRec.SetRecordingTime(atoi(v[9].c_str()));
+    xRec.SetDuration(atoi(v[10].c_str()));
+    xRec.SetPriority(atoi(v[11].c_str()));
+    xRec.SetLifetime(atoi(v[12].c_str()));
+    xRec.SetGenreType(atoi(v[13].c_str()));
+    xRec.SetGenreSubType(atoi(v[14].c_str()));
     if (_addon.GetSettings().GetEnableMultiResume())
     {
-      xRec.SetLastPlayedPosition(std::stoi(v[15]));
+      xRec.SetLastPlayedPosition(atoi(v[15].c_str()));
       if (v.size() > 24)
       {
-        xRec.SetPlayCount(std::stoi(v[24]));
+        xRec.SetPlayCount(atoi(v[24].c_str()));
       }
     }
 
     // Kodi PVR API 1.9.5 adds EPG ID field
     if (v.size() > 19)
     {
-      xRec.SetEPGEventId(std::stoul(v[18]));
+      xRec.SetEPGEventId(strtoul(v[18].c_str(), nullptr, 10));
     }
 
     // Kodi PVR API 5.0.0 adds EPG ID field
     if (v.size() > 18)
     {
-      xRec.SetChannelUid(std::stoi(v[17]));
+      xRec.SetChannelUid(atoi(v[17].c_str()));
     }
     else
     {
@@ -1319,7 +1319,7 @@ bool Pvr2Wmc::OpenLiveStream(const kodi::addon::PVRChannel& channel)
     // use
     if (results.size() > 2)
     {
-      _initialStreamPosition = std::stoll(results[2]);
+      _initialStreamPosition = atoll(results[2].c_str());
     }
 
     _streamFile.OpenFile(_streamFileName); // open the video file for streaming, same handle
@@ -1675,9 +1675,8 @@ PVR_ERROR Pvr2Wmc::GetSignalStatus(int channelUid, kodi::addon::PVRSignalStatus&
         cachedSignalStatus.SetProviderName(results[2]);
         cachedSignalStatus.SetServiceName(results[3]);
         cachedSignalStatus.SetMuxName(results[4]);
-        cachedSignalStatus.SetSignal((int)(std::stoi(results[5]) * 655.35));
-
-        bool error = std::stoi(results[8]) == 1;
+        cachedSignalStatus.SetSignal(static_cast<int>(atoi(results[5].c_str()) * 655.35));
+        bool error = atoi(results[8].c_str()) == 1;
         if (error)
         {
           // Backend indicates it can't provide SignalStatus for this channel
@@ -1707,16 +1706,16 @@ PVR_ERROR Pvr2Wmc::GetStreamTimes(kodi::addon::PVRStreamTimes& times)
         return PVR_ERROR_SERVER_ERROR;
       }
 
-      times.SetStartTime(std::stoll(results[0])); // get time_t utc of when stream was started
+      times.SetStartTime(atoll(results[0].c_str())); // get time_t utc of when stream was started
       times.SetPTSStart(0); // relative to the above time, time when the stream starts (?)
       times.SetPTSBegin(
           0); // how far back the buffer data goes, which is always stream start for swmc
       times.SetPTSEnd(
-          std::stoll(results[1]) *
+          atoll(results[1].c_str()) *
           STREAM_TIME_BASE); // get the current length of the live buffer or recording duration (uSec)
       _savBuffStart = times.GetStartTime(); // save values last found to filter queries
       _savBuffEnd = times.GetPTSEnd();
-      _buffTimeFILTER = std::stol(results[2]); // get filter value from swmc
+      _buffTimeFILTER = atol(results[2].c_str()); // get filter value from swmc
     }
     else
     {
@@ -1765,9 +1764,9 @@ PVR_ERROR Pvr2Wmc::GetRecordingEdl(const kodi::addon::PVRRecording& recording,
         if (vals.size() == 3)
         {
           kodi::addon::PVREDLEntry entry;
-          entry.SetStart(int64_t(std::stold(vals[0]) * 1000)); // convert s to ms
-          entry.SetEnd(int64_t(std::stold(vals[1]) * 1000));
-          entry.SetType(PVR_EDL_TYPE(std::stoi(vals[2])));
+          entry.SetStart(static_cast<int64_t>(std::strtod(vals[0].c_str(), nullptr) * 1000)); // convert s to ms
+          entry.SetEnd(static_cast<int64_t>(std::strtod(vals[1].c_str(), nullptr) * 1000));
+          entry.SetType(PVR_EDL_TYPE(atoi(vals[2].c_str())));
           edl.emplace_back(entry);
         }
       }
