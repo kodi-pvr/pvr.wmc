@@ -7,14 +7,15 @@ msgstr ""
 "Project-Id-Version: KODI Main\n"
 "Report-Msgid-Bugs-To: https://github.com/xbmc/xbmc/issues/\n"
 "POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Kodi Translation Team\n"
-"Language-Team: Ukrainian (Ukraine) (http://www.transifex.com/projects/p/kodi-main/language/uk_UA/)\n"
+"PO-Revision-Date: 2021-06-28 08:29+0000\n"
+"Last-Translator: Christian Gade <gade@kodi.tv>\n"
+"Language-Team: Ukrainian <https://kodi.weblate.cloud/projects/kodi-add-ons-pvr-clients/pvr-wmc/uk_ua/>\n"
+"Language: uk_ua\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: uk_UA\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"X-Generator: Weblate 4.7\n"
 
 msgctxt "#30000"
 msgid "Server Hostname or IP"
@@ -50,7 +51,7 @@ msgstr "Не вдалось видалити запис, файл запису �
 
 msgctxt "#30008"
 msgid "Recording file not found"
-msgstr "Файл запису не  знайдено"
+msgstr "Файл запису не знайдено"
 
 msgctxt "#30009"
 msgid "Alternate channel chosen: "
@@ -110,7 +111,7 @@ msgstr "Помилка в Live TV, вимкнувся швидше термін�
 
 msgctxt "#30023"
 msgid "Recording stream timed-out"
-msgstr "Закінчився час запису потоку "
+msgstr "Закінчився час запису потоку"
 
 msgctxt "#30024"
 msgid "Recording stream exited early"
@@ -188,6 +189,30 @@ msgctxt "#30130"
 msgid "Created by Repeating Timer"
 msgstr "Створено зусиллями Repeating Timer"
 
+msgctxt "#30131"
+msgid "One time (manual)"
+msgstr ""
+
+msgctxt "#30132"
+msgid "One time (guide)"
+msgstr ""
+
+msgctxt "#30133"
+msgid "One time (wishlist)"
+msgstr ""
+
+msgctxt "#30134"
+msgid "Repeating (manual)"
+msgstr ""
+
+msgctxt "#30135"
+msgid "Repeating (guide)"
+msgstr ""
+
+msgctxt "#30136"
+msgid "Repeating (wishlist)"
+msgstr ""
+
 msgctxt "#30140"
 msgid "Normal"
 msgstr "Нормальне"
@@ -199,3 +224,78 @@ msgstr "Макс."
 msgctxt "#30142"
 msgid "Low"
 msgstr "Мін."
+
+# empty strings from id 30143 to 30149
+msgctxt "#30150"
+msgid "New Episodes Only"
+msgstr ""
+
+msgctxt "#30151"
+msgid "New and Rerun Episodes"
+msgstr ""
+
+msgctxt "#30152"
+msgid "Live Only"
+msgstr ""
+
+# empty strings from id 30153 to 30159
+msgctxt "#30160"
+msgid "Not Set"
+msgstr ""
+
+msgctxt "#30161"
+msgid "Keep Latest Recordings"
+msgstr ""
+
+msgctxt "#30162"
+msgid "Keep Until I Watch"
+msgstr ""
+
+msgctxt "#30163"
+msgid "Keep Until Space Needed"
+msgstr ""
+
+msgctxt "#30164"
+msgid "Keep Until I Delete"
+msgstr ""
+
+msgctxt "#30165"
+msgid "Keep For 1 Week"
+msgstr ""
+
+# empty strings from id 30166 to 30169
+msgctxt "#30170"
+msgid "Keep As Many As Possible"
+msgstr ""
+
+msgctxt "#30171"
+msgid "Keep 1 Recording"
+msgstr ""
+
+msgctxt "#30172"
+msgid "Keep 2 Recordings"
+msgstr ""
+
+msgctxt "#30173"
+msgid "Keep 3 Recordings"
+msgstr ""
+
+msgctxt "#30174"
+msgid "Keep 4 Recordings"
+msgstr ""
+
+msgctxt "#30175"
+msgid "Keep 5 Recordings"
+msgstr ""
+
+msgctxt "#30176"
+msgid "Keep 6 Recordings"
+msgstr ""
+
+msgctxt "#30177"
+msgid "Keep 7 Recordings"
+msgstr ""
+
+msgctxt "#30178"
+msgid "Keep 10 Recordings"
+msgstr ""

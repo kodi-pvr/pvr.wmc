@@ -8,13 +8,13 @@ msgstr ""
 "Report-Msgid-Bugs-To: https://github.com/xbmc/xbmc/issues/\n"
 "POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Kodi Translation Team\n"
-"Language-Team: Vietnamese (Viet Nam) (http://www.transifex.com/projects/p/kodi-main/language/vi_VN/)\n"
-"Language: vi_VN\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: ml_in\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
 
 msgctxt "#30000"
 msgid "Server Hostname or IP"
@@ -50,7 +50,7 @@ msgstr ""
 
 msgctxt "#30008"
 msgid "Recording file not found"
-msgstr "Không tìm thấy file đã ghi"
+msgstr ""
 
 msgctxt "#30009"
 msgid "Alternate channel chosen: "
@@ -128,7 +128,7 @@ msgctxt "#30027"
 msgid "Time drift between client and backend of %s minutes"
 msgstr ""
 
-# empty strings from id 30028 to 30099
+#empty strings from id 30028 to 30099
 msgctxt "#30100"
 msgid "Recording Preference"
 msgstr ""
@@ -159,13 +159,13 @@ msgstr ""
 
 msgctxt "#30107"
 msgid "Channel:"
-msgstr "Kênh:"
+msgstr ""
 
 msgctxt "#30108"
 msgid "Any Channel"
 msgstr ""
 
-# empty string with id 30109
+#empty string with id 30109
 msgctxt "#30110"
 msgid "Airtime:"
 msgstr ""
@@ -174,9 +174,10 @@ msgctxt "#30111"
 msgid "Anytime"
 msgstr ""
 
+#empty strings from id 30112 to 30119
 msgctxt "#30120"
 msgid "Delete Timer"
-msgstr "hủy hẹn giờ"
+msgstr ""
 
 msgctxt "#30121"
 msgid "Delete this episode timer only"
@@ -186,7 +187,7 @@ msgctxt "#30122"
 msgid "Delete the entire series"
 msgstr ""
 
-# empty strings from id 30123 to 30129
+#empty strings from id 30123 to 30129
 msgctxt "#30130"
 msgid "Created by Repeating Timer"
 msgstr ""
@@ -215,19 +216,20 @@ msgctxt "#30136"
 msgid "Repeating (wishlist)"
 msgstr ""
 
+#empty strings from id 30137 to 30139
 msgctxt "#30140"
 msgid "Normal"
-msgstr "Bình thường"
+msgstr ""
 
 msgctxt "#30141"
 msgid "High"
-msgstr "Cao"
+msgstr ""
 
 msgctxt "#30142"
 msgid "Low"
-msgstr "Thấp"
+msgstr ""
 
-# empty strings from id 30143 to 30149
+#empty strings from id 30143 to 30149
 msgctxt "#30150"
 msgid "New Episodes Only"
 msgstr ""
@@ -240,7 +242,7 @@ msgctxt "#30152"
 msgid "Live Only"
 msgstr ""
 
-# empty strings from id 30153 to 30159
+#empty strings from id 30153 to 30159
 msgctxt "#30160"
 msgid "Not Set"
 msgstr ""
@@ -265,7 +267,7 @@ msgctxt "#30165"
 msgid "Keep For 1 Week"
 msgstr ""
 
-# empty strings from id 30166 to 30169
+#empty strings from id 30166 to 30169
 msgctxt "#30170"
 msgid "Keep As Many As Possible"
 msgstr ""
