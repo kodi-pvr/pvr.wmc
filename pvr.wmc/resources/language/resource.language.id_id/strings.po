@@ -10,10 +10,10 @@ msgstr ""
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Kodi Translation Team\n"
 "Language-Team: Indonesian (Indonesia) (http://www.transifex.com/projects/p/kodi-main/language/id_ID/)\n"
+"Language: id_ID\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: id_ID\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 msgctxt "#30000"
@@ -188,6 +188,30 @@ msgctxt "#30130"
 msgid "Created by Repeating Timer"
 msgstr "Dibuat dengan cara Mengulang Penghitung Waktu"
 
+msgctxt "#30131"
+msgid "One time (manual)"
+msgstr ""
+
+msgctxt "#30132"
+msgid "One time (guide)"
+msgstr ""
+
+msgctxt "#30133"
+msgid "One time (wishlist)"
+msgstr ""
+
+msgctxt "#30134"
+msgid "Repeating (manual)"
+msgstr ""
+
+msgctxt "#30135"
+msgid "Repeating (guide)"
+msgstr ""
+
+msgctxt "#30136"
+msgid "Repeating (wishlist)"
+msgstr ""
+
 msgctxt "#30140"
 msgid "Normal"
 msgstr "Normal"
@@ -207,6 +231,10 @@ msgstr "Hanya Episode Baru"
 msgctxt "#30151"
 msgid "New and Rerun Episodes"
 msgstr "Episode Baru dan yang Sedang Berjalan"
+
+msgctxt "#30152"
+msgid "Live Only"
+msgstr ""
 
 msgctxt "#30160"
 msgid "Not Set"
