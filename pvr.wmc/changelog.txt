@@ -1,3 +1,6 @@
+v6.1.2
+- Language update from Weblate
+
 6.1.1
 - Replace stoi, stoul, stol, stoll, stoull and stold with c string calls
 

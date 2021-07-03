@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <addon
   id="pvr.wmc"
-  version="6.1.1"
+  version="6.1.2"
   name="PVR WMC Client"
   provider-name="KrustyReturns and scarecrow420">
   <requires>@ADDON_DEPENDS@</requires>
@@ -114,7 +114,7 @@
     <disclaimer lang="cy_GB">Meddalwedd arbrofol yw hon. Defnyddiwch gyda synnwyr cyffredin.</disclaimer>
     <disclaimer lang="da_DK">Dette er software under udvikling. Brug på eget ansvar.</disclaimer>
     <disclaimer lang="de_DE">Dies ist eine experimentelle Software. Benutzung auf eigene Gefahr.</disclaimer>
-    <disclaimer lang="el_GR">Δοκιμαστική εφαρμογή. Χρησιμοποιήστε τη υπ' ευθύνη σας.</disclaimer>
+    <disclaimer lang="el_GR">Δοκιμαστική εφαρμογή. Χρησιμοποιήστε τη υπ ευθύνη σας.</disclaimer>
     <disclaimer lang="en_AU">This is experimental software. Use at your own risk.</disclaimer>
     <disclaimer lang="en_GB">This is experimental software. Use at your own risk.</disclaimer>
     <disclaimer lang="en_NZ">This is experimental software. Use at your own risk.</disclaimer>
@@ -164,5 +164,9 @@
     <assets>
       <icon>icon.png</icon>
     </assets>
+    <news>
+v6.1.2
+- Language update from Weblate
+    </news>
   </extension>
 </addon>
