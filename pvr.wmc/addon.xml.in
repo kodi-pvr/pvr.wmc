@@ -164,9 +164,5 @@
     <assets>
       <icon>icon.png</icon>
     </assets>
-    <news>
-v6.1.2
-- Language update from Weblate
-    </news>
   </extension>
 </addon>
