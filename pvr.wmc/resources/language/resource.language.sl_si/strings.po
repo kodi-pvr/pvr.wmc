@@ -16,6 +16,18 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);\n"
 
+msgctxt "Addon Summary"
+msgid "PVR WMC Client"
+msgstr "Odjemalec PVR WMC"
+
+msgctxt "Addon Description"
+msgid "@OS@ @ARCHITECTURE@ Edition. A PVR client to interface with Windows Media Center's Recording and EPG services. Thanks to Tomba73 and Hoopsdavis. Special thanks to DBurckh."
+msgstr "@OS@ izdaja @ARCHITECTURE@. Odjemalec PVR kot vmesnik za storitve snemanja in EPG na Windows Media Centru. Zahvale: Tomba73 in Hoopsdavis. Posebna zahvala: DBurckh."
+
+msgctxt "Addon Disclaimer"
+msgid "This is experimental software. Use at your own risk."
+msgstr "To je eksperimentalna programska oprema. Uporaba na lastno odgovornost."
+
 msgctxt "#30000"
 msgid "Server Hostname or IP"
 msgstr "Ime strežnika ali IP"
