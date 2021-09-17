@@ -140,7 +140,7 @@ msgctxt "#30027"
 msgid "Time drift between client and backend of %s minutes"
 msgstr ""
 
-#empty strings from id 30028 to 30099
+# empty strings from id 30028 to 30099
 msgctxt "#30100"
 msgid "Recording Preference"
 msgstr ""
@@ -177,7 +177,7 @@ msgctxt "#30108"
 msgid "Any Channel"
 msgstr ""
 
-#empty string with id 30109
+# empty string with id 30109
 msgctxt "#30110"
 msgid "Airtime:"
 msgstr ""
@@ -186,7 +186,7 @@ msgctxt "#30111"
 msgid "Anytime"
 msgstr ""
 
-#empty strings from id 30112 to 30119
+# empty strings from id 30112 to 30119
 msgctxt "#30120"
 msgid "Delete Timer"
 msgstr ""
@@ -199,7 +199,7 @@ msgctxt "#30122"
 msgid "Delete the entire series"
 msgstr ""
 
-#empty strings from id 30123 to 30129
+# empty strings from id 30123 to 30129
 msgctxt "#30130"
 msgid "Created by Repeating Timer"
 msgstr ""
@@ -228,7 +228,7 @@ msgctxt "#30136"
 msgid "Repeating (wishlist)"
 msgstr ""
 
-#empty strings from id 30137 to 30139
+# empty strings from id 30137 to 30139
 msgctxt "#30140"
 msgid "Normal"
 msgstr ""
@@ -241,7 +241,7 @@ msgctxt "#30142"
 msgid "Low"
 msgstr ""
 
-#empty strings from id 30143 to 30149
+# empty strings from id 30143 to 30149
 msgctxt "#30150"
 msgid "New Episodes Only"
 msgstr ""
@@ -254,7 +254,7 @@ msgctxt "#30152"
 msgid "Live Only"
 msgstr ""
 
-#empty strings from id 30153 to 30159
+# empty strings from id 30153 to 30159
 msgctxt "#30160"
 msgid "Not Set"
 msgstr ""
@@ -279,7 +279,7 @@ msgctxt "#30165"
 msgid "Keep For 1 Week"
 msgstr ""
 
-#empty strings from id 30166 to 30169
+# empty strings from id 30166 to 30169
 msgctxt "#30170"
 msgid "Keep As Many As Possible"
 msgstr ""
