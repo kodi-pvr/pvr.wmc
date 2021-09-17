@@ -1,3 +1,7 @@
+v6.1.3
+- Translations updates from Weblate
+	- da_dk, ko_kr, ml_in, pl_pl
+
 v6.1.2
 - Language update from Weblate
 
