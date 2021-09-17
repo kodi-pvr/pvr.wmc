@@ -16,6 +16,18 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
+msgctxt "Addon Summary"
+msgid "PVR WMC Client"
+msgstr ""
+
+msgctxt "Addon Description"
+msgid "@OS@ @ARCHITECTURE@ Edition. A PVR client to interface with Windows Media Center's Recording and EPG services. Thanks to Tomba73 and Hoopsdavis. Special thanks to DBurckh."
+msgstr ""
+
+msgctxt "Addon Disclaimer"
+msgid "This is experimental software. Use at your own risk."
+msgstr ""
+
 msgctxt "#30000"
 msgid "Server Hostname or IP"
 msgstr ""
