@@ -17,6 +17,18 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "X-Generator: Weblate 4.7\n"
 
+msgctxt "Addon Summary"
+msgid "PVR WMC Client"
+msgstr "Klijynt telewizyje dlŏ WMC"
+
+msgctxt "Addon Description"
+msgid "@OS@ @ARCHITECTURE@ Edition. A PVR client to interface with Windows Media Center's Recording and EPG services. Thanks to Tomba73 and Hoopsdavis. Special thanks to DBurckh."
+msgstr "Edycyjŏ dlŏ @OS@ @ARCHITECTURE@. Klijynt telewizyje dlŏ Windows Mydia Center. Podziyńkowania dlŏ Tomba73 i Hoopsdavis. Ekstra podziyńkowania dlŏ DBurckh."
+
+msgctxt "Addon Disclaimer"
+msgid "This is experimental software. Use at your own risk."
+msgstr "Software durch je w fazie rozrostu i je niysztabilne! Autory w żŏdyn knif niy sōm ôdpedzialni za niypodarzōne nagrania, felery w harmōnogramie nagrań, stracōny czŏs ani jaki ino inksze niynazdane efekty."
+
 msgctxt "#30000"
 msgid "Server Hostname or IP"
 msgstr "Miano lebo adresa serwera"

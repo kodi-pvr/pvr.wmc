@@ -17,6 +17,18 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: Weblate 4.7\n"
 
+msgctxt "Addon Summary"
+msgid "PVR WMC Client"
+msgstr "PVR WMC Cliënt"
+
+msgctxt "Addon Description"
+msgid "@OS@ @ARCHITECTURE@ Edition. A PVR client to interface with Windows Media Center's Recording and EPG services. Thanks to Tomba73 and Hoopsdavis. Special thanks to DBurckh."
+msgstr "@OS@ @ARCHITECTUUR@ Editie. Een PVR-cliënt om te samen te werken met Windows Mediacenters opname en EPG-diensten, dank aan Tomba73 and Hoopsdavis. Speciale dank gaat uit naar DBurckh."
+
+msgctxt "Addon Disclaimer"
+msgid "This is experimental software. Use at your own risk."
+msgstr "Dit is experimentele software. Gebruik het op eigen risico."
+
 msgctxt "#30000"
 msgid "Server Hostname or IP"
 msgstr "Hostname of IP-adres van server"

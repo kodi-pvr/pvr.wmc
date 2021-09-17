@@ -16,6 +16,18 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+msgctxt "Addon Summary"
+msgid "PVR WMC Client"
+msgstr "Kodin WMC-asiakasohjelma"
+
+msgctxt "Addon Description"
+msgid "@OS@ @ARCHITECTURE@ Edition. A PVR client to interface with Windows Media Center's Recording and EPG services. Thanks to Tomba73 and Hoopsdavis. Special thanks to DBurckh."
+msgstr "@OS@ @ARCHITECTURE@ -versio. Tämä PVR-asiakasohjelma on tarkoitettu käytettäväksi yhdessä Windows Media Centerin kanssa. Kiitokset Tomba 73:lle ja Hoopsdavisille. Erityiskiitokset DBurckhille."
+
+msgctxt "Addon Disclaimer"
+msgid "This is experimental software. Use at your own risk."
+msgstr "Tämä on epävakaa ohjelma! Sen tekijät eivät ole millään muotoa vastuussa epäonnistuneista tallennuksista, virheellisistä ajastuksista, haaskatusta ajasta, verenpaineen noususta tai mistään muusta epäsuotuisasta vaikutuksesta."
+
 msgctxt "#30000"
 msgid "Server Hostname or IP"
 msgstr "Palvelimen isäntänimi tai IP-osoite"
