@@ -52,6 +52,7 @@ PVR_ERROR Pvr2Wmc::GetCapabilities(kodi::addon::PVRCapabilities& capabilities)
   capabilities.SetSupportsTV(true);
   capabilities.SetSupportsRadio(true);
   capabilities.SetSupportsRecordings(true);
+  capabilities.SetSupportsRecordingsDelete(true);
   capabilities.SetSupportsRecordingsUndelete(false);
   capabilities.SetSupportsTimers(true);
   capabilities.SetSupportsChannelGroups(true);
