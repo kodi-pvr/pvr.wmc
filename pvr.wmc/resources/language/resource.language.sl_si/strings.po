@@ -21,8 +21,8 @@ msgid "PVR WMC Client"
 msgstr "Odjemalec PVR WMC"
 
 msgctxt "Addon Description"
-msgid "@OS@ @ARCHITECTURE@ Edition. A PVR client to interface with Windows Media Center's Recording and EPG services. Thanks to Tomba73 and Hoopsdavis. Special thanks to DBurckh."
-msgstr "@OS@ izdaja @ARCHITECTURE@. Odjemalec PVR kot vmesnik za storitve snemanja in EPG na Windows Media Centru. Zahvale: Tomba73 in Hoopsdavis. Posebna zahvala: DBurckh."
+msgid "A PVR client to interface with Windows Media Center's Recording and EPG services. Thanks to Tomba73 and Hoopsdavis. Special thanks to DBurckh."
+msgstr "Odjemalec PVR kot vmesnik za storitve snemanja in EPG na Windows Media Centru. Zahvale: Tomba73 in Hoopsdavis. Posebna zahvala: DBurckh."
 
 msgctxt "Addon Disclaimer"
 msgid "This is experimental software. Use at your own risk."
