@@ -1,3 +1,6 @@
+v19.0.1:
+- Make builds reproducible
+
 v19.0.0
 - Translations updates from Weblate
   - da_dk, ko_kr, ml_in, pl_pl

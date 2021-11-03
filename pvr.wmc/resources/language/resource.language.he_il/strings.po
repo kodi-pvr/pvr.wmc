@@ -21,8 +21,8 @@ msgid "PVR WMC Client"
 msgstr "לקוח טלוויזיה חיה עבור WMC"
 
 msgctxt "Addon Description"
-msgid "@OS@ @ARCHITECTURE@ Edition. A PVR client to interface with Windows Media Center's Recording and EPG services. Thanks to Tomba73 and Hoopsdavis. Special thanks to DBurckh."
-msgstr "גרסת @OS@ @ARCHITECTURE@. לקוח טלוויזיה חיה של Windows Media Center. תומך בהזרמת שידורים חיים והקלטות, הצגת לוח שידורים ותזמון הקלטות."
+msgid "A PVR client to interface with Windows Media Center's Recording and EPG services. Thanks to Tomba73 and Hoopsdavis. Special thanks to DBurckh."
+msgstr "לקוח טלוויזיה חיה של Windows Media Center. תומך בהזרמת שידורים חיים והקלטות, הצגת לוח שידורים ותזמון הקלטות."
 
 msgctxt "Addon Disclaimer"
 msgid "This is experimental software. Use at your own risk."
