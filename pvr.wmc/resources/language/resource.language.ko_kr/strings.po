@@ -22,8 +22,8 @@ msgid "PVR WMC Client"
 msgstr "PVR WMC 클라이언트"
 
 msgctxt "Addon Description"
-msgid "@OS@ @ARCHITECTURE@ Edition. A PVR client to interface with Windows Media Center's Recording and EPG services. Thanks to Tomba73 and Hoopsdavis. Special thanks to DBurckh."
-msgstr "@OS@ @ARCHITECTURE@ Edition. Windows Media Center의 녹화 및 EPG 서비스와 연결되는 PVR 클라이언트입니다. Tomba73 과 Hoopsdavis 에게 감사드립니다. DBurckh 에게 특별한 감사의 말을 남깁니다."
+msgid "A PVR client to interface with Windows Media Center's Recording and EPG services. Thanks to Tomba73 and Hoopsdavis. Special thanks to DBurckh."
+msgstr "Windows Media Center의 녹화 및 EPG 서비스와 연결되는 PVR 클라이언트입니다. Tomba73 과 Hoopsdavis 에게 감사드립니다. DBurckh 에게 특별한 감사의 말을 남깁니다."
 
 msgctxt "Addon Disclaimer"
 msgid "This is experimental software. Use at your own risk."
