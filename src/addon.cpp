@@ -9,21 +9,18 @@
 
 #include "pvr2wmc.h"
 
-ADDON_STATUS CPvr2WmcAddon::CreateInstance(int instanceType,
-                                           const std::string& instanceID,
-                                           KODI_HANDLE instance,
-                                           const std::string& version,
-                                           KODI_HANDLE& addonInstance)
+ADDON_STATUS CPvr2WmcAddon::CreateInstance(const kodi::addon::IInstanceInfo& instance,
+                                           KODI_ADDON_INSTANCE_HDL& hdl)
 {
   ADDON_STATUS status = ADDON_STATUS_UNKNOWN;
 
-  if (instanceType == ADDON_INSTANCE_PVR)
+  if (instance.IsType(ADDON_INSTANCE_PVR))
   {
     kodi::Log(ADDON_LOG_DEBUG, "%s - Creating the PVR-WMC add-on instance", __func__);
 
     _settings.Load();
 
-    Pvr2Wmc* client = new Pvr2Wmc(*this, instance, version); // create interface to ServerWMC
+    Pvr2Wmc* client = new Pvr2Wmc(*this, instance); // create interface to ServerWMC
     if (client->IsServerDown()) // check if server is down, if it is shut her down
     {
       status = ADDON_STATUS_LOST_CONNECTION;
@@ -33,22 +30,21 @@ ADDON_STATUS CPvr2WmcAddon::CreateInstance(int instanceType,
       status = ADDON_STATUS_OK;
     }
 
-    addonInstance = client;
-    _usedInstances.emplace(std::make_pair(instanceID, client));
+    hdl = client;
+    _usedInstances.emplace(std::make_pair(instance.GetID(), client));
   }
 
   return status;
 }
 
-void CPvr2WmcAddon::DestroyInstance(int instanceType,
-                                    const std::string& instanceID,
-                                    KODI_HANDLE addonInstance)
+void CPvr2WmcAddon::DestroyInstance(const kodi::addon::IInstanceInfo& instance,
+                                    const KODI_ADDON_INSTANCE_HDL hdl)
 {
-  if (instanceType == ADDON_INSTANCE_PVR)
+  if (instance.IsType(ADDON_INSTANCE_PVR))
   {
     kodi::Log(ADDON_LOG_DEBUG, "%s - Destoying the PVR-WMC add-on instance", __func__);
 
-    const auto& it = _usedInstances.find(instanceID);
+    const auto& it = _usedInstances.find(instance.GetID());
     if (it != _usedInstances.end())
     {
       it->second->UnLoading();
@@ -58,7 +54,7 @@ void CPvr2WmcAddon::DestroyInstance(int instanceType,
 }
 
 ADDON_STATUS CPvr2WmcAddon::SetSetting(const std::string& settingName,
-                                       const kodi::CSettingValue& settingValue)
+                                       const kodi::addon::CSettingValue& settingValue)
 {
   return _settings.SetSetting(settingName, settingValue);
 }

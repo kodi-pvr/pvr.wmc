@@ -15,8 +15,8 @@
 long Pvr2Wmc::_buffTimesCnt; // filter how often we do buffer status reads
 long Pvr2Wmc::_buffTimeFILTER;
 
-Pvr2Wmc::Pvr2Wmc(CPvr2WmcAddon& addon, KODI_HANDLE instance, const std::string& kodiVersion)
-  : kodi::addon::CInstancePVRClient(instance, kodiVersion), _socketClient(*this), _addon(addon)
+Pvr2Wmc::Pvr2Wmc(CPvr2WmcAddon& addon, const kodi::addon::IInstanceInfo& instance)
+  : kodi::addon::CInstancePVRClient(instance), _socketClient(*this), _addon(addon)
 {
   _socketClient.SetServerName(_addon.GetSettings().GetServerName());
   _socketClient.SetClientName(_addon.GetSettings().GetClientName());
@@ -105,13 +105,13 @@ PVR_ERROR Pvr2Wmc::GetBackendVersion(std::string& version)
       if (!kodi::vfs::DirectoryExists(results[2]))
       {
         kodi::Log(ADDON_LOG_ERROR, "Recorded tv '%s' does not exist", results[2].c_str());
-        std::string infoStr = kodi::GetLocalizedString(30017);
+        std::string infoStr = kodi::addon::GetLocalizedString(30017);
         kodi::QueueNotification(QUEUE_ERROR, "", infoStr);
       }
       else if (!kodi::vfs::GetDirectory(results[2], "", items))
       {
         kodi::Log(ADDON_LOG_ERROR, "Recorded tv '%s' count not be opened", results[2].c_str());
-        std::string infoStr = kodi::GetLocalizedString(30018);
+        std::string infoStr = kodi::addon::GetLocalizedString(30018);
         kodi::QueueNotification(QUEUE_ERROR, "", infoStr);
       }
     }
@@ -122,7 +122,7 @@ PVR_ERROR Pvr2Wmc::GetBackendVersion(std::string& version)
       _addon.GetSettings().SetServerMAC(results[3]);
 
       // Attempt to save MAC address to custom addon data
-      Utils::WriteFileContents(kodi::GetBaseUserPath("ServerMACAddr.txt"),
+      Utils::WriteFileContents(kodi::addon::GetUserPath("ServerMACAddr.txt"),
                                _addon.GetSettings().GetServerMAC());
     }
 
@@ -188,45 +188,45 @@ PVR_ERROR Pvr2Wmc::GetTimerTypes(std::vector<kodi::addon::PVRTimerType>& types)
   static std::vector<kodi::addon::PVRTypeIntValue> priorityValues;
   if (priorityValues.size() == 0)
   {
-    priorityValues.emplace_back(WMC_PRIORITY_NORMAL, kodi::GetLocalizedString(30140));
-    priorityValues.emplace_back(WMC_PRIORITY_HIGH, kodi::GetLocalizedString(30141));
-    priorityValues.emplace_back(WMC_PRIORITY_LOW, kodi::GetLocalizedString(30142));
+    priorityValues.emplace_back(WMC_PRIORITY_NORMAL, kodi::addon::GetLocalizedString(30140));
+    priorityValues.emplace_back(WMC_PRIORITY_HIGH, kodi::addon::GetLocalizedString(30141));
+    priorityValues.emplace_back(WMC_PRIORITY_LOW, kodi::addon::GetLocalizedString(30142));
   }
 
   /* PVR_Timer.iLifeTime values and presentation.*/
   static std::vector<kodi::addon::PVRTypeIntValue> lifetimeValues;
   if (lifetimeValues.size() == 0)
   {
-    lifetimeValues.emplace_back(WMC_LIFETIME_NOTSET, kodi::GetLocalizedString(30160));
-    lifetimeValues.emplace_back(WMC_LIFETIME_LATEST, kodi::GetLocalizedString(30161));
-    lifetimeValues.emplace_back(WMC_LIFETIME_WATCHED, kodi::GetLocalizedString(30162));
-    lifetimeValues.emplace_back(WMC_LIFETIME_ELIGIBLE, kodi::GetLocalizedString(30163));
-    lifetimeValues.emplace_back(WMC_LIFETIME_DELETED, kodi::GetLocalizedString(30164));
-    lifetimeValues.emplace_back(WMC_LIFETIME_ONEWEEK, kodi::GetLocalizedString(30165));
+    lifetimeValues.emplace_back(WMC_LIFETIME_NOTSET, kodi::addon::GetLocalizedString(30160));
+    lifetimeValues.emplace_back(WMC_LIFETIME_LATEST, kodi::addon::GetLocalizedString(30161));
+    lifetimeValues.emplace_back(WMC_LIFETIME_WATCHED, kodi::addon::GetLocalizedString(30162));
+    lifetimeValues.emplace_back(WMC_LIFETIME_ELIGIBLE, kodi::addon::GetLocalizedString(30163));
+    lifetimeValues.emplace_back(WMC_LIFETIME_DELETED, kodi::addon::GetLocalizedString(30164));
+    lifetimeValues.emplace_back(WMC_LIFETIME_ONEWEEK, kodi::addon::GetLocalizedString(30165));
   }
 
   /* PVR_Timer.iMaxRecordings values and presentation. */
   static std::vector<kodi::addon::PVRTypeIntValue> recordingLimitValues;
   if (recordingLimitValues.size() == 0)
   {
-    recordingLimitValues.emplace_back(WMC_LIMIT_ASMANY, kodi::GetLocalizedString(30170));
-    recordingLimitValues.emplace_back(WMC_LIMIT_1, kodi::GetLocalizedString(30171));
-    recordingLimitValues.emplace_back(WMC_LIMIT_2, kodi::GetLocalizedString(30172));
-    recordingLimitValues.emplace_back(WMC_LIMIT_3, kodi::GetLocalizedString(30173));
-    recordingLimitValues.emplace_back(WMC_LIMIT_4, kodi::GetLocalizedString(30174));
-    recordingLimitValues.emplace_back(WMC_LIMIT_5, kodi::GetLocalizedString(30175));
-    recordingLimitValues.emplace_back(WMC_LIMIT_6, kodi::GetLocalizedString(30176));
-    recordingLimitValues.emplace_back(WMC_LIMIT_7, kodi::GetLocalizedString(30177));
-    recordingLimitValues.emplace_back(WMC_LIMIT_10, kodi::GetLocalizedString(30178));
+    recordingLimitValues.emplace_back(WMC_LIMIT_ASMANY, kodi::addon::GetLocalizedString(30170));
+    recordingLimitValues.emplace_back(WMC_LIMIT_1, kodi::addon::GetLocalizedString(30171));
+    recordingLimitValues.emplace_back(WMC_LIMIT_2, kodi::addon::GetLocalizedString(30172));
+    recordingLimitValues.emplace_back(WMC_LIMIT_3, kodi::addon::GetLocalizedString(30173));
+    recordingLimitValues.emplace_back(WMC_LIMIT_4, kodi::addon::GetLocalizedString(30174));
+    recordingLimitValues.emplace_back(WMC_LIMIT_5, kodi::addon::GetLocalizedString(30175));
+    recordingLimitValues.emplace_back(WMC_LIMIT_6, kodi::addon::GetLocalizedString(30176));
+    recordingLimitValues.emplace_back(WMC_LIMIT_7, kodi::addon::GetLocalizedString(30177));
+    recordingLimitValues.emplace_back(WMC_LIMIT_10, kodi::addon::GetLocalizedString(30178));
   }
 
   /* PVR_Timer.iPreventDuplicateEpisodes values and presentation.*/
   static std::vector<kodi::addon::PVRTypeIntValue> showTypeValues;
   if (showTypeValues.size() == 0)
   {
-    showTypeValues.emplace_back(WMC_SHOWTYPE_FIRSTRUNONLY, kodi::GetLocalizedString(30150));
-    showTypeValues.emplace_back(WMC_SHOWTYPE_ANY, kodi::GetLocalizedString(30151));
-    showTypeValues.emplace_back(WMC_SHOWTYPE_LIVEONLY, kodi::GetLocalizedString(30152));
+    showTypeValues.emplace_back(WMC_SHOWTYPE_FIRSTRUNONLY, kodi::addon::GetLocalizedString(30150));
+    showTypeValues.emplace_back(WMC_SHOWTYPE_ANY, kodi::addon::GetLocalizedString(30151));
+    showTypeValues.emplace_back(WMC_SHOWTYPE_LIVEONLY, kodi::addon::GetLocalizedString(30152));
   }
 
   static std::vector<kodi::addon::PVRTypeIntValue> emptyList;
@@ -275,7 +275,7 @@ PVR_ERROR Pvr2Wmc::GetTimerTypes(std::vector<kodi::addon::PVRTimerType>& types)
             /* Attributes. */
             TIMER_MANUAL_ATTRIBS,
             /* Description. */
-            kodi::GetLocalizedString(30131), // "One time (manual)",
+            kodi::addon::GetLocalizedString(30131), // "One time (manual)",
             /* Values definitions for attributes. */
             priorityValues, _defaultPriority, lifetimeValues, _defaultLiftetime,
             recordingLimitValues, _defaultLimit, showTypeValues, _defaultShowType)));
@@ -288,7 +288,7 @@ PVR_ERROR Pvr2Wmc::GetTimerTypes(std::vector<kodi::addon::PVRTimerType>& types)
             /* Attributes. */
             TIMER_EPG_ATTRIBS,
             /* Description. */
-            kodi::GetLocalizedString(30132), // "One time (guide)",
+            kodi::addon::GetLocalizedString(30132), // "One time (guide)",
             /* Values definitions for attributes. */
             priorityValues, _defaultPriority, lifetimeValues, _defaultLiftetime,
             recordingLimitValues, _defaultLimit, showTypeValues, _defaultShowType)));
@@ -301,7 +301,7 @@ PVR_ERROR Pvr2Wmc::GetTimerTypes(std::vector<kodi::addon::PVRTimerType>& types)
             /* Attributes. */
             TIMER_KEYWORD_ATTRIBS,
             /* Description. */
-            kodi::GetLocalizedString(30133), // "One time (wishlist)"
+            kodi::addon::GetLocalizedString(30133), // "One time (wishlist)"
             /* Values definitions for attributes. */
             priorityValues, _defaultPriority, lifetimeValues, _defaultLiftetime,
             recordingLimitValues, _defaultLimit, showTypeValues, _defaultShowType)));
@@ -314,7 +314,7 @@ PVR_ERROR Pvr2Wmc::GetTimerTypes(std::vector<kodi::addon::PVRTimerType>& types)
             /* Attributes. */
             TIMER_MANUAL_ATTRIBS | TIMER_CHILD_ATTRIBUTES,
             /* Description. */
-            kodi::GetLocalizedString(30130), // "Created by Repeating Timer"
+            kodi::addon::GetLocalizedString(30130), // "Created by Repeating Timer"
             /* Values definitions for attributes. */
             priorityValues, _defaultPriority, lifetimeValues, _defaultLiftetime,
             recordingLimitValues, _defaultLimit, showTypeValues, _defaultShowType)));
@@ -327,7 +327,7 @@ PVR_ERROR Pvr2Wmc::GetTimerTypes(std::vector<kodi::addon::PVRTimerType>& types)
             /* Attributes. */
             TIMER_EPG_ATTRIBS | TIMER_CHILD_ATTRIBUTES,
             /* Description. */
-            kodi::GetLocalizedString(30130), // "Created by Repeating Timer"
+            kodi::addon::GetLocalizedString(30130), // "Created by Repeating Timer"
             /* Values definitions for attributes. */
             priorityValues, _defaultPriority, lifetimeValues, _defaultLiftetime,
             recordingLimitValues, _defaultLimit, showTypeValues, _defaultShowType)));
@@ -340,7 +340,7 @@ PVR_ERROR Pvr2Wmc::GetTimerTypes(std::vector<kodi::addon::PVRTimerType>& types)
             /* Attributes. */
             TIMER_KEYWORD_ATTRIBS | TIMER_CHILD_ATTRIBUTES,
             /* Description. */
-            kodi::GetLocalizedString(30130), // "Created by Repeating Timer"
+            kodi::addon::GetLocalizedString(30130), // "Created by Repeating Timer"
             /* Values definitions for attributes. */
             priorityValues, _defaultPriority, lifetimeValues, _defaultLiftetime,
             recordingLimitValues, _defaultLimit, showTypeValues, _defaultShowType)));
@@ -353,7 +353,7 @@ PVR_ERROR Pvr2Wmc::GetTimerTypes(std::vector<kodi::addon::PVRTimerType>& types)
             /* Attributes. */
             TIMER_MANUAL_ATTRIBS | TIMER_REPEATING_MANUAL_ATTRIBS,
             /* Description. */
-            kodi::GetLocalizedString(30134), // "Repeating (manual)"
+            kodi::addon::GetLocalizedString(30134), // "Repeating (manual)"
             /* Values definitions for attributes. */
             priorityValues, _defaultPriority, lifetimeValues, _defaultLiftetime,
             recordingLimitValues, _defaultLimit, showTypeValues, _defaultShowType)));
@@ -366,7 +366,7 @@ PVR_ERROR Pvr2Wmc::GetTimerTypes(std::vector<kodi::addon::PVRTimerType>& types)
             /* Attributes. */
             TIMER_EPG_ATTRIBS | TIMER_REPEATING_EPG_ATTRIBS,
             /* Description. */
-            kodi::GetLocalizedString(30135), // "Repeating (guide)"
+            kodi::addon::GetLocalizedString(30135), // "Repeating (guide)"
             /* Values definitions for attributes. */
             priorityValues, _defaultPriority, lifetimeValues, _defaultLiftetime,
             recordingLimitValues, _defaultLimit, showTypeValues, _defaultShowType)));
@@ -379,7 +379,7 @@ PVR_ERROR Pvr2Wmc::GetTimerTypes(std::vector<kodi::addon::PVRTimerType>& types)
             /* Attributes. */
             TIMER_KEYWORD_ATTRIBS | TIMER_REPEATING_KEYWORD_ATTRIBS,
             /* Description. */
-            kodi::GetLocalizedString(30136), // "Repeating (wishlist)"
+            kodi::addon::GetLocalizedString(30136), // "Repeating (wishlist)"
             /* Values definitions for attributes. */
             priorityValues, _defaultPriority, lifetimeValues, _defaultLiftetime,
             recordingLimitValues, _defaultLimit, showTypeValues, _defaultShowType)));
@@ -415,7 +415,7 @@ bool isServerError(std::vector<std::string> results)
       int errorID = atoi(results[2].c_str());
       if (errorID != 0)
       {
-        std::string errStr = kodi::GetLocalizedString(errorID);
+        std::string errStr = kodi::addon::GetLocalizedString(errorID);
         kodi::QueueNotification(QUEUE_ERROR, "", errStr);
       }
     }
@@ -478,7 +478,7 @@ void Pvr2Wmc::TriggerUpdates(std::vector<std::string> results)
 
       // Get localised string for this stringID
       int stringId = atoi(v[2].c_str());
-      infoStr = kodi::GetLocalizedString(stringId);
+      infoStr = kodi::addon::GetLocalizedString(stringId);
 
       // Use text from backend if stringID not found
       if (infoStr == "")
@@ -826,7 +826,7 @@ PVR_ERROR Pvr2Wmc::AddTimer(const kodi::addon::PVRTimer& timer)
           kodi::Log(ADDON_LOG_DEBUG, "timer channel changed by wmc to '%s'",
                     splitResult[1].c_str());
           // build info string and notify user of channel change
-          infoStr = kodi::GetLocalizedString(30009) + splitResult[1];
+          infoStr = kodi::addon::GetLocalizedString(30009) + splitResult[1];
           kodi::QueueNotification(QUEUE_WARNING, "", infoStr);
         }
         else if (splitResult[0] ==
@@ -835,7 +835,7 @@ PVR_ERROR Pvr2Wmc::AddTimer(const kodi::addon::PVRTimer& timer)
           kodi::Log(ADDON_LOG_DEBUG, "timer start time changed by wmc to '%s'",
                     splitResult[1].c_str());
           // build info string and notify user of time change
-          infoStr = kodi::GetLocalizedString(30010) + splitResult[1];
+          infoStr = kodi::addon::GetLocalizedString(30010) + splitResult[1];
           kodi::QueueNotification(QUEUE_WARNING, "", infoStr);
         }
         else if (splitResult[0] ==
@@ -844,7 +844,7 @@ PVR_ERROR Pvr2Wmc::AddTimer(const kodi::addon::PVRTimer& timer)
           kodi::Log(ADDON_LOG_DEBUG, "instant record end time increased by '%s' minutes",
                     splitResult[1].c_str());
           // build info string and notify user of time increase
-          infoStr = kodi::GetLocalizedString(30013) + splitResult[1] + " min";
+          infoStr = kodi::addon::GetLocalizedString(30013) + splitResult[1] + " min";
           kodi::QueueNotification(QUEUE_INFO, "", infoStr);
         }
       }
@@ -1438,7 +1438,8 @@ int Pvr2Wmc::ReadStream(unsigned char* pBuffer, unsigned int iBufferSize)
                -1) // if fileSize -1, server is reporting an 'unkown' error with the stream
       {
         kodi::QueueNotification(
-            QUEUE_ERROR, "", kodi::GetLocalizedString(30003)); // display generic error with stream
+            QUEUE_ERROR, "",
+            kodi::addon::GetLocalizedString(30003)); // display generic error with stream
         kodi::Log(ADDON_LOG_DEBUG, "live tv error, server reported error");
         _lostStream = true; // flag that stream is down
         return -1;
@@ -1449,13 +1450,14 @@ int Pvr2Wmc::ReadStream(unsigned char* pBuffer, unsigned int iBufferSize)
         _lostStream = true; // flag that stream is down
         if (currentPos == 0 && fileSize == 0) // if no data was ever read, assume no video signal
         {
-          kodi::QueueNotification(QUEUE_ERROR, "", kodi::GetLocalizedString(30004));
+          kodi::QueueNotification(QUEUE_ERROR, "", kodi::addon::GetLocalizedString(30004));
           kodi::Log(ADDON_LOG_DEBUG, "no video found for stream");
         }
         else // a mysterious reason caused timeout
         {
           kodi::QueueNotification(
-              QUEUE_ERROR, "", kodi::GetLocalizedString(30003)); // otherwise display generic error
+              QUEUE_ERROR, "",
+              kodi::addon::GetLocalizedString(30003)); // otherwise display generic error
           kodi::Log(ADDON_LOG_DEBUG, "live tv timed out, unknown reason");
         }
         return -1; // this makes xbmc call closelivestream

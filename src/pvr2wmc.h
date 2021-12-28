@@ -75,10 +75,10 @@ enum backend_status
   BACKEND_UP
 };
 
-class ATTRIBUTE_HIDDEN Pvr2Wmc : public kodi::addon::CInstancePVRClient
+class ATTR_DLL_LOCAL Pvr2Wmc : public kodi::addon::CInstancePVRClient
 {
 public:
-  Pvr2Wmc(CPvr2WmcAddon& addon, KODI_HANDLE instance, const std::string& kodiVersion);
+  Pvr2Wmc(CPvr2WmcAddon& addon, const kodi::addon::IInstanceInfo& instance);
   ~Pvr2Wmc() override = default;
 
   bool IsServerDown();

@@ -17,13 +17,14 @@
 #define DEFAULT_SIGNAL_THROTTLE 10
 #define DEFAULT_MULTI_RESUME true
 
-class ATTRIBUTE_HIDDEN CSettings
+class ATTR_DLL_LOCAL CSettings
 {
 public:
   CSettings() = default;
 
   bool Load();
-  ADDON_STATUS SetSetting(const std::string& settingName, const kodi::CSettingValue& settingValue);
+  ADDON_STATUS SetSetting(const std::string& settingName,
+                          const kodi::addon::CSettingValue& settingValue);
 
   const std::string& GetServerName() const { return _strServerName; }
   const std::string& GetClientName() const { return _strClientName; }
