@@ -105,7 +105,7 @@ enum SocketProtocol
 #endif
 };
 
-class ATTRIBUTE_HIDDEN Socket
+class ATTR_DLL_LOCAL Socket
 {
 public:
   /*!

@@ -14,12 +14,12 @@
 bool CSettings::Load()
 {
   /* Read setting "port" from settings.xml */
-  if (!kodi::CheckSettingInt("port", _port))
+  if (!kodi::addon::CheckSettingInt("port", _port))
   {
     kodi::Log(ADDON_LOG_ERROR, "Couldn't get 'port' setting, using '%i'", DEFAULT_PORT);
   }
 
-  if (kodi::CheckSettingString("host", _strServerName))
+  if (kodi::addon::CheckSettingString("host", _strServerName))
   {
     kodi::Log(ADDON_LOG_DEBUG, "Settings: host='%s', port=%i", _strServerName.c_str(), _port);
   }
@@ -28,7 +28,7 @@ bool CSettings::Load()
     kodi::Log(ADDON_LOG_ERROR, "Couldn't get 'host' setting, using '127.0.0.1'");
   }
 
-  if (!kodi::CheckSettingBoolean("wake_on_lan", _bWakeOnLAN))
+  if (!kodi::addon::CheckSettingBoolean("wake_on_lan", _bWakeOnLAN))
   {
     kodi::Log(ADDON_LOG_ERROR, "Couldn't get 'wake_on_lan' setting, using '%s'",
               DEFAULT_WAKEONLAN_ENABLE);
@@ -47,18 +47,18 @@ bool CSettings::Load()
               "Couldn't get ServerWMC MAC address from custom addondata, using empty value");
   }
 
-  if (!kodi::CheckSettingBoolean("signal", _bSignalEnable))
+  if (!kodi::addon::CheckSettingBoolean("signal", _bSignalEnable))
   {
     kodi::Log(ADDON_LOG_ERROR, "Couldn't get 'signal' setting, using '%s'", DEFAULT_SIGNAL_ENABLE);
   }
 
-  if (!kodi::CheckSettingInt("signal_throttle", _signalThrottle))
+  if (!kodi::addon::CheckSettingInt("signal_throttle", _signalThrottle))
   {
     kodi::Log(ADDON_LOG_ERROR, "Couldn't get 'signal_throttle' setting, using '%s'",
               DEFAULT_SIGNAL_THROTTLE);
   }
 
-  if (!kodi::CheckSettingBoolean("multiResume", _bEnableMultiResume))
+  if (!kodi::addon::CheckSettingBoolean("multiResume", _bEnableMultiResume))
   {
     kodi::Log(ADDON_LOG_ERROR, "Couldn't get 'multiResume' setting, using '%s'",
               DEFAULT_MULTI_RESUME);
@@ -84,7 +84,7 @@ bool CSettings::Load()
 }
 
 ADDON_STATUS CSettings::SetSetting(const std::string& settingName,
-                                   const kodi::CSettingValue& settingValue)
+                                   const kodi::addon::CSettingValue& settingValue)
 {
   std::string sName = settingName;
 

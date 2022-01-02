@@ -621,7 +621,7 @@ std::vector<std::string> Socket::GetVector(const std::string& request,
                   _client.GetSettings().GetServerMAC().c_str());
         if (_client.GetBackendStatus() != BACKEND_UNKNOWN)
         {
-          std::string infoStr = kodi::GetLocalizedString(30026);
+          std::string infoStr = kodi::addon::GetLocalizedString(30026);
           kodi::QueueNotification(QUEUE_INFO, "", infoStr); // Notify WOL is being sent
         }
         kodi::network::WakeOnLan(_client.GetSettings().GetServerMAC()); // Send WOL request
