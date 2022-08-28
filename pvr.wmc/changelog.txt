@@ -1,3 +1,7 @@
+v19.0.3
+- Translations updates from Weblate
+	- be_by, cs_cz, de_de, fi_fi, hr_hr, it_it, sk_sk
+
 v19.0.2
 - Translations updates from Weblate
 	- es_ar
