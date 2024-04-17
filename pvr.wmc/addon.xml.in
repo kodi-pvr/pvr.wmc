@@ -81,12 +81,12 @@
     <description lang="es_AR">Un cliente A PVR para interactuar con los servicios Recording &amp; EPG de Windows Media Center. Gracias a Tomba73 y Hoopsdavis. Agradecimientos especiales a DBurckh.</description>
     <description lang="es_ES">Un cliente PVR que hace de interface con los servicios de grabación y EPG de Windows Media Center. Agradecimientos a Tomba73 y Hoopsdavis. Agradecimientos especiales a DBurckh.</description>
     <description lang="es_MX">Un cliente PVR para interactuar con los servicios de Grabación y EPG de Windows Media Center. Gracias a Tomba73 y Hoopsdavis. Gracias especiales a DBurckh.</description>
-    <description lang="fi_FI">Tämä PVR-asiakasohjelma on tarkoitettu käytettäväksi yhdessä Windows Media Centerin kanssa. Kiitokset Tomba 73:lle ja Hoopsdavisille. Erityiskiitokset DBurckhille.</description>
+    <description lang="fi_FI">Tämä PVR-pääte on tarkoitettu käytettäväksi Windows Media Centerin kanssa. Kiitokset Tomba 73:lle ja Hoopsdavisille, ja erityiskiitos DBurckhille.</description>
     <description lang="fr_CA">Un client de numériscope pour interfacer avec les services d’enregistrement et de GÉP du Centre Multimédia Windows. Merci à Tomba73 et Hoopsdavis. Un grand merci à DBurckh.</description>
     <description lang="fr_FR">Un client enregistreur vidéo (PVR) s&apos;interfaçant avec les services d&apos;enregistrement et de guide électronique des programmes TV de Windows Media Center. Merci à Tomba73 et Hoopsdavis. Un merci spécial à DBurckh.</description>
     <description lang="gl_ES">Un cliente PVR para os servizos de Gravación e Guía do Windows Media Center. Grazas a Tomba73 e Hoopsdavis. Grazas especiais a DBurckh.</description>
     <description lang="he_IL">לקוח טלוויזיה חיה של Windows Media Center. תומך בהזרמת שידורים חיים והקלטות, הצגת לוח שידורים ותזמון הקלטות.</description>
-    <description lang="hr_HR">PVR klijent za povezivanje sa snimanjima i EPG uslugom Windows Media Centra.. Zahvaljujemo Tomba73 i Hoopsdavis. Posebna zahvala DBurckh.</description>
+    <description lang="hr_HR">PVR klijent za povezivanje sa snimanjima i EPG uslugom Windows Media Centra. Zahvaljujemo Tomba73 i Hoopsdavis. Posebna zahvala DBurckh.</description>
     <description lang="hu_HU">Egy PVR kliens a Windows Media Center felvételeihez és EPG szolgáltatáshoz. Köszönet: JeffreyF, Tomba73, Hoopsdavis. Különleges köszönet: DBurckh.</description>
     <description lang="id_ID">Sebuah klien PVR untuk berhubungan dengan Perekaman Windows Media Center dan layanan EPG. Terimakasih untuk Tomba73 dan Hoopsdavis. Terimakasih khusus untuk DBurckh.</description>
     <description lang="is_IS">PVR-biðlari til að tala við Windows Media Center&apos;s upptöku og rafræna dagskrárþjónustur. Þakkir fá Tomba73 og Hoopsdavis. Sérstakar þakkir fær DBurckh.</description>
@@ -138,7 +138,7 @@
     <disclaimer lang="hu_HU">Fejlesztés alatt! A saját felelősségére használja!</disclaimer>
     <disclaimer lang="id_ID">Perangkat lunak ini masih eksperimental. Resiko ditanggung penumpang.</disclaimer>
     <disclaimer lang="is_IS">Þetta er tilraunahugbúnaður. Notið á eigin ábyrgð.</disclaimer>
-    <disclaimer lang="it_IT">Prova questo software sperimentale. Usalo a tuo rischio e pericolo.</disclaimer>
+    <disclaimer lang="it_IT">Questo è un software sperimentale. Utilizzare a proprio rischio.</disclaimer>
     <disclaimer lang="ja_JP">これは実験的なソフトウェアです。利用は自己責任でお願いします。</disclaimer>
     <disclaimer lang="ko_KR">이것은 실험적인 소프트웨어 입니다. 본인의 책임하에 사용해주세요.</disclaimer>
     <disclaimer lang="lt_LT">Tai yra eksperimentinė programinė įranga. Naudodami ją prisiimate visą riziką.</disclaimer>
