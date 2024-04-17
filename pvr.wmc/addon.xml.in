@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <addon
   id="pvr.wmc"
-  version="21.0.0"
+  version="21.0.1"
   name="Windows Media Center Client"
   provider-name="KrustyReturns and scarecrow420">
   <requires>@ADDON_DEPENDS@</requires>
