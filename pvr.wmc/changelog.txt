@@ -1,3 +1,7 @@
+v21.0.2
+- Translations updates from Weblate
+	- sl_si
+
 v21.0.1
 - Translations updates from Weblate
 	- ast_es, be_by, cs_cz, de_de, es_es, fi_fi, fr_fr, hr_hr, it_it, sk_sk
