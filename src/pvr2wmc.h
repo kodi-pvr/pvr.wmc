@@ -132,17 +132,17 @@ public:
                             std::vector<kodi::addon::PVREDLEntry>& edl) override;
 
   // recording streams
-  bool OpenRecordedStream(const kodi::addon::PVRRecording& recording) override;
-  void CloseRecordedStream() override { CloseStream(); }
-  int ReadRecordedStream(unsigned char* buffer, unsigned int size) override
+  bool OpenRecordedStream(const kodi::addon::PVRRecording& recording, int64_t& streamId) override;
+  void CloseRecordedStream(int64_t streamId) override { CloseStream(); }
+  int ReadRecordedStream(int64_t streamId, unsigned char* buffer, unsigned int size) override
   {
     return ReadStream(buffer, size);
   }
-  int64_t SeekRecordedStream(int64_t position, int whence) override
+  int64_t SeekRecordedStream(int64_t streamId, int64_t position, int whence) override
   {
     return SeekStream(position, whence);
   }
-  int64_t LengthRecordedStream() override { return LengthStream(); }
+  int64_t LengthRecordedStream(int64_t streamId) override { return LengthStream(); }
 
   // live tv
   bool OpenLiveStream(const kodi::addon::PVRChannel& channel) override;

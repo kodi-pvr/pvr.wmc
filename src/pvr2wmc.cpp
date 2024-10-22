@@ -1567,7 +1567,7 @@ bool Pvr2Wmc::CloseStream(bool notifyServer /*=true*/)
     return true;
 }
 
-bool Pvr2Wmc::OpenRecordedStream(const kodi::addon::PVRRecording& recording)
+bool Pvr2Wmc::OpenRecordedStream(const kodi::addon::PVRRecording& recording, int64_t& streamId)
 {
   if (IsServerDown())
     return false;
