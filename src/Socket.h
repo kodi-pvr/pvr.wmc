@@ -33,7 +33,7 @@ typedef unsigned short port_t;
 #ifndef sa_family_t
 #define sa_family_t ADDRESS_FAMILY
 #endif
-#elif defined TARGET_LINUX || defined TARGET_DARWIN || defined TARGET_FREEBSD
+#elif defined TARGET_POSIX
 #ifdef SOCKADDR_IN
 #undef SOCKADDR_IN
 #endif
@@ -78,7 +78,7 @@ enum SocketFamily
 
 enum SocketDomain
 {
-#if defined TARGET_LINUX || defined TARGET_DARWIN || defined TARGET_FREEBSD
+#if defined TARGET_POSIX
   pf_unix = PF_UNIX,
   pf_local = PF_LOCAL,
 #endif
